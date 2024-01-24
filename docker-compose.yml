@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  tchap-bot-pantalaimon:
+    image: matrixdotorg/pantalaimon:latest
+    container_name: tchap-bot-pantalaimon
+    restart: unless-stopped
+    ports:
+      - '8008:8008'
+    volumes:
+      - ./backend-pantalaimon/conf/pantalaimon.conf:/data/pantalaimon.conf
+      - pantalaimon_data:/data
+    networks:
+      - tchap-bot-network
+
+  tchap-bot:
+    build:
+      context: ./
+      dockerfile: backend-docker/Dockerfile
+    container_name: tchap-bot
+    restart: unless-stopped
+    ports:
+      - '8083:8085'
+    networks:
+      - tchap-bot-network
+
+networks:
+  tchap-bot-network:
+
+volumes:
+  pantalaimon_data:
