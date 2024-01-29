@@ -1,12 +1,13 @@
 import db from '../models/index.js'
 
 const Webhook = db.webhook;
-const Op = db.Sequelize.Op;
+// const Op = db.Sequelize.Op;
+
 
 // Create and Save a new Webhook
 function create (req, res) {
   if (!req.body.room) {
-    res.status(400).send({
+    res.sendStatus(400).send({
       message: "Room id can not be empty!"
     });
     return;
@@ -26,9 +27,33 @@ function create (req, res) {
       res.send(data);
     })
     .catch(err => {
-      res.status(500).send({
+      res.sendStatus(500).send({
         message:
           err.message || "Some error occurred while creating webhook."
+      });
+    });
+}
+
+function destroy (req, res) {
+
+  const webhookId = req.body.webhook
+
+  return Webhook.destroy({where: {webhook_id: webhookId}})
+    .then(status => {
+      console.log(status)
+      res.status(200).json({
+        message: {
+          type: 'success',
+          title: 'Webhook supprimé',
+          description: 'Webhook supprimé avec succès (' + webhookId + ')'
+        }
+      });
+    })
+    .catch(err => {
+      console.log(err)
+      res.sendStatus(500).send({
+        message:
+          err.message || "Some error occurred while deleting webhook."
       });
     });
 }
@@ -41,7 +66,7 @@ function findAll (req, res) {
       res.send(data);
     })
     .catch(err => {
-      res.status(500).send({
+      res.sendStatus(500).send({
         message:
           err.message || "Some error occurred while retrieving webhooks."
       });
@@ -49,9 +74,9 @@ function findAll (req, res) {
 }
 
 // Retrieve all Webhooks from the database.
-function findOneWithWebhook (req, res) {
+function findOneWithWebhook (req, _res) {
 
-  return Webhook.findOne({ where: { webhook_id: req.params.webhook } })
+  return Webhook.findOne({where: {webhook_id: req.params.webhook}})
 }
 
 function generateId (length) {
@@ -66,4 +91,4 @@ function generateId (length) {
   return result;
 }
 
-export {create, findAll, findOneWithWebhook}
+export {create, findAll, findOneWithWebhook, destroy}

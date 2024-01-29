@@ -7,7 +7,7 @@ const apiPath = import.meta.env.VITE_API_ENDPOINT
 const router = useRouter()
 const {user} = useAuth()
 
-fetch(apiPath + '/logout', {
+fetch(apiPath + '/api/logout', {
   method: 'POST',
   credentials: 'include'
 }).then(res => res.json())

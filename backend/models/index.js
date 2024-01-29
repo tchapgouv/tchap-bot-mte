@@ -1,4 +1,4 @@
-import dbConfig from "../config/db.config.js";
+import dbConfig from "../configs/db.config.js";
 import Sequelize from "sequelize";
 import webhook from "./webhook.model.js"
 import user from "./user.model.js"

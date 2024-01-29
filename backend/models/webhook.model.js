@@ -1,15 +1,15 @@
-export default (sequelize, Sequelize) => {
-  const Webhook = sequelize.define("webhook", {
+import {DataTypes} from "sequelize";
+
+export default (sequelize) => {
+  return sequelize.define("webhook", {
     webhook_label: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     webhook_id: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     room_id: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
   });
-
-  return Webhook;
 };

@@ -3,13 +3,14 @@ import fetchWithError from "@/scripts/fetchWithError.js";
 
 const user = ref(null)
 const apiPath = import.meta.env.VITE_API_ENDPOINT
+const authError = ""
 
 export default () => {
 
   const useCheckAuth = async () => {
     if (user.value) return true
 
-    fetchWithError(apiPath + '/user')
+    fetchWithError(apiPath + '/api/user')
       .then(stream => stream.json())
       .then(data => {
         // if user is returned, it means that the cookie is valid,
@@ -29,6 +30,7 @@ export default () => {
 
   return {
     user,
+    authError,
     useCheckAuth
   }
 }

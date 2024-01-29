@@ -30,7 +30,7 @@ function onClick () {
 
   console.log(apiPath)
   
-  fetchWithError(apiPath + '/post/' + webhook_id.value,
+  fetchWithError(apiPath + '/api/post/' + webhook_id.value,
     {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       headers: {

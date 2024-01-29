@@ -16,7 +16,7 @@ const client = sdk.createClient({
   baseUrl: myBaseUrl, accessToken: myAccessToken, userId: myUserId, deviceId: myDeviceId, usingExternalCrypto: true
 });
 
-client.on('sync', async function (state, _prevState, _res) {
+client.on(ClientEvent.Sync, async function (state, _prevState, _res) {
   if (state === "PREPARED") {
     onPrepared()
   } else {
@@ -115,10 +115,6 @@ function onPrepared () {
   console.log("prepared");
 
   sendMessage(gmcdInfra, "Bonjour à tous, je viens de démarrer (Oui, encore...) !")
-
-  // setInterval(function () {
-  //   sendMessage(gmcdInfra, (new Date).toLocaleString())
-  // }, 5000);
 }
 
 export default client;

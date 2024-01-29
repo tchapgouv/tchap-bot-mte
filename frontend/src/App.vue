@@ -14,13 +14,13 @@ const logoText = ['Ministère', 'de la Transition', 'écologique']
 const login = {
   label: 'Se connecter',
   to: '/login',
-  icon: 'fr-icon-lock-line',
+  icon: 'ri-login-box-line',
   iconAttrs: {color: 'var(--success-425-625)'},
 }
 const logout = {
   label: 'Se déconnecter',
   to: '/logout',
-  icon: 'fr-icon-lock-unlock-line',
+  icon: 'ri-logout-box-line',
   iconAttrs: {color: 'var(--warning-425-625) !important;'},
 }
 
@@ -28,7 +28,7 @@ const quickLinks = ref([
   login
 ])
 
-watch(user, async (newUser, oldUser) => {
+watch(user, async (newUser, _oldUser) => {
   if (newUser) {
     quickLinks.value = [
       logout,
@@ -41,7 +41,7 @@ watch(user, async (newUser, oldUser) => {
       {
         label: 'Tester',
         to: '/postman',
-        icon: 'fr-icon-test-tube-line',
+        icon: 'ri-flask-line',
         iconAttrs: {color: 'var(--orange-terre-battue-sun-370-moon-672) !important;'},
       }
     ]
