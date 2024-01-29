@@ -1,7 +1,7 @@
 import db from "../models/index.js";
 
 const User = db.user;
-const Op = db.Sequelize.Op;
+// const Op = db.Sequelize.Op;
 
 // Retrieve all Webhooks from the database.
 function findAll (req, res) {

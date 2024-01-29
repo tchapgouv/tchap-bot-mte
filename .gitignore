@@ -20,6 +20,7 @@ node_modules/
 # Project
 
 .storage/
+**/database.sqlite
 
 # dotenv environment variable files
 .env
