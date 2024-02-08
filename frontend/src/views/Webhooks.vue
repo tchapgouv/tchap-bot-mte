@@ -111,7 +111,7 @@ function onClickGenerate () {
   )
     .then(stream => stream.json())
     .then(value => {
-      console.log(value)
+      // console.log(value)
       // updateList()
       router.push('/webhook/' + value.webhook_id)
     })

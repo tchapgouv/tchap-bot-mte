@@ -19,9 +19,9 @@ router.post("/api/webhook/get", verifyToken, findOneWithWebhook);
 router.put("/api/webhook/update", verifyToken, update);
 // router.post("/create", create);
 
-router.post("/api/webhook/:webhook/post", verifyToken, (req, res) => {
+router.post("/api/webhook/post", verifyToken, (req, res) => {
 
-  findOne({where: {webhook_id: req.params.webhook}}).then(data => {
+  findOne({where: {webhook_id: req.body.webhook}}).then(data => {
 
     const room_id = data.dataValues.room_id
     const script = data.dataValues.script

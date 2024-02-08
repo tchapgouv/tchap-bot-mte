@@ -108,7 +108,7 @@ function getWebhook (webhookId) {
   )
     .then(stream => stream.json())
     .then(value => {
-      console.log(value)
+      // console.log(value)
       webhook.value.label = value.webhook_label
       webhook.value.roomId = value.room_id
       webhook.value.id = value.webhook_id
@@ -159,7 +159,7 @@ function deleteWebhook () {
     }
   ).then(stream => stream.json())
     .then(value => {
-      console.log(value.message)
+      // console.log(value.message)
 
       if (value.message) {
         alerteClosed.value = false
@@ -192,7 +192,7 @@ function saveWebhook () {
     }
   ).then(stream => stream.json())
     .then(value => {
-      console.log(value.message)
+      // console.log(value.message)
 
       if (value.message) {
         alerteClosed.value = false

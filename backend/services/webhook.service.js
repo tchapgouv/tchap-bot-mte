@@ -38,8 +38,8 @@ function destroy (req, res) {
   const webhookId = req.body.webhook
 
   return Webhook.destroy({where: {webhook_id: webhookId}})
-    .then(status => {
-      console.log(status)
+    .then(_status => {
+      // console.log(status)
       res.status(200).json({
         message: {
           type: 'success',
@@ -49,7 +49,7 @@ function destroy (req, res) {
       });
     })
     .catch(err => {
-      console.log(err)
+      // console.log(err)
       res.sendStatus(500).send({
         message:
           err.message || "Some error occurred while deleting webhook."
@@ -83,7 +83,7 @@ async function update (req, res) {
     script: req.body.webhook.script,
   })
 
-  webhook.save().then(data => {
+  webhook.save().then(_data => {
     res.send({
       'message': {
         type: 'success',

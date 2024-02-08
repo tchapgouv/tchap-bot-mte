@@ -28,22 +28,23 @@ const apiPath = import.meta.env.VITE_API_ENDPOINT
 
 function onClick () {
 
-  console.log(apiPath)
+  // console.log(apiPath)
   
-  fetchWithError(apiPath + '/api/webhook/' + webhook_id.value + "/post",
+  fetchWithError(apiPath + '/api/webhook/post',
     {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        "webhook": webhook_id.value,
         "message": message.value,
       })
     }
   )
     .then(stream => stream.json())
-    .then(value => {
-      console.log(value)
+    .then(_value => {
+      // console.log(value)
     }).catch(e => console.error(e))
 }
 
