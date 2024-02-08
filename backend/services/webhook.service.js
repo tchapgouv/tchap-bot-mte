@@ -18,7 +18,6 @@ function create (req, res) {
     webhook_id: generateId(100),
     webhook_label: req.body.label,
     room_id: req.body.room,
-    // room_id: req.body.description,
   };
 
   // Save Webhook in the database
@@ -66,17 +65,68 @@ function findAll (req, res) {
       res.send(data);
     })
     .catch(err => {
-      res.sendStatus(500).send({
+      res.statusCode = 500
+      res.send({
         message:
           err.message || "Some error occurred while retrieving webhooks."
       });
     });
 }
 
-// Retrieve all Webhooks from the database.
-function findOneWithWebhook (req, _res) {
+async function update (req, res) {
 
-  return Webhook.findOne({where: {webhook_id: req.params.webhook}})
+  const webhook = await Webhook.findOne({where: {webhook_id: req.body.webhook.webhook_id}})
+
+  webhook.set({
+    webhook_label: req.body.webhook.webhook_label,
+    room_id: req.body.webhook.room_id,
+    script: req.body.webhook.script,
+  })
+
+  webhook.save().then(data => {
+    res.send({
+      'message': {
+        type: 'success',
+        title: 'Enregistrement',
+        description: 'Webhook sauvé avec succès',
+      }
+    });
+  })
+    .catch(err => {
+      res.sendStatus(500).send({
+        message:
+          err.message || "Some error occurred while saving webhook."
+      });
+    });
+}
+
+async function findOne (criteria) {
+
+  return await Webhook.findOne(criteria).then(data => {
+    return data;
+  })
+    .catch(err => {
+      return {
+        message:
+          err.message || "Some error occurred while retrieving webhook."
+      };
+    });
+}
+
+// Retrieve all Webhooks from the database.
+function findOneWithWebhook (req, res) {
+
+  console.log(req.body)
+
+  findOne({where: {webhook_id: req.body.webhook}}).then(data => {
+    res.send(data);
+  })
+    .catch(err => {
+      res.sendStatus(500).send({
+        message:
+          err.message || "Some error occurred while retrieving webhook."
+      });
+    });
 }
 
 function generateId (length) {
@@ -91,4 +141,4 @@ function generateId (length) {
   return result;
 }
 
-export {create, findAll, findOneWithWebhook, destroy}
+export {create, findAll, findOneWithWebhook, destroy, update, findOne}

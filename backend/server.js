@@ -23,13 +23,22 @@ app.use(webhookApi);
 app.use(userApi);
 app.use(authApi);
 
-db.sequelize.sync()
+await db.sequelize.sync()
   .then(() => {
     console.log("Synced db.");
   })
   .catch((err) => {
     console.log("Failed to sync db: " + err.message);
   });
+
+await db.user.findOrCreate({
+  where: {
+    username: 'thomas.bouchardon'
+  },
+  defaults: {
+    username: 'thomas.bouchardon'
+  }
+})
 
 // simple route
 app.get("/", (req, res) => {

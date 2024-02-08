@@ -4,6 +4,7 @@ import Login from "@/views/Login.vue";
 import useAuth from "@/composable/useAuth";
 import Webhooks from "@/views/Webhooks.vue";
 import Postman from "@/views/Postman.vue";
+import Webhook from "@/views/Webhook.vue";
 
 const {useCheckAuth} = useAuth()
 
@@ -14,6 +15,14 @@ const routes = [
     path: '/webhooks',
     name: 'Webhooks',
     component: Webhooks,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/webhook/:webhookId',
+    name: 'Webhook',
+    component: Webhook,
     meta: {
       requiresAuth: true
     }

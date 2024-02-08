@@ -6,9 +6,9 @@ import olm from "olm";
 global.Olm = olm
 
 const myUserId = "@bot-gmcd-developpement-durable.gouv.fr:agent.dev-durable.tchap.gouv.fr";
-const myAccessToken = "syt_Ym90LWdtY2QtZGV2ZWxvcHBlbWVudC1kdXJhYmxlLmdvdXYuZnI_AenTNNOwQUbAtstNkzlf_0JciTN";
+const myAccessToken = process.env.BOT_ACCESS_TOKEN;
 const myDeviceId = "bot-device-id"
-const myBaseUrl = "http://tchap-bot-pantalaimon:8008"
+const myBaseUrl = "http://" + process.env.PANTALAIMON_URL
 const gmcdInfra = "!pKaqgPaNhBnAvPHjjr:agent.dev-durable.tchap.gouv.fr"
 
 

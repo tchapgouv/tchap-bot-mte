@@ -17,7 +17,7 @@ RUN rm -Rf /tchap-bot-workdir/backend/static/*
 RUN cp -R /tchap-bot-workdir/frontend/dist/* /tchap-bot-workdir/backend/static/
 RUN rm -Rf /tchap-bot-workdir/frontend/*
 WORKDIR /tchap-bot-workdir/backend
-#RUN cd /tchap-bot-workdir/backend
+RUN cd /tchap-bot-workdir/backend
 RUN yarn install
 
-ENTRYPOINT ["node",  "/tchap-bot-workdir/backend/server.js"]
+ENTRYPOINT ["yarn",  "--cwd", "/tchap-bot-workdir/backend/", "start-prod"]
