@@ -21,7 +21,7 @@ const logout = {
   label: 'Se déconnecter',
   to: '/logout',
   icon: 'ri-logout-box-line',
-  iconAttrs: {color: 'var(--warning-425-625) !important;'},
+  iconAttrs: {color: 'var(--warning-425-625)'},
 }
 
 const quickLinks = ref([
@@ -42,7 +42,7 @@ watch(user, async (newUser, _oldUser) => {
         label: 'Tester',
         to: '/postman',
         icon: 'ri-flask-line',
-        iconAttrs: {color: 'var(--orange-terre-battue-sun-370-moon-672) !important;'},
+        iconAttrs: {color: 'var(--green-tilleul-verveine-sun-418-moon-817)'},
       }
     ]
   } else {

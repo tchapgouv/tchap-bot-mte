@@ -4,8 +4,9 @@
   "packageManager": "yarn@4.0.2",
   "license": "MIT",
   "scripts": {
-    "start-bot-only": "node bot.js",
-    "start": "node  --env-file=.env --env-file=.env.local server.js"
+    "start-bot-only": "node utils/bot.js",
+    "start": "node  --env-file=.env --env-file=.env.local server.js",
+    "start-prod": "node  --env-file=.env server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

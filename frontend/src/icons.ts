@@ -8,5 +8,9 @@ export {
   RiFileCopyLine,
   RiFlaskLine,
   RiLoginBoxLine,
-  RiLogoutBoxLine
+  RiLogoutBoxLine,
+  RiEditLine,
+  RiArrowGoBackLine,
+  RiDeleteBinLine,
+  RiSaveLine
 } from 'oh-vue-icons/icons/ri/index.js'
