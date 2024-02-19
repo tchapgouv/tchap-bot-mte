@@ -109,7 +109,9 @@ client.publicRooms(function (err, data) {
   console.log("Public Rooms: %s", JSON.stringify(data));
 }).catch(e => console.error(e))
 
-await client.startClient().catch(e => console.error(e))
+if (!process.env.BOTLESS) {
+  await client.startClient().catch(e => console.error(e))
+}
 
 function onPrepared () {
   console.log("prepared");

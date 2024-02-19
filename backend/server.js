@@ -41,7 +41,7 @@ await db.user.findOrCreate({
 })
 
 // simple route
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.json({message: "Welcome to the bot webhook management API."});
 });
 
