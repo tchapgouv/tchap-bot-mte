@@ -8,7 +8,9 @@
   <dsfr-input v-model="message"
               :label="'Message :'"
               :type="'text'"
-              :label-visible="true"></dsfr-input>
+              :label-visible="true"
+              :is-textarea="true"
+              rows="10"></dsfr-input>
 
   <br/>
 
@@ -20,6 +22,7 @@
 <script setup>
 
 import fetchWithError from "@/scripts/fetchWithError";
+import {DsfrInput} from "@gouvminint/vue-dsfr";
 
 
 const webhook_id = ref('');
