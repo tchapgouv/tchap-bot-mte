@@ -116,7 +116,7 @@ if (!process.env.BOTLESS) {
 function onPrepared () {
   console.log("prepared");
 
-  sendMessage(gmcdInfra, "Bonjour à tous, je viens de démarrer (Oui, encore...) !")
+  sendMessage(gmcdInfra, "Bonjour à tous, je viens de redémarrer (Oui, encore...) !")
 }
 
 export default client;
