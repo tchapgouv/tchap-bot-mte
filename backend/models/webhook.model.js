@@ -11,5 +11,8 @@ export default (sequelize) => {
     room_id: {
       type: DataTypes.STRING
     },
+    script: {
+      type: DataTypes.STRING
+    },
   });
 };

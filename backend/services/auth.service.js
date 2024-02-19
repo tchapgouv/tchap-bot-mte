@@ -60,6 +60,9 @@ export async function getUserFromToken (token) {
 
 export async function ldapAuth (username, password) {
 
+  console.log(process.env.LDAP_URI)
+  console.log(process.env.BASE_DN)
+
   const client = ldap.createClient({
     url: process.env.LDAP_URI,
     baseDN: process.env.BASE_DN

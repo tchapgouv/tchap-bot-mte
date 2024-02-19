@@ -8,7 +8,9 @@
   <dsfr-input v-model="message"
               :label="'Message :'"
               :type="'text'"
-              :label-visible="true"></dsfr-input>
+              :label-visible="true"
+              :is-textarea="true"
+              rows="10"></dsfr-input>
 
   <br/>
 
@@ -20,6 +22,7 @@
 <script setup>
 
 import fetchWithError from "@/scripts/fetchWithError";
+import {DsfrInput} from "@gouvminint/vue-dsfr";
 
 
 const webhook_id = ref('');
@@ -28,22 +31,23 @@ const apiPath = import.meta.env.VITE_API_ENDPOINT
 
 function onClick () {
 
-  console.log(apiPath)
+  // console.log(apiPath)
   
-  fetchWithError(apiPath + '/api/post/' + webhook_id.value,
+  fetchWithError(apiPath + '/api/webhook/post',
     {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        "webhook": webhook_id.value,
         "message": message.value,
       })
     }
   )
     .then(stream => stream.json())
-    .then(value => {
-      console.log(value)
+    .then(_value => {
+      // console.log(value)
     }).catch(e => console.error(e))
 }
 

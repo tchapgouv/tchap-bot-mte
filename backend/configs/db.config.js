@@ -3,7 +3,7 @@ export default {
   USER: "root",
   PASSWORD: "123456",
   DB: "tchap-bot-webhooks",
-  storage: 'database.sqlite',
+  storage: '/tchap-bot-workdir/data/database.sqlite',
   dialect: "sqlite",
   pool: {
     max: 5,

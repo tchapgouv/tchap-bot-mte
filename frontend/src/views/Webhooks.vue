@@ -61,6 +61,9 @@
 <script setup>
 import {DsfrButton, DsfrInput} from "@gouvminint/vue-dsfr";
 import fetchWithError from "@/scripts/fetchWithError.js";
+import {useRouter} from "vue-router";
+
+const router = useRouter()
 
 const hookLabel = ref('Webhook infra');
 const roomId = ref('!pKaqgPaNhBnAvPHjjr:agent.dev-durable.tchap.gouv.fr');
@@ -80,7 +83,6 @@ const modalDeleteText = ref('')
 const modalDeleteOpened = ref(false)
 const modalDeleteActions = ref([])
 
-
 onMounted(() => {
   updateList()
 })
@@ -95,7 +97,7 @@ function closeCopyModal () {
 
 function onClickGenerate () {
 
-  fetchWithError(apiPath + '/api/create',
+  fetchWithError(apiPath + '/api/webhook/create',
     {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       headers: {
@@ -109,15 +111,16 @@ function onClickGenerate () {
   )
     .then(stream => stream.json())
     .then(value => {
-      console.log(value)
-      updateList()
+      // console.log(value)
+      // updateList()
+      router.push('/webhook/' + value.webhook_id)
     })
 }
 
 function updateList () {
-  fetchWithError(apiPath + '/api/getall',
+  fetchWithError(apiPath + '/api/webhook/list',
     {
-      method: "GET", // *GET, POST, PUT, DELETE, etc.
+      method: "GET",
     }
   )
     .then(stream => stream.json())
@@ -134,72 +137,15 @@ function updateList () {
           row.room_id,
           {
             component: DsfrButton,
-            label: "Supprimer",
+            label: "Éditer",
             iconOnly: true,
-            onClick: () => confirmDeleteWebhook(row.webhook_id, row.webhook_label),
-            icon: "fr-icon-delete-line"
+            onClick: () => router.push('/webhook/' + row.webhook_id),
+            icon: "fr-icon-edit-line"
           }]);
-    })
-
-  fetchWithError(apiPath + '/api/user',
-    {
-      method: "GET", // *GET, POST, PUT, DELETE, etc.
-    }
-  )
-}
-
-function cancelDeleteWebhook () {
-  modalDeleteOpened.value = false
-  modalDeleteText.value = ''
-  modalDeleteActions.value = []
-}
-
-function confirmDeleteWebhook (webhook_id, label) {
-  modalDeleteText.value = label
-  modalDeleteOpened.value = true
-  modalDeleteActions.value = [
-    {
-      "label": "Confirmer",
-      onClick: () => deleteWebhook(webhook_id)
-    },
-    {
-      "label": "Annuler",
-      onClick: () => cancelDeleteWebhook(),
-      "secondary": true
-    }
-  ]
-}
-
-function deleteWebhook (webhook_id) {
-  fetchWithError(apiPath + '/api/webhook/delete/',
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        "webhook": webhook_id,
-      })
-    }
-  ).then(stream => stream.json())
-    .then(value => {
-      console.log(value.message)
-
-      if (value.message) {
-        alerteClosed.value = false
-        alerteType.value = value.message.type
-        alerteTitle.value = value.message.title
-        alerteDescription.value = value.message.description
-      }
-
-      cancelDeleteWebhook()
-      updateList()
     })
 }
 
 function copyWebhook (webhookId) {
-
-  console.log("toto")
 
   if (navigator.clipboard) {
     navigator.clipboard.writeText(webhookId);
