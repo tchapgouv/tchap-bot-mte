@@ -1,10 +1,12 @@
 import express from 'express';
+import https from 'https';
+import fs from 'fs';
 import db from './models/index.js'
 import webhookApi from './routes/webhook.routes.js';
 import userApi from './routes/user.routes.js';
 import authApi from './routes/auth.routes.js';
 import cors from 'cors';
-
+import logger from "./utils/logger.js";
 
 const app = express()
 const vuePath = "./static"
@@ -45,8 +47,32 @@ app.get("/api", (req, res) => {
   res.json({message: "Welcome to the bot webhook management API."});
 });
 
-// set port, listen for requests
 const PORT = process.env.PORT || 8085;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
+
+try {
+
+  logger.info("Starting express in http mod.")
+
+  const privateKey = fs.readFileSync('/etc/certs/tchap-bot.mel.e2.rie.gouv.fr-key.pem', 'utf8');
+  const certificate = fs.readFileSync('/etc/certs/tchap-bot.mel.e2.rie.gouv.fr-cert.pem', 'utf8');
+
+  const credentials = {key: privateKey, cert: certificate};
+
+  const httpsServer = https.createServer(credentials, app);
+
+  httpsServer.listen(PORT, () => {
+    console.log(`Server is running https on port ${PORT}.`);
+  });
+
+} catch (error) {
+
+  logger.error("Error during https startup !")
+  logger.error(error)
+  logger.info("Starting express in http mod.")
+
+  app.listen(PORT, () => {
+    logger.info(`Server is running http on port ${PORT}.`);
+  });
+
+}
+

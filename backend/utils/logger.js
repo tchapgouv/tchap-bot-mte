@@ -1,28 +1,28 @@
 const logger = {}
 
 logger.emergency = function (...data) {
-  if (getLogLevel() <= 1) console.log("[EMERGENCY] ", data)
+  if (getLogLevel() >= 1) console.log("[EMERGENCY] ", data)
 }
 logger.alert = function alert (...data) {
-  if (getLogLevel() <= 2) console.log("[ALERT] ", data)
+  if (getLogLevel() >= 2) console.log("[ALERT]     ", data)
 }
 logger.critical = function critical (...data) {
-  if (getLogLevel() <= 3) console.log("[CRITICAL] ", data)
+  if (getLogLevel() >= 3) console.log("[CRITICAL]  ", data)
 }
 logger.error = function error (...data) {
-  if (getLogLevel() <= 4) console.log("[ERROR] ", data)
+  if (getLogLevel() >= 4) console.log("[ERROR]     ", data)
 }
 logger.warning = function warning (...data) {
-  if (getLogLevel() <= 5) console.log("[WARNING] ", data)
+  if (getLogLevel() >= 5) console.log("[WARNING]   ", data)
 }
 logger.notice = function notice (...data) {
-  if (getLogLevel() <= 6) console.log("[NOTICE] ", data)
+  if (getLogLevel() >= 6) console.log("[NOTICE]    ", data)
 }
 logger.info = function info (...data) {
-  if (getLogLevel() <= 7) console.log("[INFO] ", data)
+  if (getLogLevel() >= 7) console.log("[INFO]      ", data)
 }
 logger.debug = function debug (...data) {
-  if (getLogLevel() <= 8) console.log("[DEBUG] ", data)
+  if (getLogLevel() >= 8) console.log("[DEBUG]     ", data)
 }
 
 function getLogLevel () {
