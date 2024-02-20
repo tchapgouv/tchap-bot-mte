@@ -115,8 +115,12 @@ if (!process.env.BOTLESS) {
 
 function onPrepared () {
   console.log("prepared");
+  const start = ['Bonjour à tous', 'Bonjour', 'Salut', 'Hello'];
+  const startLength = start.length
+  const end = ['.', ' !', ', me revoilà.', '. Je viens de redémarrer ¯\\_(ツ)_/¯', ', encore =)'];
+  const endLength = end.length
 
-  sendMessage(gmcdInfra, "Bonjour à tous, je viens de redémarrer (Oui, encore...) !")
+  sendMessage(gmcdInfra, start[Math.floor(Math.random() * startLength)] + end[Math.floor(Math.random() * endLength)])
 }
 
 export default client;
