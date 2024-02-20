@@ -53,8 +53,8 @@ try {
 
   logger.info("Starting express in http mod.")
 
-  const privateKey = fs.readFileSync('/etc/certs/tchap-bot.mel.e2.rie.gouv.fr-key.pem', 'utf8');
-  const certificate = fs.readFileSync('/etc/certs/tchap-bot.mel.e2.rie.gouv.fr-cert.pem', 'utf8');
+  const privateKey = fs.readFileSync('/etc/certs/tchap-bot.mel.edcs.fr-key.pem', 'utf8');
+  const certificate = fs.readFileSync('/etc/certs/tchap-bot.mel.edcs.fr-cert.pem', 'utf8');
 
   const credentials = {key: privateKey, cert: certificate};
 
