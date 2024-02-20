@@ -5,17 +5,36 @@
               :type="'text'"
               :label-visible="true"></dsfr-input>
   <br/>
-  <dsfr-input v-model="message"
-              :label="'Message :'"
-              :type="'text'"
-              :label-visible="true"
-              :is-textarea="true"
-              rows="10"></dsfr-input>
 
-  <br/>
+  <div style="padding-bottom: 2em;">
+    <div style="width: 49%; float: left;">
+
+      <dsfr-input v-model="message"
+                  :label="'Message :'"
+                  :type="'text'"
+                  :label-visible="true"
+                  :is-textarea="true"
+                  rows="10"/>
+    </div>
+    <div style="width: 49%; float: left; margin-left:2%">
+
+      <dsfr-input :label="'Charge utile (endpoint : /api/webhook/post) :'"
+                  :type="'text'"
+                  :model-value="
+              '{\n' +  
+              '   message: &quot;' + message + '&quot;,\n' +
+              '   webhook: &quot;' + webhook_id + '&quot;\n' +
+              '}'"
+                  :label-visible="true"
+                  :is-textarea="true"
+                  disabled="disabled"
+                  rows="10"/>
+    </div>
+    <div style="clear: both"/>
+  </div>
 
   <dsfr-button :label="'Envoyer'"
-               @click="onClick"></dsfr-button>
+               @click="onClick"/>
   <br/>
 
 </template>
@@ -32,7 +51,7 @@ const apiPath = import.meta.env.VITE_API_ENDPOINT
 function onClick () {
 
   // console.log(apiPath)
-  
+
   fetchWithError(apiPath + '/api/webhook/post',
     {
       method: "POST", // *GET, POST, PUT, DELETE, etc.

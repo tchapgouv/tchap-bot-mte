@@ -51,7 +51,7 @@ const PORT = process.env.PORT || 8085;
 
 try {
 
-  logger.info("Starting express in http mod.")
+  logger.info("Starting express in https mod.")
 
   const privateKey = fs.readFileSync('/etc/certs/tchap-bot.mel.edcs.fr-key.pem', 'utf8');
   const certificate = fs.readFileSync('/etc/certs/tchap-bot.mel.edcs.fr-cert.pem', 'utf8');
@@ -73,6 +73,5 @@ try {
   app.listen(PORT, () => {
     logger.info(`Server is running http on port ${PORT}.`);
   });
-
 }
 
