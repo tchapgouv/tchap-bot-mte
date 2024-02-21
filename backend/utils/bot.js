@@ -93,13 +93,16 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
       parseMessageToSelf(event)
     }
 
-    addEmoji(event, ":wave:")
+    if (event.getRoomId() in [gmcdInfra]) {
+      addEmoji(event, ":wave:")
+    }
   }
 });
 
-function addEmoji(event, emoji) {
-  const room = event.getRoomId()
+function addEmoji (event, emoji) {
   const threadId = event.getThread().id
+  const room = event.getRoomId()
+
   client.sendEmoteMessage(room, threadId, emoji).catch(e => logger.error(e));
 }
 
