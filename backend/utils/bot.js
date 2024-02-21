@@ -92,8 +92,16 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
     if (isSelfMentionned && isNewMessage) {
       parseMessageToSelf(event)
     }
+
+    addEmoji(event, ":wave:")
   }
 });
+
+function addEmoji(event, emoji) {
+  const room = event.getRoomId()
+  const threadId = event.getThread().id
+  client.sendEmoteMessage(room, threadId, emoji).catch(e => logger.error(e));
+}
 
 function sendMessage (room, message) {
 
