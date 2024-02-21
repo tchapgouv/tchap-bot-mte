@@ -2,7 +2,6 @@ import * as sdk from "matrix-js-sdk";
 import {ClientEvent, RoomEvent, RoomMemberEvent} from "matrix-js-sdk";
 import olm from "olm";
 import logger from "./logger.js";
-import {EventType, MsgType} from "matrix-js-sdk/src/@types/event.js";
 
 // noinspection JSUnresolvedReference
 global.Olm = olm
@@ -103,11 +102,11 @@ function addEmoji (event, emoji) {
 
   const content = {
     "body": emoji,
-    "msgtype": MsgType.Emote,
+    "msgtype": "m.emote",
     "m.relates_to": event.getId(),
   };
 
-  client.sendEvent(room, EventType.Reaction, content).then((res) => {
+  client.sendEvent(room, "m.reaction", content).then((res) => {
     logger.debug(res);
   }).catch(e => logger.error(e));
 }
@@ -117,9 +116,9 @@ function sendMessage (room, message) {
 
   const content = {
     "body": message,
-    "msgtype": MsgType.Text,
+    "msgtype": "m.text",
   };
-  client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
+  client.sendEvent(room, "m.room.message", content).then((res) => {
     logger.debug(res);
   }).catch(e => logger.error(e));
 
