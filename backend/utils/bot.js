@@ -120,7 +120,7 @@ function onPrepared () {
   const end = ['.', ' !', ', me revoilà.', '. Je viens de redémarrer ¯\\_(ツ)_/¯', ', encore =)'];
   const endLength = end.length
 
-  sendMessage(gmcdInfra, start[Math.floor(Math.random() * startLength)] + end[Math.floor(Math.random() * endLength)])
+  sendMessage(gmcdInfra, "(Prepared) " + start[Math.floor(Math.random() * startLength)] + end[Math.floor(Math.random() * endLength)])
 }
 
 export default client;
