@@ -91,7 +91,7 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
       parseMessageToSelf(event)
     }
 
-    if (event.getRoomId() in [gmcdInfra]) {
+    if ([gmcdInfra].indexOf(event.getRoomId()) > -1) {
       addEmoji(event, ":wave:")
     }
   }
