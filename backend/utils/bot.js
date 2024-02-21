@@ -103,8 +103,8 @@ function addEmoji (event, emoji) {
   const threadId = event.getThread().id
   const room = event.getRoomId()
 
-  client.sendEmoteMessage(room, threadId, emoji, (err, _res) => {
-    logger.error(err);
+  client.sendEmoteMessage(room, threadId, emoji).then((res) => {
+    logger.debug(res);
   }).catch(e => logger.error(e));
 }
 
@@ -114,8 +114,8 @@ function sendMessage (room, message) {
   const content = {
     body: message, msgtype: "m.text",
   };
-  client.sendEvent(room, "m.room.message", content, "", (err, _res) => {
-    logger.error(err);
+  client.sendEvent(room, "m.room.message", content).then((res) => {
+    logger.debug(res);
   }).catch(e => logger.error(e));
 
 }
