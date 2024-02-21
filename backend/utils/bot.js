@@ -1,6 +1,7 @@
 import * as sdk from "matrix-js-sdk";
 import {ClientEvent, RoomEvent, RoomMemberEvent} from "matrix-js-sdk";
 import olm from "olm";
+import logger from "./logger.js";
 
 // noinspection JSUnresolvedReference
 global.Olm = olm
@@ -20,21 +21,21 @@ client.on(ClientEvent.Sync, async function (state, _prevState, _res) {
   if (state === "PREPARED") {
     onPrepared()
   } else {
-    // console.log(state);
+    // logger.debug(state);
   }
 });
 
 // Listen for low-level MatrixEvents
 client.on(ClientEvent.Event, function (event) {
-  console.log(event.getType());
+  logger.debug(event.getType());
 });
 
 // Listen for typing changes
 client.on(RoomMemberEvent.Typing, function (event, member) {
   if (member.typing) {
-    console.log(member.name + " is typing...");
+    logger.debug(member.name + " is typing...");
   } else {
-    console.log(member.name + " stopped typing.");
+    logger.debug(member.name + " stopped typing.");
   }
 });
 
@@ -42,22 +43,22 @@ client.on(RoomMemberEvent.Typing, function (event, member) {
 client.on(RoomMemberEvent.Membership, function (event, member) {
   if (member.membership === "invite" && member.userId === myUserId) {
     client.joinRoom(member.roomId).then(function () {
-      console.log("Auto-joined %s", member.roomId);
+      logger.notice("Auto-joined %s", member.roomId);
     });
   }
 });
 
 function parseMessageToSelf (event) {
 
-  console.log("parseMessageToSelf()")
-  console.log(event.event)
-  console.log(event.event.content)
-  console.log(event.event.content?.body.toLowerCase())
+  logger.debug("parseMessageToSelf()")
+  logger.debug(event.event)
+  logger.debug(event.event.content)
+  logger.debug(event.event.content?.body.toLowerCase())
 
   if (event.event.content?.body && event.event.content.body.toLowerCase().includes("oust")) {
-    console.log("Someone dismissed me :(")
+    logger.warning("Someone dismissed me :(")
     sendMessage(event.event.room_id, "Au revoir ! 😭")
-    client.leave(event.event.room_id).catch(e => console.error(e));
+    client.leave(event.event.room_id).catch(e => logger.error(e));
     return
   }
 
@@ -66,27 +67,27 @@ function parseMessageToSelf (event) {
 
 // Listen to messages
 client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
-  console.log("-------------------------------------------------------")
-  console.log(event.getType())
+  logger.debug("-------------------------------------------------------")
+  logger.debug(event.getType())
 
 
   if (event.getType() === "m.room.message") {
 
     if (event.sender.userId === myUserId) {
-      console.log("Message is mine")
+      logger.info("Message is mine")
       return
     }
 
-    console.log(event);
+    logger.debug(event);
 
     const isSelfMentionned = event.getContent()["m.mentions"]?.user_ids?.indexOf(myUserId) > -1
-    console.log("Is self mentioned ?")
-    console.log(isSelfMentionned)
-    console.log("sender :")
-    console.log(event.getSender())
-    console.log("event age = " + event.event.unsigned?.age)
+    logger.debug("Is self mentioned ?")
+    logger.debug(isSelfMentionned)
+    logger.debug("sender :")
+    logger.debug(event.getSender())
+    logger.debug("event age = " + event.event.unsigned?.age)
     const isNewMessage = event.event.unsigned?.age && event.event.unsigned.age < 10 * 1000
-    console.log("isNewMessage ? " + isNewMessage)
+    logger.debug("isNewMessage ? " + isNewMessage)
 
     if (isSelfMentionned && isNewMessage) {
       parseMessageToSelf(event)
@@ -100,21 +101,21 @@ function sendMessage (room, message) {
     body: message, msgtype: "m.text",
   };
   client.sendEvent(room, "m.room.message", content, "", (err, _res) => {
-    console.log(err);
-  }).catch(e => console.error(e));
+    logger.error(err);
+  }).catch(e => logger.error(e));
 
 }
 
 client.publicRooms(function (err, data) {
-  console.log("Public Rooms: %s", JSON.stringify(data));
-}).catch(e => console.error(e))
+  logger.debug("Public Rooms: %s", JSON.stringify(data));
+}).catch(e => logger.error(e))
 
 if (!process.env.BOTLESS) {
-  await client.startClient().catch(e => console.error(e))
+  await client.startClient().catch(e => logger.error(e))
 }
 
 function onPrepared () {
-  console.log("prepared");
+  logger.debug("prepared");
   const start = ['Bonjour à tous', 'Bonjour', 'Salut', 'Hello'];
   const startLength = start.length
   const end = ['.', ' !', ', me revoilà.', '. Je viens de redémarrer ¯\\_(ツ)_/¯', ', encore =)'];

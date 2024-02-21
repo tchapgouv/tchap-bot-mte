@@ -27,10 +27,10 @@ app.use(authApi);
 
 await db.sequelize.sync()
   .then(() => {
-    console.log("Synced db.");
+    logger.notice("Synced db.");
   })
   .catch((err) => {
-    console.log("Failed to sync db: " + err.message);
+    logger.error("Failed to sync db: " + err.message);
   });
 
 await db.user.findOrCreate({
@@ -61,17 +61,17 @@ try {
   const httpsServer = https.createServer(credentials, app);
 
   httpsServer.listen(PORT, () => {
-    console.log(`Server is running https on port ${PORT}.`);
+    logger.notice(`Server is running https on port ${PORT}.`);
   });
 
 } catch (error) {
 
   logger.error("Error during https startup !")
   logger.error(error)
-  logger.info("Starting express in http mod.")
+  logger.notice("Starting express in http mod.")
 
   app.listen(PORT, () => {
-    logger.info(`Server is running http on port ${PORT}.`);
+    logger.notice(`Server is running http on port ${PORT}.`);
   });
 }
 

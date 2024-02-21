@@ -16,7 +16,7 @@ export async function getAllUsers () {
       })
     })
     .catch(err => {
-      console.log(err)
+      logger.error(err)
     });
 }
 
@@ -36,7 +36,7 @@ export async function verifyJwt (token) {
     user = users.find(u => u.username === decoded.uid[0]);
   })
 
-  logger.debug("User found : ", user)
+  logger.notice("User found : ", user)
 
   return user
 }
@@ -60,8 +60,8 @@ export async function getUserFromToken (token) {
 
 export async function ldapAuth (username, password) {
 
-  console.log(process.env.LDAP_URI)
-  console.log(process.env.BASE_DN)
+  logger.debug(process.env.LDAP_URI)
+  logger.debug(process.env.BASE_DN)
 
   const client = ldap.createClient({
     url: process.env.LDAP_URI,
@@ -77,31 +77,34 @@ export async function ldapAuth (username, password) {
       scope: 'sub'
     };
 
-    console.log("Search DN for " + username)
+    logger.notice("Search DN for " + username)
     let userCount = 0;
 
     client.search(process.env.BASE_DN, opts, (err, res) => {
 
       res.on('searchRequest', (searchRequest) => {
-        console.log('searchRequest: ', searchRequest.messageId);
+        logger.debug('searchRequest: ', searchRequest.messageId);
       });
       res.on('searchReference', (referral) => {
-        console.log('referral: ' + referral.uris.join());
+        logger.debug('referral: ' + referral.uris.join());
       });
       res.on('error', (err) => {
         console.error('error: ' + err.message);
       });
       res.on('end', (result) => {
-        console.log('status: ' + result.status);
-        if (userCount === 0) reject({message: "Not found."})
+        logger.debug('status: ' + result.status);
+        if (userCount === 0) {
+          logger.alert(username + " : Not found.")
+          reject({message: "Not found."})
+        }
       });
 
       res.on('searchEntry', (entry) => {  // There was a match.
 
-        console.log('searchEntry: ');
+        logger.debug('searchEntry: ');
         userCount++
 
-        // console.log('entry: ' + JSON.stringify(entry.pojo));
+        // logger.debug('entry: ' + JSON.stringify(entry.pojo));
         const user = {}
         user.dn = entry.pojo.objectName
 
@@ -109,23 +112,23 @@ export async function ldapAuth (username, password) {
           user[entry.pojo.attributes[attribute].type] = entry.pojo.attributes[attribute].values
         }
 
-        console.log(user)
-        console.log("Binding " + user.dn)
+        logger.debug(user)
+        logger.debug("Binding " + user.dn)
         client.bind(user.dn, password, (error, _response) => {
 
-          // console.log(response)
+          // logger.debug(response)
 
           if (error) {
 
             client.unbind(() => {
-              console.log('Disconnecting.');
+              logger.debug('Disconnecting.');
             });
-            console.error("LDAP binding failed.")
+            logger.alert("LDAP binding failed.")
             reject({message: error.lde_message})
 
           } else {
 
-            console.log("Logged in")
+            logger.notice(username + " : Logged in")
             resolve(user)
 
           }

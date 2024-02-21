@@ -117,7 +117,7 @@ async function findOne (criteria) {
 // Retrieve all Webhooks from the database.
 function findOneWithWebhook (req, res) {
 
-  console.log(req.body)
+  // console.log(req.body)
 
   findOne({where: {webhook_id: req.body.webhook}}).then(data => {
     res.send(data);
