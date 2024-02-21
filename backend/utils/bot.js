@@ -66,6 +66,7 @@ function parseMessageToSelf (event) {
 function sayGoodbyIfNecessary (event) {
   const message = event.event.content?.body.toLowerCase()
   if (/.*(bonne soirée|[aà] demain|bon we|bonsoir).*/i.test(message)) {
+    logger.debug("Saying goodbye.")
     addEmoji(event, ":wave:");
   }
 }
