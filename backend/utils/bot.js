@@ -81,13 +81,11 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
     logger.debug(event);
 
     const isSelfMentionned = event.getContent()["m.mentions"]?.user_ids?.indexOf(myUserId) > -1
-    logger.debug("Is self mentioned ?")
-    logger.debug(isSelfMentionned)
-    logger.debug("sender :")
-    logger.debug(event.getSender())
-    logger.debug("event age = " + event.event.unsigned?.age)
+    logger.debug("Is self mentioned ? ", isSelfMentionned)
+    logger.debug("sender = ", event.getSender())
+    logger.debug("event age = ", event.event.unsigned?.age)
     const isNewMessage = event.event.unsigned?.age && event.event.unsigned.age < 10 * 1000
-    logger.debug("isNewMessage ? " + isNewMessage)
+    logger.debug("isNewMessage ? ", +isNewMessage)
 
     if (isSelfMentionned && isNewMessage) {
       parseMessageToSelf(event)
@@ -100,13 +98,18 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
 });
 
 function addEmoji (event, emoji) {
+  logger.debug("Sending emoji : ", emoji)
+
   const threadId = event.getThread().id
   const room = event.getRoomId()
 
-  client.sendEmoteMessage(room, threadId, emoji).catch(e => logger.error(e));
+  client.sendEmoteMessage(room, threadId, emoji, (err, _res) => {
+    logger.error(err);
+  }).catch(e => logger.error(e));
 }
 
 function sendMessage (room, message) {
+  logger.debug("Sending message : ", message)
 
   const content = {
     body: message, msgtype: "m.text",
