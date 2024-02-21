@@ -50,10 +50,8 @@ client.on(RoomMemberEvent.Membership, function (event, member) {
 
 function parseMessageToSelf (event) {
 
-  logger.debug("parseMessageToSelf()")
-  logger.debug(event.event)
-  logger.debug(event.event.content)
-  logger.debug(event.event.content?.body.toLowerCase())
+  logger.debug("Parsing Message To Self")
+  // logger.debug(event.event.content?.body.toLowerCase())
 
   if (event.event.content?.body && event.event.content.body.toLowerCase().includes("oust")) {
     logger.warning("Someone dismissed me :(")
@@ -65,11 +63,19 @@ function parseMessageToSelf (event) {
   sendMessage(gmcdInfra, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }
 
+function sayGoodbyIfNecessary (event) {
+  const message = event.event.content?.body.toLowerCase()
+  if (/.*(bonne soirée|[aà] demain|bon we|bonsoir).*/i.test(message)) {
+    addEmoji(event, ":wave:");
+  }
+}
+
 // Listen to messages
 client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
   logger.debug("-------------------------------------------------------")
-  logger.debug(event.getType())
-  logger.debug(event);
+  logger.debug("Event type : ", event.getType())
+  logger.debug("Event :", event);
+  logger.debug("Event content :", event.event.content)
 
   if (event.getType() === "m.room.message") {
 
@@ -85,12 +91,15 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
     const isNewMessage = event.event.unsigned?.age && event.event.unsigned.age < 10 * 1000
     logger.debug("isNewMessage ? ", +isNewMessage)
 
-    if (isSelfMentionned && isNewMessage) {
-      parseMessageToSelf(event)
-    }
+    if (isNewMessage) {
 
-    if ([gmcdInfra].indexOf(event.getRoomId()) > -1) {
-      addEmoji(event, ":wave:")
+      if (isSelfMentionned) {
+        parseMessageToSelf(event)
+      }
+
+      if ([gmcdInfra].indexOf(event.getRoomId()) > -1) {
+        sayGoodbyIfNecessary(event)
+      }
     }
   }
 });
@@ -102,9 +111,9 @@ function addEmoji (event, emoji) {
 
   const content = {
     "m.relates_to": {
-      "event_id":event.getId(),
-      "key":"👍️",
-      "rel_type":"m.annotation"
+      "event_id": event.getId(),
+      "key": emoji,
+      "rel_type": "m.annotation"
     },
   };
 
