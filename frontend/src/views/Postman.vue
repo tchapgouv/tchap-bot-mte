@@ -33,6 +33,13 @@
     <div style="clear: both"/>
   </div>
 
+  <p style="line-break: anywhere">
+    E.g. :
+    <br/>
+    {{
+      'curl -d \'{"message":"' + message.replace("\"", "\\\"").replace("\'", "\'\\\'\'") + '", "webhook":"' + webhook_id + '"}\' -H "Content-Type: application/json" -X POST https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post'
+    }} </p>
+
   <dsfr-button :label="'Envoyer'"
                @click="onClick"/>
   <br/>
@@ -43,10 +50,15 @@
 import fetchWithError from "@/scripts/fetchWithError";
 import {DsfrInput} from "@gouvminint/vue-dsfr";
 
+const route = useRoute()
 
 const webhook_id = ref('');
 const message = ref('Coucou ! Message envoyé avec un webhook =)');
 const apiPath = import.meta.env.VITE_API_ENDPOINT
+
+onMounted(() => {
+  webhook_id.value = route.params.webhookId
+})
 
 function onClick () {
 

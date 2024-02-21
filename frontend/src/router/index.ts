@@ -28,7 +28,7 @@ const routes = [
     }
   },
   {
-    path: '/postman',
+    path: '/postman/:webhookId?',
     name: 'Postman',
     component: Postman,
     meta: {

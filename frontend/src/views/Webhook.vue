@@ -53,8 +53,11 @@
                  :icon="'ri-save-line'"
                  @click="saveWebhook"/>
     <dsfr-button :label="'Supprimer'"
-                 :icon="'ri-delete-bin-line'"
+                 :icon="{name: 'ri-delete-bin-line', fill: 'var(--red-marianne-main-472)'}"
                  @click="confirmDeleteWebhook"/>
+    <dsfr-button :label="'Tester'"
+                 :icon="{name: 'ri-flask-line', fill: 'var(--yellow-moutarde-sun-348-moon-860)'}"
+                 @click="router.push('/postman/' + webhook.id)"/>
   </dsfr-button-group>
 </template>
 

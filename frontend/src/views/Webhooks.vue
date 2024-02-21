@@ -9,7 +9,7 @@
              @close="close"/>
 
   <h1 style="margin-top: 1em;">Webhooks</h1>
-  
+
   <h4 style="margin-top: 1em;">Générer un Webhook</h4>
 
   <dsfr-input v-model="hookLabel"
@@ -30,10 +30,10 @@
               :headers="['Label', 'Webhook', 'Room Id', 'Action']"
               :rows="webhookList"
               v-if="webhookList.length > 0"
-  style="margin-top: 2em;"/>
+              style="margin-top: 2em;"/>
 
   <br/>
-  
+
   <DsfrModal :opened="modalCopyOpened"
              :is-alert="true"
              :icon="'fr-icon-anchor-fill'"
@@ -45,7 +45,6 @@
              :is-alert="true"
              :icon="'fr-icon-anchor-fill'"
              :title="'Suppression d\'un Webhook.'"
-             @close="cancelDeleteWebhook"
              :actions="modalDeleteActions"><p style="line-break: normal">Vous êtes sur le point de supprimer le webhook suivant : <br/>-
                                                                          {{ modalDeleteText }} <br/>Cette action est irréversible.</p>
   </DsfrModal>
@@ -53,13 +52,13 @@
 </template>
 
 <style>
-  table {
-    display: inline-table !important;
-  }
+table {
+  display : inline-table !important;
+}
 </style>
 
 <script setup>
-import {DsfrButton, DsfrInput} from "@gouvminint/vue-dsfr";
+import {DsfrButton, DsfrButtonGroup, DsfrInput} from "@gouvminint/vue-dsfr";
 import fetchWithError from "@/scripts/fetchWithError.js";
 import {useRouter} from "vue-router";
 
@@ -136,12 +135,26 @@ function updateList () {
           },
           row.room_id,
           {
-            component: DsfrButton,
-            label: "Éditer",
-            iconOnly: true,
-            onClick: () => router.push('/webhook/' + row.webhook_id),
-            icon: "fr-icon-edit-line"
-          }]);
+            component: DsfrButtonGroup,
+            inlineLayoutWhen: "always",
+            buttons:
+              [
+                {
+                  label: "Éditer",
+                  iconOnly: true,
+                  onClick: () => router.push('/webhook/' + row.webhook_id),
+                  icon: "fr-icon-edit-line"
+                },
+                {
+                  label: "Tester",
+                  iconOnly: true,
+                  onClick: () => router.push('/postman/' + row.webhook_id),
+                  tertiary: "true",
+                  icon: {name: 'ri-flask-line', fill: 'var(--yellow-moutarde-sun-348-moon-860)'}
+                }
+              ]
+          }
+        ]);
     })
 }
 

@@ -42,7 +42,7 @@ watch(user, async (newUser, _oldUser) => {
         label: 'Tester',
         to: '/postman',
         icon: 'ri-flask-line',
-        iconAttrs: {color: 'var(--green-tilleul-verveine-sun-418-moon-817)'},
+        iconAttrs: {color: 'var(--yellow-moutarde-sun-348-moon-860)'},
       }
     ]
   } else {
