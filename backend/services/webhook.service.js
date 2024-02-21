@@ -18,7 +18,7 @@ function create (req, res) {
     webhook_id: generateId(100),
     webhook_label: req.body.label,
     room_id: req.body.room,
-    script: '// Il est possible de manipuler la variable data (le message), qui sera récupérée et envoyée au bot à la fin.\ndata = data;'
+    script: '// Il est possible de manipuler la variable data (le message), qui sera récupérée et envoyée au bot à la fin du traitement.\ndata = data;'
   };
 
   // Save Webhook in the database

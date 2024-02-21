@@ -2,6 +2,7 @@ import * as sdk from "matrix-js-sdk";
 import {ClientEvent, RoomEvent, RoomMemberEvent} from "matrix-js-sdk";
 import olm from "olm";
 import logger from "./logger.js";
+import {EventType, MsgType} from "matrix-js-sdk/src/@types/event.js";
 
 // noinspection JSUnresolvedReference
 global.Olm = olm
@@ -69,7 +70,7 @@ function parseMessageToSelf (event) {
 client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
   logger.debug("-------------------------------------------------------")
   logger.debug(event.getType())
-
+  logger.debug(event);
 
   if (event.getType() === "m.room.message") {
 
@@ -77,8 +78,6 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
       logger.info("Message is mine")
       return
     }
-
-    logger.debug(event);
 
     const isSelfMentionned = event.getContent()["m.mentions"]?.user_ids?.indexOf(myUserId) > -1
     logger.debug("Is self mentioned ? ", isSelfMentionned)
@@ -100,10 +99,15 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
 function addEmoji (event, emoji) {
   logger.debug("Sending emoji : ", emoji)
 
-  const threadId = event.getThread().id
   const room = event.getRoomId()
 
-  client.sendEmoteMessage(room, threadId, emoji).then((res) => {
+  const content = {
+    "body": emoji,
+    "msgtype": MsgType.Emote,
+    "m.relates_to": event.getId(),
+  };
+
+  client.sendEvent(room, EventType.Reaction, content).then((res) => {
     logger.debug(res);
   }).catch(e => logger.error(e));
 }
@@ -112,9 +116,10 @@ function sendMessage (room, message) {
   logger.debug("Sending message : ", message)
 
   const content = {
-    body: message, msgtype: "m.text",
+    "body": message,
+    "msgtype": MsgType.Text,
   };
-  client.sendEvent(room, "m.room.message", content).then((res) => {
+  client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
     logger.debug(res);
   }).catch(e => logger.error(e));
 
