@@ -101,9 +101,11 @@ function addEmoji (event, emoji) {
   const room = event.getRoomId()
 
   const content = {
-    "body": emoji,
-    "msgtype": "m.emote",
-    "m.relates_to": event.getId(),
+    "m.relates_to": {
+      "event_id":event.getId(),
+      "key":"👍️",
+      "rel_type":"m.annotation"
+    },
   };
 
   client.sendEvent(room, "m.reaction", content).then((res) => {
