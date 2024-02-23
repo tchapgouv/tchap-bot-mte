@@ -2,7 +2,7 @@ import bot from "../utils/bot.js";
 import vm from "vm"
 
 
-async function runScript (script, message) {
+async function runScript (script:string, message:string) {
 
   const context = {'data': message};
   vm.createContext(context); // Contextify the object.
@@ -13,13 +13,13 @@ async function runScript (script, message) {
 }
 
 
-async function postMessage (room, message, script) {
+async function postMessage (roomId:string, message:string, script:string) {
 
   // console.log('message before script : ', message);
   await runScript(script, message).then(data => message = data)
   // console.log('message after script : ', message);
 
-  return await bot.sendTextMessage(room, message).then(() => {
+  return await bot.sendTextMessage(roomId, message).then(() => {
     return {message: "Message sent"}
   }).catch(e => console.error(e))
 }

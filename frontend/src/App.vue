@@ -54,7 +54,7 @@ watch(user, async (newUser, _oldUser) => {
 
 const searchQuery = ref('')
 
-</script>
+</script >
 
 <template>
   <DsfrHeader v-model="searchQuery"
