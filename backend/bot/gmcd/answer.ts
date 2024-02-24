@@ -17,8 +17,9 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent) {
 function sayGoodbyeIfNecessary(client: MatrixClient, event: MatrixEvent, body: string) {
 
     const regex: RegExp = /.*(bonne soirée|[aà] demain|bon we|bonsoir).*/i
+    let shallContinue = true
 
-    if (body && regex.test(body)) {
+    if (shallContinue && body && regex.test(body)) {
         logger.debug("Saying goodbye.")
         addEmoji(client, event, "👋");
     }
@@ -30,13 +31,14 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent) {
 
     const lowerCaseBody: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
+    let shallContinue = true
 
     logger.debug("body =", lowerCaseBody)
     logger.debug("room_id =", roomId)
 
-    if (roomId && lowerCaseBody) maybeLeaveRoom(client, roomId, lowerCaseBody)
+    if (shallContinue && roomId && lowerCaseBody) shallContinue = !maybeLeaveRoom(client, roomId, lowerCaseBody)
 
-    if (event.sender) {
+    if (shallContinue && event.sender) {
         sendMessage(client, GMCD_INFRA_ROOM_ID, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
     }
 }
@@ -48,6 +50,7 @@ function maybeLeaveRoom(client: MatrixClient, roomId: string, body: string) {
         logger.warning("Someone dismissed me :(")
         sendMessage(client, roomId, "Au revoir ! 😭")
         client.leave(roomId).catch(e => logger.error(e));
-        return
+        return true
     }
+    return false
 }
