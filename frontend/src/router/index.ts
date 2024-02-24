@@ -1,10 +1,15 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import Logout from "@/views/Logout.vue";
-import Login from "@/views/Login.vue";
-import useAuth from "@/composable/useAuth";
-import Webhooks from "@/views/Webhooks.vue";
-import Postman from "@/views/Postman.vue";
-import Webhook from "@/views/Webhook.vue";
+import Logout from "../views/Logout.vue";
+import Login from "../views/Login.vue";
+import useAuth from "../composable/useAuth";
+import Webhooks from "../views/Webhooks.vue";
+import Webhook from "../views/Webhook.vue";
+import Postman from "../views/Postman.vue";
+
+
+declare global {
+  const document:any;
+}
 
 const {useCheckAuth} = useAuth()
 

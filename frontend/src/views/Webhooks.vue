@@ -57,9 +57,10 @@ table {
 }
 </style>
 
-<script setup>
+<script setup
+        lang="ts">
 import {DsfrButton, DsfrButtonGroup, DsfrInput} from "@gouvminint/vue-dsfr";
-import fetchWithError from "@/scripts/fetchWithError.js";
+import fetchWithError from "../scripts/fetchWithError";
 import {useRouter} from "vue-router";
 
 const router = useRouter()
@@ -82,19 +83,24 @@ const modalDeleteText = ref('')
 const modalDeleteOpened = ref(false)
 const modalDeleteActions = ref([])
 
+
+declare global {
+  const navigator: any;
+}
+
 onMounted(() => {
   updateList()
 })
 
-function close () {
+function close() {
   alerteClosed.value = !alerteClosed.value
 }
 
-function closeCopyModal () {
+function closeCopyModal() {
   modalCopyOpened.value = !modalCopyOpened.value
 }
 
-function onClickGenerate () {
+function onClickGenerate() {
 
   fetchWithError(apiPath + '/api/webhook/create',
     {
@@ -116,7 +122,7 @@ function onClickGenerate () {
     })
 }
 
-function updateList () {
+function updateList() {
   fetchWithError(apiPath + '/api/webhook/list',
     {
       method: "GET",
@@ -125,7 +131,7 @@ function updateList () {
     .then(stream => stream.json())
     .then(value => {
       if (value.map) webhookList.value = value.map(
-        row => [
+        (row: WebhookRow) => [
           row.webhook_label,
           {
             component: DsfrButton,
@@ -158,9 +164,9 @@ function updateList () {
     })
 }
 
-function copyWebhook (webhookId) {
+function copyWebhook(webhookId: string) {
 
-  if (navigator.clipboard) {
+  if (navigator.navigator.clipboard) {
     navigator.clipboard.writeText(webhookId);
     alerteClosed.value = false
     alerteType.value = "success"
@@ -170,6 +176,12 @@ function copyWebhook (webhookId) {
     modalCopyOpened.value = true
     modalCopyText.value = webhookId
   }
+}
+
+interface WebhookRow {
+  webhook_id: string
+  webhook_label: string
+  room_id: string
 }
 
 </script>

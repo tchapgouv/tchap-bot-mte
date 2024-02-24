@@ -45,9 +45,13 @@
   <br/>
 
 </template>
-<script setup>
 
-import fetchWithError from "@/scripts/fetchWithError";
+<style/>
+
+<script setup
+        lang="ts">
+
+import fetchWithError from "../scripts/fetchWithError";
 import {DsfrInput} from "@gouvminint/vue-dsfr";
 
 const route = useRoute()
@@ -57,10 +61,10 @@ const message = ref('Coucou ! Message envoyé avec un webhook =)');
 const apiPath = import.meta.env.VITE_API_ENDPOINT
 
 onMounted(() => {
-  webhook_id.value = route.params.webhookId
+  webhook_id.value = <string>route.params.webhookId
 })
 
-function onClick () {
+function onClick() {
 
   // console.log(apiPath)
 

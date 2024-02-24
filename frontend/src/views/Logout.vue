@@ -1,7 +1,12 @@
 <template/>
-<script setup>
+
+<style/>
+
+<script setup
+        lang="ts">
+
 import {useRouter} from 'vue-router'
-import useAuth from "@/composable/useAuth.js";
+import useAuth from "../composable/useAuth";
 
 const apiPath = import.meta.env.VITE_API_ENDPOINT
 const router = useRouter()
@@ -11,7 +16,7 @@ fetch(apiPath + '/api/logout', {
   method: 'POST',
   credentials: 'include'
 }).then(res => res.json())
-  .then(data => {
+  .then((data:any) => {
 
     if (data.success) {
       user.value = null

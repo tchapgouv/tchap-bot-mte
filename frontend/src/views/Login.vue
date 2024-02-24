@@ -23,10 +23,13 @@
   </div>
 </template>
 
-<script setup>
+<style/>
 
-import fetchWithError from "@/scripts/fetchWithError.js";
-import useAuth from "@/composable/useAuth.js";
+<script setup
+        lang="ts">
+
+import fetchWithError from "../scripts/fetchWithError";
+import useAuth from "../composable/useAuth";
 import {useRouter} from 'vue-router'
 
 const username = ref('');

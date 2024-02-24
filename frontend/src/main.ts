@@ -10,23 +10,6 @@ import router from './router/index'
 import * as icons from './icons'
 
 import './main.css'
-// import useAuth from "@/composable/useAuth";
-
-// const { useCheckAuth } = useAuth()
-
-// router.beforeEach(async (to, from, next) => {
-//   if(to.meta.requiresAuth){
-//     if(!(await useCheckAuth())){
-//       return next({name: 'login'})
-//     }
-//   }
-//   else if(to.meta.guest){
-//     if(await useCheckAuth()){
-//       return next({name: '/'})
-//     }
-//   }
-//   next()
-// })
 
 addIcons(...Object.values(icons)) // Autoimporté grâce à ohVueIconAutoimportPreset dans vite.config.ts
 

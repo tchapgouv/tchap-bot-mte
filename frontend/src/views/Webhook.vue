@@ -67,9 +67,11 @@ table {
 }
 </style>
 
-<script setup>
+<script setup
+        lang="ts">
+
 import {DsfrButton, DsfrInput} from "@gouvminint/vue-dsfr";
-import fetchWithError from "@/scripts/fetchWithError.js";
+import fetchWithError from "../scripts/fetchWithError";
 
 const router = useRouter()
 const route = useRoute()
@@ -83,7 +85,7 @@ const alerteClosed = ref(true)
 
 const modalDeleteText = ref('')
 const modalDeleteOpened = ref(false)
-const modalDeleteActions = ref([])
+const modalDeleteActions:Ref<any[]> = ref([])
 
 const webhook = ref({
   label: '',
@@ -93,10 +95,10 @@ const webhook = ref({
 })
 
 onMounted(() => {
-  getWebhook(route.params.webhookId)
+  getWebhook(<string> route.params.webhookId)
 })
 
-function getWebhook (webhookId) {
+function getWebhook (webhookId:string) {
   
   fetchWithError(apiPath + '/api/webhook/get',
     {
@@ -149,7 +151,7 @@ function confirmDeleteWebhook () {
   ]
 }
 
-function deleteWebhook () {
+function deleteWebhook (webhookId:string) {
   fetchWithError(apiPath + '/api/webhook/delete/',
     {
       method: "DELETE",
@@ -157,7 +159,7 @@ function deleteWebhook () {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        "webhook": webhook.value.id,
+        "webhook": webhookId,
       })
     }
   ).then(stream => stream.json())
