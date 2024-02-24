@@ -3,7 +3,7 @@ import * as sdk from "matrix-js-sdk";
 import {ClientEvent, EventType, RoomEvent, RoomMemberEvent} from "matrix-js-sdk";
 import {GMCD_INFRA_ROOM_ID, myAccessToken, myBaseUrl, myDeviceId, myUserId} from "./config.js";
 import {sendMessage} from "./helper.js";
-import {parseMessageToSelf, sayGoodbyIfNecessary} from "./answer.js";
+import {parseMessageToSelf, parseMessage} from "./answer.js";
 
 
 const opts = {
@@ -76,11 +76,8 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
             if (isSelfMentioned) {
                 parseMessageToSelf(client, event)
             }
-
-            const roomId = event.getRoomId()
-
-            if (roomId && [GMCD_INFRA_ROOM_ID].indexOf(roomId) > -1) {
-                sayGoodbyIfNecessary(client, event)
+            else {
+                parseMessage(client, event)
             }
         }
     }
