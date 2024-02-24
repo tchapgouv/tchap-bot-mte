@@ -1,4 +1,4 @@
-import bot from "../utils/bot.js";
+import bot from "../bot/gmcd/bot.js";
 import vm from "vm"
 
 
