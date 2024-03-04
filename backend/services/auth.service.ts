@@ -2,11 +2,13 @@ import jwt, {JwtPayload} from 'jsonwebtoken';
 import ldap, {SearchOptions} from "ldapjs"
 import logger from "../utils/logger.js";
 import {User} from "../models/user.model.js";
+import sequelize from "../models/index.js";
 
+const userRepository = sequelize.getRepository(User)
 
 export async function getAllUsers() {
 
-    return await User.findAll()
+    return await userRepository.findAll()
         .then(data => {
             return data.map((value) => {
                 return {
