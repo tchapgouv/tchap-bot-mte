@@ -29,6 +29,7 @@ async function createRoomAndInvite(roomName: string, userList: string[]) {
             visibility: Visibility.Private
         })
             .then((data) => {
+                logger.notice("Room created : ", data)
                 roomId = data.room_id
             })
             .catch(reason => {
@@ -69,7 +70,7 @@ async function postMessage(roomId: string, message: string, script: string) {
 
     return await bot.sendTextMessage(roomId, message).then(() => {
         return {message: "Message sent"}
-    }).catch(e => console.error(e))
+    }).catch(e => logger.error(e))
 }
 
 export {postMessage, createRoomAndInvite}

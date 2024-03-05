@@ -52,7 +52,7 @@ router.post('/api/auth', (req, res) => {
                         res.json({user, token});
 
                     }).catch(err => {
-                        console.error(JSON.stringify(err))
+                        logger.error(JSON.stringify(err))
                         res.status(401).json({
                             message: "User '" + username + "' : " + err.message,
                         });

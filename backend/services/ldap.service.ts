@@ -32,29 +32,29 @@ export async function getUserForUID(client: ldap.Client, username: string) {
         scope: 'sub'
     };
 
-    logger.notice("Search DN for " + username)
+    logger.notice('LDAP : Search DN for ' + username)
     let userCount = 0;
 
     const user: any = {}
 
-    await new Promise((resolve, reject) => {
+    await new Promise((_resolve, _reject) => {
 
         client.search(process.env.BASE_DN || '', opts, ((err, res) => {
 
             res.on('searchRequest', (searchRequest) => {
-                logger.debug('searchRequest: ', searchRequest.messageId);
+                logger.debug('LDAP : searchRequest: ', searchRequest.messageId);
             });
             res.on('searchReference', (referral) => {
-                logger.debug('referral: ' + referral.uris.join());
+                logger.debug('LDAP : referral: ' + referral.uris.join());
             });
             res.on('error', (err) => {
-                console.error('error: ' + err.message);
+                logger.error('LDAP : error: ' + err.message);
             });
             res.on('end', (result) => {
-                logger.debug('status: ' + result?.status);
+                logger.debug('LDAP : status: ' + result?.status);
                 if (userCount === 0) {
-                    logger.alert(username + " : Not found.")
-                    reject({message: "Not found."})
+                    logger.alert('LDAP : ' + username + " : Not found.")
+                    // reject({message: "Not found."})
                 }
             });
 
@@ -65,7 +65,7 @@ export async function getUserForUID(client: ldap.Client, username: string) {
                 for (const attribute in entry.pojo.attributes) {
                     user[entry.pojo.attributes[attribute].type] = entry.pojo.attributes[attribute].values
                 }
-                console.log(user)
+                logger.debug('LDAP : ', user)
             })
         }))
     })
