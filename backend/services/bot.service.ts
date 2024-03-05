@@ -21,7 +21,7 @@ async function createRoomAndInvite(roomName: string, userList: string[]) {
 
     await bot.getRoomIdForAlias(roomName).then((data) => {
         roomId = data.room_id
-    })
+    }).catch(reason => logger.notice("Room not found", reason))
 
     if (!roomId) {
         await bot.createRoom({
