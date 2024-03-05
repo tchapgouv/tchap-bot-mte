@@ -76,6 +76,7 @@ export async function ldapAuth(username: string, password: string) {
 
     const client = ldap.createClient({
         url: process.env.LDAP_URI || '',
+
         // baseDN: process.env.BASE_DN || ''
     });
 

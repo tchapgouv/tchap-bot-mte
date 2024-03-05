@@ -49,9 +49,14 @@ async function createRoomAndInvite(roomName: string, userList: string[]) {
     let inviteError: { mail: string; reason: string; }[] = []
 
     for (const userMail of userMailList) {
+
+        if (!userMail) continue
+
         logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + ")")
         await bot.inviteByEmail(roomId, userMail)
-            .then(() => logger.notice(userMail + " successfully invited."))
+            .then(() => {
+                logger.notice(userMail + " successfully invited.")
+            })
             .catch(reason => {
                 logger.error("Error inviting " + userMail + ". ", reason)
                 inviteError.push({mail: userMail, reason: reason})
