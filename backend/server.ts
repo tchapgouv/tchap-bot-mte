@@ -4,6 +4,7 @@ import fs from 'fs';
 import db from './models/index.js'
 import webhookApi from './routes/webhook.routes.js';
 import userApi from './routes/user.routes.js';
+import helpersApi from './routes/helpers.routes.js';
 import authApi from './routes/auth.routes.js';
 import cors from 'cors';
 import logger from "./utils/logger.js";
@@ -25,6 +26,7 @@ app.use(express.static(vuePath));
 app.use(webhookApi);
 app.use(userApi);
 app.use(authApi);
+app.use(helpersApi);
 
 db.sync()
     .then(() => {

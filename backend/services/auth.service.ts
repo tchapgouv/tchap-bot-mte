@@ -1,8 +1,9 @@
 import jwt, {JwtPayload} from 'jsonwebtoken';
-import ldap, {SearchOptions} from "ldapjs"
+import ldap from "ldapjs"
 import logger from "../utils/logger.js";
 import {User} from "../models/user.model.js";
 import sequelize from "../models/index.js";
+import {getUserForUID} from "./ldap.service.js";
 
 const userRepository = sequelize.getRepository(User)
 
@@ -78,72 +79,27 @@ export async function ldapAuth(username: string, password: string) {
         // baseDN: process.env.BASE_DN || ''
     });
 
+    let user: any = {}
+    await getUserForUID(client, username).then(value => user = value)
 
     return new Promise((resolve, reject) => {
+        client.bind(user.dn, password, (error, _response) => {
 
-        const opts: SearchOptions = {
-            attributes: ['uid', 'cn', 'mail'],
-            filter: "(&(uid=" + username + "))",
-            scope: 'sub'
-        };
+            // logger.debug(response)
 
-        logger.notice("Search DN for " + username)
-        let userCount = 0;
+            if (error) {
 
-        client.search(process.env.BASE_DN || '', opts, ((err, res) => {
+                client.unbind(() => {
+                    logger.debug('Disconnecting.');
+                });
+                logger.alert("LDAP binding failed.")
+                reject({message: error.message})
 
-            res.on('searchRequest', (searchRequest) => {
-                logger.debug('searchRequest: ', searchRequest.messageId);
-            });
-            res.on('searchReference', (referral) => {
-                logger.debug('referral: ' + referral.uris.join());
-            });
-            res.on('error', (err) => {
-                console.error('error: ' + err.message);
-            });
-            res.on('end', (result) => {
-                logger.debug('status: ' + result?.status);
-                if (userCount === 0) {
-                    logger.alert(username + " : Not found.")
-                    reject({message: "Not found."})
-                }
-            });
+            } else {
 
-            res.on('searchEntry', (entry) => {  // There was a match.
-
-                logger.debug('searchEntry: ');
-                userCount++
-
-                // logger.debug('entry: ' + JSON.stringify(entry.pojo));
-                const user: any = {}
-                user.dn = entry.pojo.objectName
-
-                for (const attribute in entry.pojo.attributes) {
-                    user[entry.pojo.attributes[attribute].type] = entry.pojo.attributes[attribute].values
-                }
-
-                logger.debug(user)
-                logger.debug("Binding " + user.dn)
-                client.bind(user.dn, password, (error, _response) => {
-
-                    // logger.debug(response)
-
-                    if (error) {
-
-                        client.unbind(() => {
-                            logger.debug('Disconnecting.');
-                        });
-                        logger.alert("LDAP binding failed.")
-                        reject({message: error.message})
-
-                    } else {
-
-                        logger.notice(username + " : Logged in")
-                        resolve(user)
-
-                    }
-                })
-            })
-        }))
+                logger.notice(username + " : Logged in")
+                resolve(user)
+            }
+        })
     })
 }

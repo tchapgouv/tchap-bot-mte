@@ -1,6 +1,7 @@
 import {verifyJwt} from "../services/auth.service.js";
 import logger from "../utils/logger.js";
 import {RequestHandler} from "express";
+import * as crypto from "crypto";
 
 export const verifyToken: RequestHandler = (req, res, next) => {
 
@@ -26,4 +27,18 @@ export const verifyToken: RequestHandler = (req, res, next) => {
 
         next()
     })
+}
+
+export const verifyTimeToken: RequestHandler = (req, res, next) => {
+
+    logger.debug(">>>> verifyTimeToken")
+
+    if (!req.body.token) return res.status(401).json({message: 'Unauthenticated (Missing Token)'});
+
+    const token = req.body.token
+    const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString() + "-" + process.env.JWT_KEY).digest('hex')
+
+    if (token !== currentToken) return res.status(401).json({message: 'Unauthenticated (Token Error)'});
+
+    next()
 }

@@ -75,8 +75,7 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
 
             if (isSelfMentioned) {
                 parseMessageToSelf(client, event)
-            }
-            else {
+            } else {
                 parseMessage(client, event)
             }
         }
