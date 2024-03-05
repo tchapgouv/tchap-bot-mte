@@ -14,6 +14,7 @@ export async function getMailsForUIDs(usernames: string[]) {
         await getMailForUID(client, username).then(mail => userMailList.push(mail)).catch(reason => logger.error("getMailsForUIDs : ", reason))
     })).catch(reason => logger.error("getMailsForUIDs : ", reason))
 
+    logger.debug("Mailing list : " + userMailList)
     return userMailList
 }
 
@@ -38,6 +39,8 @@ export async function getMailForUID(client: ldap.Client, username: string) {
         }
         if (!mail) mail = user.mail[0]
     }).catch(reason => logger.error("getMailForUID : ", reason))
+
+    logger.debug("Main mail for user " + username + " = " + mail)
     return mail
 }
 
@@ -84,7 +87,7 @@ export async function getUserForUID(client: ldap.Client, username: string) {
                 for (const attribute in entry.pojo.attributes) {
                     user[entry.pojo.attributes[attribute].type] = entry.pojo.attributes[attribute].values
                 }
-                logger.debug('LDAP : ', user)
+                logger.debug('LDAP : User found for username = ' + username + ' : ', user)
             })
         }))
     })
