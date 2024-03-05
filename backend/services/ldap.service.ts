@@ -55,9 +55,9 @@ export async function getUserForUID(client: ldap.Client, username: string) {
     logger.notice('LDAP : Search DN for ' + username)
     let userCount = 0;
 
-    const user: any = {}
+    let user: any = {}
 
-    await new Promise((_resolve, _reject) => {
+    await new Promise((resolve, _reject) => {
 
         client.search(process.env.BASE_DN || '', opts, ((err, res) => {
 
@@ -74,7 +74,7 @@ export async function getUserForUID(client: ldap.Client, username: string) {
                 logger.debug('LDAP : status: ' + result?.status);
                 if (userCount === 0) {
                     logger.alert('LDAP : ' + username + " : Not found.")
-                    // reject({message: "Not found."})
+                    resolve({})
                 }
             });
 
@@ -82,15 +82,18 @@ export async function getUserForUID(client: ldap.Client, username: string) {
 
                 userCount++
 
-                user.dn = entry.pojo.objectName
+                let mappedUser:any = {}
+
+                mappedUser.dn = entry.pojo.objectName
 
                 for (const attribute in entry.pojo.attributes) {
-                    user[entry.pojo.attributes[attribute].type] = entry.pojo.attributes[attribute].values
+                    mappedUser[entry.pojo.attributes[attribute].type] = entry.pojo.attributes[attribute].values
                 }
-                logger.debug('LDAP : User found for username = ' + username + ' : ', user)
+                logger.debug('LDAP : User found for username = ' + username + ' : ', mappedUser)
+                resolve(mappedUser)
             })
         }))
-    })
+    }).then(data => user = data)
 
     return user
 }

@@ -83,6 +83,9 @@ export async function ldapAuth(username: string, password: string) {
     await getUserForUID(client, username).then(value => user = value)
 
     return new Promise((resolve, reject) => {
+
+        if (!user.dn) reject({message: "User not found !"})
+
         client.bind(user.dn, password, (error, _response) => {
 
             // logger.debug(response)
