@@ -11,8 +11,8 @@ export async function getMailsForUIDs(usernames: string[]) {
     });
 
     await Promise.all(usernames.map(async (username) => {
-        await getMailForUID(client, username).then(mail => userMailList.push(mail))
-    }))
+        await getMailForUID(client, username).then(mail => userMailList.push(mail)).catch(reason => logger.error("getMailsForUIDs : ", reason))
+    })).catch(reason => logger.error("getMailsForUIDs : ", reason))
 
     return userMailList
 }
@@ -37,7 +37,7 @@ export async function getMailForUID(client: ldap.Client, username: string) {
             if (!mail && regexpAt.test(currentMail)) mail = currentMail
         }
         if (!mail) mail = user.mail[0]
-    })
+    }).catch(reason => logger.error("getMailForUID : ", reason))
     return mail
 }
 

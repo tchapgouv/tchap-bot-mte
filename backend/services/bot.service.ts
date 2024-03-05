@@ -44,7 +44,7 @@ async function createRoomAndInvite(roomName: string, userList: string[]) {
     }
 
     let userMailList: string[] = []
-    await getMailsForUIDs(userList).then(mails => userMailList = mails)
+    await getMailsForUIDs(userList).then(mails => userMailList = mails).catch(reason => logger.error("createRoomAndInvite : ", reason))
 
     let inviteError: { mail: string; reason: string; }[] = []
 
