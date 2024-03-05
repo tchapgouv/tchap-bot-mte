@@ -20,7 +20,24 @@ export async function getMailsForUIDs(usernames: string[]) {
 export async function getMailForUID(client: ldap.Client, username: string) {
 
     let mail: string = ""
-    await getUserForUID(client, username).then((user: any) => (mail = user.dn))
+    await getUserForUID(client, username).then((user: any) => {
+
+        const regexpDevDur = new RegExp(username + '@developpement.*')
+        const regexpICarre = new RegExp(username + '@i-carre.*')
+        const regexpAt = new RegExp(username + '@.*')
+        for (const currentMail of user.mail) {
+            // Mail en dev dur > tous !
+            if (regexpDevDur.test(currentMail)) {
+                mail = currentMail
+                break;
+            }
+            // Mail en i-carre OK en attendant mieux
+            if (regexpICarre.test(currentMail)) mail = currentMail
+            // N'importe quel mail si aucun jusqu'à présent
+            if (!mail && regexpAt.test(currentMail)) mail = currentMail
+        }
+        if (!mail) mail = user.mail[0]
+    })
     return mail
 }
 
@@ -59,6 +76,8 @@ export async function getUserForUID(client: ldap.Client, username: string) {
             });
 
             res.on('searchEntry', (entry) => {  // There was a match.
+
+                userCount++
 
                 user.dn = entry.pojo.objectName
 
