@@ -12,14 +12,14 @@ const opts = {
     userId: myUserId,
     deviceId: myDeviceId,
     idBaseUrl: myIdBaseUrl,
-    identityServer: {
-        getAccessToken():Promise<string|null> {
-            return new Promise((resolve, _reject) => {
-                const token = myAccessToken ? myAccessToken  : null;
-                resolve(token)
-            })
-        }
-    }
+    // identityServer: {
+    //     getAccessToken():Promise<string|null> {
+    //         return new Promise((resolve, _reject) => {
+    //             const token = myAccessToken ? myAccessToken  : null;
+    //             resolve(token)
+    //         })
+    //     }
+    // }
 }
 
 const client = sdk.createClient(opts);
@@ -91,8 +91,16 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
     }
 });
 
+
 function onPrepared() {
     logger.debug("prepared");
+
+    client.publicRooms().then((data) => {
+        logger.debug("Public Rooms: %s", JSON.stringify(data));
+    }).catch(e => logger.error(e))
+
+    client.lookupThreePid()
+
     const start = ['Bonjour à tous', 'Bonjour', 'Salut', 'Hello'];
     const startLength = start.length
     const end = ['.', ' !', ', me revoilà.', '. Je viens de redémarrer ¯\\_(ツ)_/¯', ', encore =)'];
@@ -100,9 +108,5 @@ function onPrepared() {
 
     sendMessage(client, GMCD_INFRA_ROOM_ID, "(Prepared) " + start[Math.floor(Math.random() * startLength)] + end[Math.floor(Math.random() * endLength)])
 }
-
-client.publicRooms().then((data) => {
-    logger.debug("Public Rooms: %s", JSON.stringify(data));
-}).catch(e => logger.error(e))
 
 export default client;
