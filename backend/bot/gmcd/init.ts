@@ -99,8 +99,6 @@ function onPrepared() {
         logger.debug("Public Rooms: %s", JSON.stringify(data));
     }).catch(e => logger.error(e))
 
-    client.lookupThreePid()
-
     const start = ['Bonjour à tous', 'Bonjour', 'Salut', 'Hello'];
     const startLength = start.length
     const end = ['.', ' !', ', me revoilà.', '. Je viens de redémarrer ¯\\_(ツ)_/¯', ', encore =)'];
