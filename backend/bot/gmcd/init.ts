@@ -1,9 +1,9 @@
 import logger from "../../utils/logger.js";
 import * as sdk from "matrix-js-sdk";
 import {ClientEvent, EventType, RoomEvent, RoomMemberEvent} from "matrix-js-sdk";
-import {GMCD_INFRA_ROOM_ID, myAccessToken, myBaseUrl, myDeviceId, myUserId, myIdBaseUrl} from "./config.js";
+import {GMCD_INFRA_ROOM_ID, myAccessToken, myBaseUrl, myDeviceId, myIdBaseUrl, myUserId} from "./config.js";
 import {sendMessage} from "./helper.js";
-import {parseMessageToSelf, parseMessage} from "./answer.js";
+import {parseMessage, parseMessageToSelf} from "./answer.js";
 
 
 const opts = {
@@ -11,7 +11,15 @@ const opts = {
     accessToken: myAccessToken,
     userId: myUserId,
     deviceId: myDeviceId,
-    idBaseUrl: myIdBaseUrl
+    idBaseUrl: myIdBaseUrl,
+    identityServer: {
+        getAccessToken():Promise<string|null> {
+            return new Promise((resolve, _reject) => {
+                const token = myAccessToken ? myAccessToken  : null;
+                resolve(token)
+            })
+        }
+    }
 }
 
 const client = sdk.createClient(opts);
