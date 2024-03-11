@@ -5,10 +5,10 @@
   "license": "MIT",
   "scripts": {
     "build": "npx tsc",
-    "start-dev": "npx tsx --env-file=.env --env-file=.env.local server.ts",
-    "start-dev-js": "npx tsc && node --env-file=.env --env-file=.env.local server.js",
-    "start-bot-only": "node utils/bot.js",
-    "start-prod": "node --env-file=.env server.js"
+    "start-dev": "npx tsx --env-file=.env --env-file=.env.local src/server.ts",
+    "start-dev-js": "npx tsc && node --env-file=.env --env-file=.env.local src/server.js",
+    "start-bot-only": "node src/utils/bot.js",
+    "start-prod": "node --env-file=.env src/server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
