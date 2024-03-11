@@ -2,9 +2,9 @@ import express from 'express';
 import {verifyTimeToken} from "../controllers/auth.controller.js";
 import {createRoomAndInvite} from "../services/bot.service.js";
 
-const router = express.Router();
+const helpersRouter = express.Router();
 
-router.post("/api/migrate/room", verifyTimeToken, (req, res) => {
+helpersRouter.post("/api/migrate/room", verifyTimeToken, (req, res) => {
 
     if (!req.body.room_name) res.status(500).json({message: 'Missing room name !'});
     if (!req.body.users_list) res.status(500).json({message: 'Missing users UIDs list !'});
@@ -14,4 +14,4 @@ router.post("/api/migrate/room", verifyTimeToken, (req, res) => {
     })
 })
 
-export default router
+export default helpersRouter

@@ -3,9 +3,9 @@ import jwt from "jsonwebtoken";
 import {getAllUsers, ldapAuth} from "../services/auth.service.js";
 import logger from "../utils/logger.js";
 
-const router = express.Router();
+const authRouter = express.Router();
 
-router.post('/api/auth', (req, res) => {
+authRouter.post('/api/auth', (req, res) => {
 
     const {username, password} = req.body;
 
@@ -64,10 +64,10 @@ router.post('/api/auth', (req, res) => {
 });
 
 
-router.post('/api/logout', (req, res) => {
+authRouter.post('/api/logout', (req, res) => {
 
     res.setHeader('Set-Cookie', `user_token=; HttpOnly;`);
     res.json({success: 'OK'});
 });
 
-export default router
+export default authRouter

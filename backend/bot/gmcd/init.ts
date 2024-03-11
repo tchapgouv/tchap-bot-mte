@@ -4,7 +4,7 @@ import {ClientEvent, EventType, RoomEvent, RoomMemberEvent} from "matrix-js-sdk"
 import {GMCD_INFRA_ROOM_ID, myAccessToken, myBaseUrl, myDeviceId, myIdBaseUrl, myUserId} from "./config.js";
 import {sendMessage} from "./helper.js";
 import {parseMessage, parseMessageToSelf} from "./answer.js";
-
+import bot from "./bot.js";
 
 const opts = {
     baseUrl: myBaseUrl,
@@ -12,14 +12,31 @@ const opts = {
     userId: myUserId,
     deviceId: myDeviceId,
     idBaseUrl: myIdBaseUrl,
-    // identityServer: {
-    //     getAccessToken():Promise<string|null> {
-    //         return new Promise((resolve, _reject) => {
-    //             const token = myAccessToken ? myAccessToken  : null;
-    //             resolve(token)
-    //         })
-    //     }
-    // }
+    identityServer: {
+        getAccessToken(): Promise<string | null> {
+            return getIdentityServerToken()
+        }
+    }
+}
+
+async function getIdentityServerToken(): Promise<string | null> {
+
+    return new Promise((resolve, _reject) => {
+
+        bot.getOpenIdToken().then(openIdToken => {
+            bot.registerWithIdentityServer(openIdToken).then(value => {
+                logger.notice("registerWithIdentityServer : ", value)
+                resolve(value.access_token)
+            }).catch(reason => {
+                logger.error("registerWithIdentityServer : ", reason)
+                resolve(null)
+            })
+        }).catch(reason => {
+            logger.error("getOpenIdToken : ", reason)
+            resolve(null)
+        })
+
+    })
 }
 
 const client = sdk.createClient(opts);

@@ -2,13 +2,13 @@ import express from 'express';
 import https from 'https';
 import fs from 'fs';
 import db from './models/index.js'
-import webhookApi from './routes/webhook.routes.js';
-import userApi from './routes/user.routes.js';
-import helpersApi from './routes/helpers.routes.js';
-import authApi from './routes/auth.routes.js';
+import userRouter from './routes/user.routes.js';
+import helpersRouter from './routes/helpers.routes.js';
+import authRouter from './routes/auth.routes.js';
 import cors from 'cors';
 import logger from "./utils/logger.js";
 import {create as createUser} from "./services/user.service.js";
+import webhookRouter from "./routes/webhook.routes.js";
 
 const app = express()
 const vuePath = "./static"
@@ -23,17 +23,17 @@ app.use(express.urlencoded({extended: true}));
 
 app.use(express.static(vuePath));
 
-app.use(webhookApi);
-app.use(userApi);
-app.use(authApi);
-app.use(helpersApi);
+app.use(webhookRouter);
+app.use(userRouter);
+app.use(authRouter);
+app.use(helpersRouter);
 
 db.sync()
     .then(() => {
         logger.notice("Synced db.");
 
-        createUser("thomas.bouchardon").catch(_reason => logger.error("Could not create user !"))
-        createUser("hugo.tourbez.i").catch(_reason => logger.error("Could not create user !"))
+        createUser("thomas.bouchardon").catch((_reason: any) => logger.error("Could not create user !"))
+        createUser("hugo.tourbez.i").catch((_reason: any) => logger.error("Could not create user !"))
 
     })
     .catch((err: any) => {
