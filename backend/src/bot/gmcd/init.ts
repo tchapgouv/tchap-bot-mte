@@ -14,7 +14,7 @@ const opts = {
     idBaseUrl: myIdBaseUrl,
     identityServer: {
         getAccessToken(): Promise<string | null> {
-            let token = getIdentityServerToken()
+            const token = getIdentityServerToken()
             logger.debug(token)
             return token
         }
