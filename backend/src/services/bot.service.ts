@@ -4,7 +4,6 @@ import {Preset, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import {getMailsForUIDs} from "./ldap.service.js";
 import {IWebResponse} from "../utils/IWebResponse.js";
-import {inviteByMail} from "../bot/gmcd/helper.js";
 
 
 async function runScript(script: string, message: string) {
@@ -76,15 +75,14 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                 if (!userMail) continue
 
                 logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + ")")
-                inviteByMail(bot, roomId, userMail)
-                // await bot.inviteByEmail(roomId, userMail)
-                //     .then(() => {
-                //         logger.notice(userMail + " successfully invited.")
-                //     })
-                //     .catch(reason => {
-                //         logger.error("Error inviting " + userMail + ". ", reason)
-                //         inviteErrors.push({mail: userMail, reason: reason})
-                //     })
+                await bot.inviteByEmail(roomId, userMail)
+                    .then(() => {
+                        logger.notice(userMail + " successfully invited.")
+                    })
+                    .catch(reason => {
+                        logger.error("Error inviting " + userMail + ". ", reason)
+                        inviteErrors.push({mail: userMail, reason: reason})
+                    })
             }
 
             resolve({status: 200, message: "Room created", data: {invite_errors: inviteErrors}})
