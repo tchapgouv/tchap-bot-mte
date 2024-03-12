@@ -9,9 +9,12 @@ import cors from 'cors';
 import logger from "./utils/logger.js";
 import {create as createUser} from "./services/user.service.js";
 import webhookRouter from "./routes/webhook.routes.js";
+import path from 'path'
 
 const app = express()
-const vuePath = "./static"
+const vuePath = path.join(__dirname, 'static')
+
+logger.notice("Static path : ", vuePath)
 
 const corsOptions = {origin: true, credentials: true};
 app.use(cors(corsOptions));
