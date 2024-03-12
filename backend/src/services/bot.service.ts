@@ -41,13 +41,15 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                 }
             });
 
+            logger.debug(userInviteList)
+
             if (!roomId) {
                 await bot.createRoom({
                     name: roomName,
                     room_alias_name: roomName,
                     preset: Preset.TrustedPrivateChat,
                     invite_3pid: userInviteList,
-                    visibility: Visibility.Private
+                    visibility: Visibility.Private,
                 })
                     .then((data) => {
                         logger.notice("Room created : ", data)
@@ -55,7 +57,7 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                     })
                     .catch(reason => {
                         logger.error("Error creating room " + roomName + ". ", reason)
-                        reject({status: 500, message: "Error creating room " + roomName + ". "})
+                        reject(reason)
                     })
             }
 
