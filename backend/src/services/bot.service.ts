@@ -22,7 +22,7 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
         (async () => {
             let roomId: string = ""
 
-            await bot.getRoomIdForAlias("#" + roomName).then((data) => {
+            await bot.getRoomIdForAlias("#" + roomName + ":" + process.env.TCHAP_SERVER_NAME).then((data) => {
                 roomId = data.room_id
             }).catch(reason => logger.notice("Room not found", reason))
 
