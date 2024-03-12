@@ -14,6 +14,7 @@ helpersRouter.post("/api/migrate/room", verifyTimeToken, (req, res) => {
         res.status(value.status).json(value)
     }).catch(reason => {
         logger.error("Error migrating room (" + req.body.room_name + ")", reason)
+        res.status(500).json(reason)
     })
 })
 
