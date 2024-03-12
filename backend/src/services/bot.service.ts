@@ -1,8 +1,9 @@
 import bot from "../bot/gmcd/bot.js";
 import vm from "vm"
-import {Visibility} from "matrix-js-sdk";
+import {Preset, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import {getMailsForUIDs} from "./ldap.service.js";
+import {IWebResponse} from "../utils/IWebResponse.js";
 
 
 async function runScript(script: string, message: string) {
@@ -15,55 +16,69 @@ async function runScript(script: string, message: string) {
     return context.data
 }
 
-async function createRoomAndInvite(roomName: string, userList: string[]) {
+async function createRoomAndInvite(roomName: string, userList: string[]): Promise<IWebResponse> {
 
-    let roomId: string = ""
+    return new Promise((resolve, reject) => {
+        (async () => {
+            let roomId: string = ""
 
-    await bot.getRoomIdForAlias(roomName).then((data) => {
-        roomId = data.room_id
-    }).catch(reason => logger.notice("Room not found", reason))
-
-    if (!roomId) {
-        await bot.createRoom({
-            name: roomName,
-            visibility: Visibility.Private
-        })
-            .then((data) => {
-                logger.notice("Room created : ", data)
+            await bot.getRoomIdForAlias(roomName).then((data) => {
                 roomId = data.room_id
-            })
-            .catch(reason => {
-                logger.error("Error creating room " + roomName + ". ", reason)
-                return {status: 500, message: "Error creating room " + roomName + ". "}
-            })
-    }
+            }).catch(reason => logger.notice("Room not found", reason))
 
-    if (!roomId) {
-        logger.error("Room id not found, cannot invite users ! ")
-        return {status: 500, message: "Room id not found, cannot invite users ! "}
-    }
+            let userMailList: string[] = []
+            await getMailsForUIDs(userList).then(mails => userMailList = mails).catch(reason => logger.error("createRoomAndInvite : ", reason))
 
-    let userMailList: string[] = []
-    await getMailsForUIDs(userList).then(mails => userMailList = mails).catch(reason => logger.error("createRoomAndInvite : ", reason))
+            let userInviteList: {
+                id_server: string,
+                medium: string,
+                address: string
+            }[] = userMailList.map(mail => {
+                return {
+                    id_server: bot.getHomeserverUrl(),
+                    medium: "email",
+                    address: mail
+                }
+            });
 
-    let inviteError: { mail: string; reason: string; }[] = []
+            if (!roomId) {
+                await bot.createRoom({
+                    name: roomName,
+                    room_alias_name: roomName,
+                    preset: Preset.TrustedPrivateChat,
+                    invite_3pid: userInviteList,
+                    visibility: Visibility.Private
+                })
+                    .then((data) => {
+                        logger.notice("Room created : ", data)
+                        roomId = data.room_id
+                    })
+                    .catch(reason => {
+                        logger.error("Error creating room " + roomName + ". ", reason)
+                        reject({status: 500, message: "Error creating room " + roomName + ". "})
+                    })
+            }
 
-    for (const userMail of userMailList) {
+            let inviteErrors: { mail: string; reason: string; }[] = []
 
-        if (!userMail) continue
+            for (const userMail of userMailList) {
 
-        logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + ")")
-        await bot.inviteByEmail(roomId, userMail)
-            .then(() => {
-                logger.notice(userMail + " successfully invited.")
-            })
-            .catch(reason => {
-                logger.error("Error inviting " + userMail + ". ", reason)
-                inviteError.push({mail: userMail, reason: reason})
-            })
-    }
+                if (!userMail) continue
 
-    return {status: 200, message: "Room created", invite_errors: inviteError}
+                logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + ")")
+                await bot.inviteByEmail(roomId, userMail)
+                    .then(() => {
+                        logger.notice(userMail + " successfully invited.")
+                    })
+                    .catch(reason => {
+                        logger.error("Error inviting " + userMail + ". ", reason)
+                        inviteErrors.push({mail: userMail, reason: reason})
+                    })
+            }
+
+            resolve({status: 200, message: "Room created", data: {invite_errors: inviteErrors}})
+        })()
+    })
 }
 
 
