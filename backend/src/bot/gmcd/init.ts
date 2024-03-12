@@ -26,7 +26,7 @@ async function getIdentityServerToken(): Promise<string | null> {
         bot.getOpenIdToken().then(openIdToken => {
             bot.registerWithIdentityServer(openIdToken).then(value => {
                 logger.notice("registerWithIdentityServer : ", value)
-                resolve(value.access_token)
+                resolve(value.token)
             }).catch(reason => {
                 logger.error("registerWithIdentityServer : ", reason)
                 resolve(null)
