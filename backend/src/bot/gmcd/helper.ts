@@ -32,3 +32,16 @@ export function sendMessage(client: MatrixClient, room: string, message: string)
         logger.debug(res);
     }).catch(e => logger.error(e));
 }
+
+export function inviteByMail(client: MatrixClient, room: string, email: string) {
+    logger.debug("Inviting message : ", email)
+
+    const message = "/invite " + email
+
+    const content = {
+        "body": message, "msgtype": MsgType.Text,
+    };
+    client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
+        logger.debug(res);
+    }).catch(e => logger.error(e));
+}
