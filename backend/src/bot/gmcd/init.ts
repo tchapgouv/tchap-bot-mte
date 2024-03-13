@@ -35,12 +35,7 @@ async function getIdentityServerToken(): Promise<string | null> {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    "access_token": openIdToken,
-                    "expires_in": 60 * 60,
-                    "matrix_server_name": process.env.TCHAP_SERVER_NAME,
-                    "token_type": "Bearer"
-                })
+                body: JSON.stringify(openIdToken)
             }
             const fetchOpts = {
                 requestInit: requestInit,
