@@ -26,29 +26,34 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                 roomId = data.room_id
             }).catch(reason => logger.notice("Room not found", reason))
 
+            let inviteErrors: { mail: string; reason: string; }[] = []
+
             let userMailList: string[] = []
             await getMailsForUIDs(userList)
-                .then(mails => userMailList = mails)
+                .then(data => {
+                    userMailList = data.userMailList
+                    for (const username of data.userNotFoundList) {
+                        inviteErrors.push({mail: username, reason: "No match in LDAP !"})
+                    }
+                })
                 .catch(reason => {
                     logger.error("createRoomAndInvite : ", reason)
                     reject(reason)
                 })
 
-            let userInviteList: {
-                id_server: string,
-                medium: string,
-                address: string
-            }[] = userMailList.map(mail => {
-                return {
-                    id_server: bot.getHomeserverUrl(),
-                    medium: "email",
-                    address: mail
-                }
-            });
-
-            logger.debug(userInviteList)
-
-            // inviteByMail(bot, roomName, )
+            // let userInviteList: {
+            //     id_server: string,
+            //     medium: string,
+            //     address: string
+            // }[] = userMailList.map(mail => {
+            //     return {
+            //         id_server: bot.getHomeserverUrl(),
+            //         medium: "email",
+            //         address: mail
+            //     }
+            // });
+            //
+            // logger.debug("userInviteList : ", userInviteList)
 
             if (!roomId) {
                 await bot.createRoom({
@@ -67,8 +72,6 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                         reject(reason)
                     })
             }
-
-            let inviteErrors: { mail: string; reason: string; }[] = []
 
             for (const userMail of userMailList) {
 

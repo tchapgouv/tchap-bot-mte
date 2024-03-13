@@ -31,7 +31,7 @@ async function getIdentityServerToken(): Promise<string | null> {
             logger.notice("openIdToken : ", openIdToken)
             const url: string = process.env.IDENTITY_SERVER_URL + "/_matrix/identity/v2/account/register"
             const requestInit: RequestInit = {
-                method: "POST", // *GET, POST, PUT, DELETE, etc.
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -44,18 +44,11 @@ async function getIdentityServerToken(): Promise<string | null> {
             fetchWithError(url, fetchOpts)
                 .then((response: Response) => response.json())
                 .then((data: any) => {
-                    logger.notice("fetchWithError : " + url, data)
+                    logger.notice("fetch : " + url, data)
                     resolve(data.access_token)
                 })
-                .catch(reason => logger.error("fetchWithError : " + url, reason))
+                .catch(reason => logger.error("fetch : " + url, reason))
 
-            bot.registerWithIdentityServer(openIdToken).then(value => {
-                logger.notice("registerWithIdentityServer : ", value)
-                resolve(value.access_token)
-            }).catch(reason => {
-                logger.error("registerWithIdentityServer : ", reason)
-                resolve(null)
-            })
         }).catch(reason => {
             logger.error("getOpenIdToken : ", reason)
             resolve(null)
