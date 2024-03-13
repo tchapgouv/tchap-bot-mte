@@ -5,6 +5,8 @@ import {GMCD_INFRA_ROOM_ID, myAccessToken, myBaseUrl, myDeviceId, myIdBaseUrl, m
 import {sendMessage} from "./helper.js";
 import {parseMessage, parseMessageToSelf} from "./answer.js";
 import bot from "./bot.js";
+import {RequestInit} from "node-fetch";
+import fetchWithError from "../../utils/fetchWithError.js";
 
 const opts = {
     baseUrl: myBaseUrl,
@@ -27,6 +29,31 @@ async function getIdentityServerToken(): Promise<string | null> {
 
         bot.getOpenIdToken().then(openIdToken => {
             logger.notice("openIdToken : ", openIdToken)
+            const url: string = process.env.IDENTITY_SERVER_URL + "/_matrix/identity/v2/account/register"
+            const requestInit: RequestInit = {
+                method: "POST", // *GET, POST, PUT, DELETE, etc.
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    "access_token": openIdToken,
+                    "expires_in": 60 * 60,
+                    "matrix_server_name": process.env.PANTALAIMON_URL,
+                    "token_type": "Bearer"
+                })
+            }
+            const fetchOpts = {
+                requestInit: requestInit,
+                proxify: true
+            }
+            fetchWithError(url, fetchOpts)
+                .then((response: Response) => response.json())
+                .then((data: any) => {
+                    logger.notice("fetchWithError : " + url, data)
+                    resolve(data.access_token)
+                })
+                .catch(reason => logger.error("fetchWithError : " + url, reason))
+
             bot.registerWithIdentityServer(openIdToken).then(value => {
                 logger.notice("registerWithIdentityServer : ", value)
                 resolve(value.access_token)
