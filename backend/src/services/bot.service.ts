@@ -41,31 +41,32 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                     reject(reason)
                 })
 
-            // let userInviteList: {
-            //     id_server: string,
-            //     medium: string,
-            //     address: string
-            // }[] = userMailList.map(mail => {
-            //     return {
-            //         id_server: bot.getHomeserverUrl(),
-            //         medium: "email",
-            //         address: mail
-            //     }
-            // });
-            //
-            // logger.debug("userInviteList : ", userInviteList)
+            let userInviteList: {
+                id_server: string,
+                medium: string,
+                address: string
+            }[] = userMailList.map(mail => {
+                return {
+                    id_server: bot.getHomeserverUrl(),
+                    medium: "email",
+                    address: mail
+                }
+            });
+
+            logger.debug("userInviteList : ", userInviteList)
 
             if (!roomId) {
                 await bot.createRoom({
                     name: roomName,
                     room_alias_name: roomName,
                     preset: Preset.TrustedPrivateChat,
-                    // invite_3pid: userInviteList,
+                    invite_3pid: userInviteList,
                     visibility: Visibility.Private,
                 })
                     .then((data) => {
                         logger.notice("Room created : ", data)
-                        roomId = data.room_id
+                        // roomId = data.room_id
+                        resolve({status: 200, message: "Room created", data: data})
                     })
                     .catch(reason => {
                         logger.error("Error creating room " + roomName + ". ", reason)
