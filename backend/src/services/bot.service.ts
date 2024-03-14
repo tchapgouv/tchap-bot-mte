@@ -78,7 +78,7 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                 })
                     .then((data) => {
                         logger.notice("Room created : ", data)
-                        message += roomName + "a été créée. Vous pouvez relancer la commande pour avoir plus de détails concernant les invitations.\n"
+                        message += roomName + " a été créée. Vous pouvez relancer la commande pour avoir plus de détails concernant les invitations.\n"
                         // roomId = data.room_id
                         resolve({status: 200, message: "Room created", data: message})
                     })

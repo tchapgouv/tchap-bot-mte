@@ -68,7 +68,7 @@ export async function getMailPRForUID(client: ldap.Client, username: string): Pr
     return new Promise((resolve, reject) => {
         (async () => {
             await getUserForUID(client, username).then((user: any) => {
-                logger.debug("Main mail for user " + username + " = " + user.mailPR.toLowerCase())
+                logger.debug("Main mail for user " + username + " = " + user.mailPR[0].toLowerCase())
                 resolve(user.mailPR[0].toLowerCase())
             }).catch(reason => {
                 logger.error("Could not get mail for uid " + username + " : ", reason)
