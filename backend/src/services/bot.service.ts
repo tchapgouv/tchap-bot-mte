@@ -89,9 +89,9 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                     })
             }
 
-            for (const userMail of userMailList) {
 
-                if (!userMail) continue
+            await Promise.all(userMailList.map(async (userMail) => {
+                if (!userMail) return
 
                 logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + ")")
                 await bot.inviteByEmail(roomId, userMail)
@@ -102,13 +102,15 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                     .catch(reason => {
                         logger.error("Error inviting " + userMail, reason)
                         if (!reason.data.error.includes("already in the room")) {
-                            // inviteErrors.push({mail: userMail, reason: reason})
                             message += " - ERREUR : " + userMail + " : " + reason.data.error + "\n"
                         } else {
                             message += " - " + userMail + " était déjà présent.\n"
                         }
                     })
-            }
+            })).catch(reason => {
+                logger.error("getMailsForUIDs : ", reason)
+                reject(reason)
+            })
 
             resolve({status: 200, message: "Room created", data: message})
         })()
