@@ -24,15 +24,15 @@ const opts = {
 }
 
 function isTokenValidForTheNextNthMinutes(ids_token: { token: string, valid_until: Date }, minutes: number) {
-    logger.debug("is " + ids_token.valid_until.getTime() + " > " + (new Date()).getTime() + minutes * 60 * 1000 + " ?")
-    return ids_token.valid_until.getTime() > (new Date()).getTime() + minutes * 60 * 1000
+    logger.debug("is " + ids_token.valid_until.getTime() + " > " + ((new Date()).getTime() + (minutes * 60 * 1000)) + " ?")
+    return ids_token.valid_until.getTime() > ((new Date()).getTime() + (minutes * 60 * 1000))
 }
 
 async function getIdentityServerToken(): Promise<string | null> {
 
     return new Promise((resolve, _reject) => {
 
-        if (ids_token && isTokenValidForTheNextNthMinutes(ids_token, 5)) {
+        if (ids_token?.token && isTokenValidForTheNextNthMinutes(ids_token, 5)) {
             logger.notice("Token still valid : ", ids_token)
             resolve(ids_token.token)
             return
@@ -57,8 +57,8 @@ async function getIdentityServerToken(): Promise<string | null> {
                 .then((data: any) => {
                     logger.notice("fetch : " + url, data)
                     ids_token = {
-                        token: data.accessToken,
-                        valid_until: new Date((new Date()).getTime() + 60 * 60 * 1000)
+                        token: data.access_token,
+                        valid_until: new Date((new Date()).getTime() + (60 * 60 * 1000))
                     }
                     resolve(data.access_token)
                 })
