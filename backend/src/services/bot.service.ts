@@ -89,7 +89,7 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                         logger.notice(userMail + " successfully invited.")
                     })
                     .catch(reason => {
-                        logger.error("Error inviting " + userMail + ". ", reason)
+                        logger.error("Error inviting " + userMail, reason)
                         if (!reason.data.error.includes("already in the room")) {
                             inviteErrors.push({mail: userMail, reason: reason})
                         }

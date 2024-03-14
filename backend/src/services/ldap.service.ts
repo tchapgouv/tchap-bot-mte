@@ -2,7 +2,7 @@ import ldap, {SearchOptions} from "ldapjs";
 import logger from "../utils/logger.js";
 
 
-export async function getMailsForUIDs(usernames: string[]): Promise<{userMailList:string[], userNotFoundList:string[]}> {
+export async function getMailsForUIDs(usernames: string[]): Promise<{ userMailList: string[], userNotFoundList: string[] }> {
 
     return new Promise((resolve, reject) => {
         (async () => {
@@ -12,7 +12,7 @@ export async function getMailsForUIDs(usernames: string[]): Promise<{userMailLis
                 url: process.env.LDAP_URI || ''
             });
 
-            let userNotFoundList:string[] = []
+            let userNotFoundList: string[] = []
             await Promise.all(usernames.map(async (username) => {
                 await getMailForUID(client, username)
                     .then(mail => userMailList.push(mail))
@@ -58,7 +58,7 @@ export async function getMailForUID(client: ldap.Client, username: string): Prom
             })
 
             logger.debug("Main mail for user " + username + " = " + mail)
-            resolve(mail)
+            resolve(mail.toLowerCase())
         })()
     })
 }
