@@ -26,7 +26,7 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
 
             await bot.getRoomIdForAlias("#" + roomName + ":" + process.env.TCHAP_SERVER_NAME).then((data) => {
                 roomId = data.room_id
-                message += roomName + " existait déjà et n'a pas été créée.\n"
+                message += roomName + " existait déjà et n'a pas été créé.\n"
             }).catch(reason => logger.notice("Room not found", reason))
 
             // let inviteErrors: { mail: string; reason: string; }[] = []
@@ -51,19 +51,19 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                     reject(reason)
                 })
 
-            let userInviteList: {
-                id_server: string,
-                medium: string,
-                address: string
-            }[] = userMailList.map(mail => {
-                return {
-                    id_server: bot.getHomeserverUrl(),
-                    medium: "email",
-                    address: mail
-                }
-            });
+            // let userInviteList: {
+            //     id_server: string,
+            //     medium: string,
+            //     address: string
+            // }[] = userMailList.map(mail => {
+            //     return {
+            //         id_server: bot.getHomeserverUrl(),
+            //         medium: "email",
+            //         address: mail
+            //     }
+            // });
 
-            logger.debug("userInviteList : ", userInviteList)
+            // logger.debug("userInviteList : ", userInviteList)
 
             if (!roomId) {
                 await bot.createRoom({
@@ -73,14 +73,14 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                     power_level_content_override: {
                         users_default: 100
                     },
-                    invite_3pid: userInviteList,
+                    // invite_3pid: userInviteList,
                     visibility: Visibility.Private,
                 })
                     .then((data) => {
                         logger.notice("Room created : ", data)
-                        message += roomName + " a été créée. Vous pouvez relancer la commande pour avoir plus de détails concernant les invitations.\n"
+                        message += roomName + " a été créé. Vous pouvez relancer la commande pour avoir plus de détails concernant les invitations.\n"
                         // roomId = data.room_id
-                        resolve({status: 200, message: "Room created", data: message})
+                        // resolve({status: 200, message: "Room created", data: message})
                     })
                     .catch(reason => {
                         logger.error("Error creating room " + roomName + ". ", reason)
