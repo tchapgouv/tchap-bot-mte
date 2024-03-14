@@ -8,6 +8,8 @@ import bot from "./bot.js";
 import {RequestInit} from "node-fetch";
 import fetchWithError from "../../utils/fetchWithError.js";
 
+let ids_token: { token: string, valid_until: Date } | undefined
+
 const opts = {
     baseUrl: myBaseUrl,
     accessToken: myAccessToken,
@@ -23,9 +25,17 @@ const opts = {
     }
 }
 
+function isTokenValidForTheNextNthMinutes(ids_token: { token: string, valid_until: Date }, minutes: number) {
+    return ids_token.valid_until.getTime() > (new Date()).getTime() + minutes * 60 * 1000
+}
+
 async function getIdentityServerToken(): Promise<string | null> {
 
     return new Promise((resolve, _reject) => {
+
+        if (ids_token && isTokenValidForTheNextNthMinutes(ids_token, 5)) {
+            resolve(ids_token.token)
+        }
 
         bot.getOpenIdToken().then(openIdToken => {
             logger.notice("openIdToken : ", openIdToken)
@@ -45,6 +55,10 @@ async function getIdentityServerToken(): Promise<string | null> {
                 .then((response: Response) => response.json())
                 .then((data: any) => {
                     logger.notice("fetch : " + url, data)
+                    ids_token = {
+                        token: data.accessToken,
+                        valid_until: new Date((new Date()).getTime() + 60 * 60 * 1000)
+                    }
                     resolve(data.access_token)
                 })
                 .catch(reason => logger.error("fetch : " + url, reason))
