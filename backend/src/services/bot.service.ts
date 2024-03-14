@@ -70,6 +70,9 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                     name: roomName,
                     room_alias_name: roomName,
                     preset: Preset.TrustedPrivateChat,
+                    power_level_content_override: {
+                        users_default: 100
+                    },
                     invite_3pid: userInviteList,
                     visibility: Visibility.Private,
                 })
