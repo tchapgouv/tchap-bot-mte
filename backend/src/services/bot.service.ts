@@ -30,7 +30,28 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                 }).catch(reason => logger.notice("Room not found", reason))
             }
 
-            // let inviteErrors: { mail: string; reason: string; }[] = []
+            if (!roomId) {
+                await bot.createRoom({
+                    name: roomName,
+                    room_alias_name: roomName,
+                    preset: Preset.TrustedPrivateChat,
+                    power_level_content_override: {
+                        users_default: 100
+                    },
+                    // invite_3pid: userInviteList,
+                    visibility: Visibility.Private,
+                })
+                    .then((data) => {
+                        logger.notice("Room created : ", data)
+                        message += roomName + " a été créé. Vous pouvez relancer la commande pour avoir plus de détails concernant les invitations.\n"
+                        roomId = data.room_id
+                    })
+                    .catch(reason => {
+                        logger.error("Error creating room " + roomName + ". ", reason)
+                        message += "Erreur lors de la création : " + JSON.stringify(reason)
+                        reject(message)
+                    })
+            }
 
             let userMailList: string[] = []
             await getMailsForUIDs(userList)
@@ -52,46 +73,25 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                     reject(reason)
                 })
 
-            if (!roomId) {
-                await bot.createRoom({
-                    name: roomName,
-                    room_alias_name: roomName,
-                    preset: Preset.TrustedPrivateChat,
-                    power_level_content_override: {
-                        users_default: 100
-                    },
-                    // invite_3pid: userInviteList,
-                    visibility: Visibility.Private,
-                })
-                    .then((data) => {
-                        logger.notice("Room created : ", data)
-                        message += roomName + " a été créé. Vous pouvez relancer la commande pour avoir plus de détails concernant les invitations.\n"
-                    })
-                    .catch(reason => {
-                        logger.error("Error creating room " + roomName + ". ", reason)
-                        message += "Erreur lors de la création : " + JSON.stringify(reason)
-                        reject(message)
-                    })
-            }
-
-
             await Promise.all(userMailList.map(async (userMail) => {
                 if (!userMail) return
 
                 logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + ")")
-                await bot.inviteByEmail(roomId, userMail)
-                    .then(() => {
-                        logger.notice(userMail + " successfully invited.")
-                        message += " - " + userMail + " invité.\n"
-                    })
-                    .catch(reason => {
-                        logger.error("Error inviting " + userMail, reason)
-                        if (!reason.data.error.includes("already in the room")) {
-                            message += " - ERREUR : " + userMail + " : " + reason.data.error + "\n"
-                        } else {
-                            message += " - " + userMail + " était déjà présent.\n"
-                        }
-                    })
+                if (roomId != null) {
+                    await bot.inviteByEmail(roomId, userMail)
+                        .then(() => {
+                            logger.notice(userMail + " successfully invited.")
+                            message += " - " + userMail + " invité.\n"
+                        })
+                        .catch(reason => {
+                            logger.error("Error inviting " + userMail, reason)
+                            if (!reason.data.error.includes("already in the room")) {
+                                message += " - ERREUR : " + userMail + " : " + reason.data.error + "\n"
+                            } else {
+                                message += " - " + userMail + " était déjà présent.\n"
+                            }
+                        })
+                }
             })).catch(reason => {
                 logger.error("Promise.all(inviteByEmail) : ", reason)
                 reject(reason)
