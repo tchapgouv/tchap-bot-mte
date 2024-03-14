@@ -33,7 +33,12 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                 .then(data => {
                     userMailList = data.userMailList
                     for (const username of data.userNotFoundList) {
-                        inviteErrors.push({mail: username, reason: "No match in LDAP !"})
+                        if (username.includes("@")) {
+                            userList.push(username)
+                            inviteErrors.push({mail: username, reason: "No match in LDAP but seams to be an email address"})
+                        } else {
+                            inviteErrors.push({mail: username, reason: "No match in LDAP !"})
+                        }
                     }
                 })
                 .catch(reason => {
