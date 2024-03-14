@@ -18,14 +18,13 @@ const opts = {
     idBaseUrl: myIdBaseUrl,
     identityServer: {
         getAccessToken(): Promise<string | null> {
-            const token = getIdentityServerToken()
-            logger.debug(token)
-            return token
+            return getIdentityServerToken()
         }
     }
 }
 
 function isTokenValidForTheNextNthMinutes(ids_token: { token: string, valid_until: Date }, minutes: number) {
+    logger.debug("is " + ids_token.valid_until.getTime() + " > " + (new Date()).getTime() + minutes * 60 * 1000 + " ?")
     return ids_token.valid_until.getTime() > (new Date()).getTime() + minutes * 60 * 1000
 }
 
@@ -34,7 +33,9 @@ async function getIdentityServerToken(): Promise<string | null> {
     return new Promise((resolve, _reject) => {
 
         if (ids_token && isTokenValidForTheNextNthMinutes(ids_token, 5)) {
+            logger.notice("Token still valid : ", ids_token)
             resolve(ids_token.token)
+            return
         }
 
         bot.getOpenIdToken().then(openIdToken => {
