@@ -20,13 +20,16 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
 
     return new Promise((resolve, reject) => {
         (async () => {
+
+            let message: string = ""
             let roomId: string = ""
 
             await bot.getRoomIdForAlias("#" + roomName + ":" + process.env.TCHAP_SERVER_NAME).then((data) => {
                 roomId = data.room_id
+                message += roomName + " existait déjà et n'a pas été créée.\n"
             }).catch(reason => logger.notice("Room not found", reason))
 
-            let inviteErrors: { mail: string; reason: string; }[] = []
+            // let inviteErrors: { mail: string; reason: string; }[] = []
 
             let userMailList: string[] = []
             await getMailsForUIDs(userList)
@@ -35,9 +38,11 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                     for (const username of data.userNotFoundList) {
                         if (username.includes("@")) {
                             userList.push(username)
-                            inviteErrors.push({mail: username, reason: "No match in LDAP but seams to be an email address"})
+                            message += "Attention, " + username + ", n'a pas été trouvé dans le LDAP, mais ressemble à une adresse mail. Une invitation sera tentée.\n"
+                            // inviteErrors.push({mail: username, reason: "No match in LDAP but seams to be an email address"})
                         } else {
-                            inviteErrors.push({mail: username, reason: "No match in LDAP !"})
+                            message += "Attention, " + username + ", n'a pas été trouvé dans le LDAP, aucune invitation ne sera faite !\n"
+                            // inviteErrors.push({mail: username, reason: "No match in LDAP !"})
                         }
                     }
                 })
@@ -70,12 +75,14 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                 })
                     .then((data) => {
                         logger.notice("Room created : ", data)
+                        message += roomName + "a été créée. Vous pouvez relancer la commande pour avoir plus de détails concernant les invitations.\n"
                         // roomId = data.room_id
-                        resolve({status: 200, message: "Room created", data: data})
+                        resolve({status: 200, message: "Room created", data: message})
                     })
                     .catch(reason => {
                         logger.error("Error creating room " + roomName + ". ", reason)
-                        reject(reason)
+                        message += "Erreur lors de la création : " + JSON.stringify(reason)
+                        reject(message)
                     })
             }
 
@@ -87,16 +94,20 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
                 await bot.inviteByEmail(roomId, userMail)
                     .then(() => {
                         logger.notice(userMail + " successfully invited.")
+                        message += " - " + userMail + " invité.\n"
                     })
                     .catch(reason => {
                         logger.error("Error inviting " + userMail, reason)
                         if (!reason.data.error.includes("already in the room")) {
-                            inviteErrors.push({mail: userMail, reason: reason})
+                            // inviteErrors.push({mail: userMail, reason: reason})
+                            message += " - ERREUR : " + userMail + " : " + reason.data.error + "\n"
+                        } else {
+                            message += " - " + userMail + " était déjà présent.\n"
                         }
                     })
             }
 
-            resolve({status: 200, message: "Room created", data: {invite_errors: inviteErrors}})
+            resolve({status: 200, message: "Room created", data: message})
         })()
     })
 }

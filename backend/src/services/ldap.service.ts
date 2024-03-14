@@ -14,7 +14,7 @@ export async function getMailsForUIDs(usernames: string[]): Promise<{ userMailLi
 
             let userNotFoundList: string[] = []
             await Promise.all(usernames.map(async (username) => {
-                await getMailForUID(client, username)
+                await getMailPRForUID(client, username)
                     .then(mail => userMailList.push(mail))
                     .catch(_reason => {
                         userNotFoundList.push(username)
@@ -63,10 +63,25 @@ export async function getMailForUID(client: ldap.Client, username: string): Prom
     })
 }
 
+export async function getMailPRForUID(client: ldap.Client, username: string): Promise<string> {
+
+    return new Promise((resolve, reject) => {
+        (async () => {
+            await getUserForUID(client, username).then((user: any) => {
+                logger.debug("Main mail for user " + username + " = " + user.mailPR.toLowerCase())
+                resolve(user.mailPR.toLowerCase())
+            }).catch(reason => {
+                logger.error("Could not get mail for uid " + username + " : ", reason)
+                reject(reason)
+            })
+        })()
+    })
+}
+
 export async function getUserForUID(client: ldap.Client, username: string) {
 
     const opts: SearchOptions = {
-        attributes: ['uid', 'cn', 'mail'],
+        attributes: ['uid', 'cn', 'mail', 'mailPR', 'displayName'],
         filter: "(&(uid=" + username + "))",
         scope: 'sub'
     };
