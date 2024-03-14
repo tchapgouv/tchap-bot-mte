@@ -21,7 +21,7 @@ async function createRoomAndInvite(roomName: string, userList: string[]): Promis
     return new Promise((resolve, reject) => {
         (async () => {
 
-            let message: string = ""
+            let message: string = "\n"
             let roomId: string = ""
 
             await bot.getRoomIdForAlias("#" + roomName + ":" + process.env.TCHAP_SERVER_NAME).then((data) => {
