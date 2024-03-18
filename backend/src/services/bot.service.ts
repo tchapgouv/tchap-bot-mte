@@ -46,7 +46,7 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                         logger.notice("Room created : ", data)
                         message += roomName + " a été créé.\n"
                         message += "Ce salon est privé, à ce titre il est crypté.\n"
-                        message += "Attention, notez que tous les utilisateurs invités pas le bot sont tous administrateurs.\n"
+                        message += "Attention, notez que tous les utilisateurs invités par le bot sont tous administrateurs.\n"
                         roomId = data.room_id
                     })
                     .catch(reason => {
