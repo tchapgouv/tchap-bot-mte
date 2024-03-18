@@ -4,6 +4,7 @@ import {Preset, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import {getMailsForUIDs} from "./ldap.service.js";
 import {IWebResponse} from "../utils/IWebResponse.js";
+import {sendMessage} from "../bot/gmcd/helper.js";
 
 
 async function runScript(script: string, message: string) {
@@ -43,7 +44,9 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                 })
                     .then((data) => {
                         logger.notice("Room created : ", data)
-                        message += roomName + " a été créé. Vous pouvez relancer la commande pour avoir plus de détails concernant les invitations.\n"
+                        message += roomName + " a été créé.\n"
+                        message += "Ce salon est privé, à ce titre il est crypté.\n"
+                        message += "Attention, notez que tous les utilisateurs invités pas le bot sont tous administrateurs.\n"
                         roomId = data.room_id
                     })
                     .catch(reason => {
@@ -60,10 +63,10 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                     for (const username of data.userNotFoundList) {
                         if (username.includes("@")) {
                             userList.push(username)
-                            message += "Attention, " + username + ", n'a pas été trouvé dans le LDAP, mais ressemble à une adresse mail. Une invitation sera tentée.\n"
+                            message += "Attention, " + username + ", n'a pas été trouvé dans le LDAP, mais ressemble à une adresse mail. Une invitation a été tentée.\n"
                             // inviteErrors.push({mail: username, reason: "No match in LDAP but seams to be an email address"})
                         } else {
-                            message += "Attention, " + username + ", n'a pas été trouvé dans le LDAP, aucune invitation ne sera faite !\n"
+                            message += "Attention, " + username + ", n'a pas été trouvé dans le LDAP, aucune invitation n'a été faite !\n"
                             // inviteErrors.push({mail: username, reason: "No match in LDAP !"})
                         }
                     }
@@ -96,6 +99,10 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                 logger.error("Promise.all(inviteByEmail) : ", reason)
                 reject(reason)
             })
+
+            if (roomId != null) {
+                sendMessage(bot, roomId, message)
+            }
 
             resolve({status: 200, message: "Room created", data: message})
         })()
