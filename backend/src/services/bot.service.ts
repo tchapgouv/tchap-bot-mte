@@ -58,6 +58,12 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                     })
             }
 
+            message += "\n"
+            message += "Bonne journée !\n"
+            message += "\n"
+            message += "\n"
+            message += "Rapport d'invitations : \n"
+
             let userMailList: string[] = []
             await getMailsForUIDs(userList)
                 .then(data => {
