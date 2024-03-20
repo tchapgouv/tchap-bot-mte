@@ -37,7 +37,7 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                     room_alias_name: roomName,
                     preset: Preset.TrustedPrivateChat,
                     power_level_content_override: {
-                        users_default: 100
+                        users_default: 50
                     },
                     // invite_3pid: userInviteList,
                     visibility: Visibility.Private,
@@ -46,7 +46,9 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                         logger.notice("Room created : ", data)
                         message += roomName + " a été créé.\n"
                         message += "Ce salon est privé, à ce titre il est crypté.\n"
-                        message += "Attention, notez que tous les utilisateurs invités par le bot sont tous administrateurs.\n"
+                        message += "Attention, notez que les utilisateurs invités par le bot sont tous modérateurs. Vous pouvez changer ce comportement par défaut en modifiant 'Rôle par défaut' dans les paramètres du salon.\n"
+                        message += "Vous pouvez vous promouvoir administrateur simplement en me le demandant : '@ bot-gmcd promote me'.\n"
+                        message += "Enfin, vous pouvez me renvoyer : '@ bot-gmcd oust !'.\n"
                         roomId = data.room_id
                     })
                     .catch(reason => {
