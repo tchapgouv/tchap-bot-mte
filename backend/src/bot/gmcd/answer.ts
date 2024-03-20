@@ -32,7 +32,7 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent) {
     logger.debug("room_id =", roomId)
 
     if (shallContinue) shallContinue = !leaveRoomIfAsked(client, roomId, message)
-    if (shallContinue) shallContinue = promoteUserIfAsked(client, event, message)
+    if (shallContinue) shallContinue = !promoteUserIfAsked(client, event, message)
     if (shallContinue) sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }
 
