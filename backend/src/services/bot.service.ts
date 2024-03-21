@@ -44,11 +44,11 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                 })
                     .then((data) => {
                         logger.notice("Room created : ", data)
-                        message += roomName + " a été créé.\n"
+                        message += roomName + " a été créé. ✌️\n"
                         message += "Ce salon est privé, à ce titre il est crypté.\n"
-                        message += "Attention, notez que les utilisateurs invités par le bot sont tous modérateurs. Vous pouvez changer ce comportement par défaut en modifiant 'Rôle par défaut' dans les paramètres du salon.\n"
-                        message += "Vous pouvez vous promouvoir administrateur simplement en me le demandant : '@ bot-gmcd promote me'.\n"
-                        message += "Enfin, vous pouvez me renvoyer : '@ bot-gmcd oust !'.\n"
+                        message += "Attention, notez que les utilisateurs invités par le bot sont tous modérateurs. Vous pouvez changer ce comportement par défaut en modifiant `Rôle par défaut` dans les paramètres du salon.\n"
+                        message += "Vous pouvez vous promouvoir administrateur simplement en me le demandant : `@bot-gmcd promote me`. 🍄\n"
+                        message += "Enfin, vous pouvez me renvoyer : `@bot-gmcd oust !`. 🪦\n"
                         roomId = data.room_id
                     })
                     .catch(reason => {
@@ -71,10 +71,10 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                     for (const username of data.userNotFoundList) {
                         if (username.includes("@")) {
                             userList.push(username)
-                            message += "Attention, " + username + ", n'a pas été trouvé dans le LDAP, mais ressemble à une adresse mail. Une invitation a été tentée.\n"
+                            message += " ❔ " + username + ", n'a pas été trouvé dans le LDAP, mais ressemble à une adresse mail. Une invitation a été tentée.\n"
                             // inviteErrors.push({mail: username, reason: "No match in LDAP but seams to be an email address"})
                         } else {
-                            message += "Attention, " + username + ", n'a pas été trouvé dans le LDAP, aucune invitation n'a été faite !\n"
+                            message += " ❓️ " + username + ", n'a pas été trouvé dans le LDAP, aucune invitation n'a été faite !\n"
                             // inviteErrors.push({mail: username, reason: "No match in LDAP !"})
                         }
                     }
@@ -92,14 +92,14 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                     await bot.inviteByEmail(roomId, userMail)
                         .then(() => {
                             logger.notice(userMail + " successfully invited.")
-                            message += " - " + userMail + " invité.\n"
+                            message += " ✅ " + userMail + " invité.\n"
                         })
                         .catch(reason => {
                             logger.error("Error inviting " + userMail, reason)
                             if (!reason.data.error.includes("already in the room")) {
-                                message += " - ERREUR : " + userMail + " : " + reason.data.error + "\n"
+                                message += " ❗️ " + userMail + ", " + reason.data.error + "\n"
                             } else {
-                                message += " - " + userMail + " était déjà présent.\n"
+                                message += " 🤷 " + userMail + " était déjà présent.\n"
                             }
                         })
                 }
