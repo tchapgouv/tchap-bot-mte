@@ -28,7 +28,7 @@ function isTokenValidForTheNextNthMinutes(ids_token: { token: string, valid_unti
     return ids_token.valid_until.getTime() > ((new Date()).getTime() + (minutes * 60 * 1000))
 }
 
-async function getIdentityServerToken(): Promise<string | null> {
+export async function getIdentityServerToken(): Promise<string | null> {
 
     return new Promise((resolve, _reject) => {
 
@@ -50,7 +50,8 @@ async function getIdentityServerToken(): Promise<string | null> {
             }
             const fetchOpts = {
                 requestInit: requestInit,
-                proxify: true
+                proxify: true,
+                timeout: 15000
             }
             fetchWithError(url, fetchOpts)
                 .then((response: Response) => response.json())
