@@ -29,7 +29,30 @@ export function sendMessage(client: MatrixClient, room: string, message: string)
 
     return new Promise((resolve, reject) => {
         const content = {
-            "body": message, "msgtype": MsgType.Text,
+            "body": message,
+            "msgtype": MsgType.Text,
+        };
+        client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
+            resolve(res)
+            logger.debug(res);
+        }).catch(reason => {
+            logger.error(reason)
+            reject(reason)
+        });
+    })
+}
+
+export function sendHtmlMessage(client: MatrixClient, room: string, rawMessage: string, htmlMessage: string) {
+
+    logger.debug("Sending message : ", rawMessage)
+    logger.debug("room : ", room)
+
+    return new Promise((resolve, reject) => {
+        const content = {
+            "body": rawMessage,
+            "formatted_body": htmlMessage,
+            "format": "org.matrix.custom.html",
+            "msgtype": MsgType.Text
         };
         client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
             resolve(res)

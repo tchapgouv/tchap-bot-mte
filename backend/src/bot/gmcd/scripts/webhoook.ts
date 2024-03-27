@@ -1,8 +1,40 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
-import {sendMessage} from "../helper.js";
+import {sendHtmlMessage} from "../helper.js";
 import {create, findOne} from "../../../services/webhook.service.js";
 import {Webhook} from "../../../models/webhook.model.js";
+
+function getWebhookMessage(exists: boolean, webhook_id: any) {
+    return (exists ? "Un webhook existe déjà pour ce salon 😉 !\n" : "J'ai créé un webhook pour vous 🚀 !\n") +
+        "L'URL est la suivante : \n" +
+        "https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + webhook_id + "\n" +
+        "La charge utile (body) doit être de la forme suivante :\n" +
+        "{\n" +
+        "   message: \"Coucou ! Message envoyé avec un webhook =)\n" +
+        "}\n" +
+        "Amusez vous bien ! 🏌️"
+}
+
+function aLink(url: string) {
+    return "<a href='" + url + "'>" + url + "</a>"
+}
+
+function codeBlock(code: string, language: string) {
+    return "<code class='language-" + language + "'>" + code + "</code>"
+}
+
+function getWebhookHtmlMessage(exists: boolean, webhook_id: any) {
+    const url = "https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + webhook_id
+    return (exists ? "Un webhook existe déjà pour ce salon 😉 !\n" : "J'ai créé un webhook pour vous 🚀 !\n") +
+        "L'URL est la suivante : \n" +
+        aLink(url) + "\n" +
+        "La charge utile (body) doit être de la forme suivante :\n" +
+        codeBlock(
+            "{\n" +
+            "   message: \"Coucou ! Message envoyé avec un webhook =)\n" +
+            "}\n", "json") +
+        "Amusez vous bien ! 🏌️"
+}
 
 export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
@@ -21,30 +53,18 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
             findOne({where: {room_id: roomId}}).then(webhook => {
 
                 if (webhook) {
-                    let message = "Un webhook existe déjà pour ce salon 😉 !\n"
-                    message += "L'URL est la suivante : \n"
-                    message += "https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + webhook.dataValues.webhook_id + "\n"
-                    message += "La charge utile (body) doit être de la forme suivante :\n"
-                    message += "```json\n"
-                    message += "{\n"
-                    message += "   message: \"Coucou ! Message envoyé avec un webhook =)\n"
-                    message += "}\n"
-                    message += "```\n"
-                    message += "Amusez vous bien ! 🏌️"
-                    sendMessage(client, roomId, message)
+
+                    const rawMessage = getWebhookMessage(true, webhook.dataValues.webhook_id)
+                    const htmlMessage = getWebhookHtmlMessage(false, webhook.dataValues.webhook_id)
+                    sendHtmlMessage(client, roomId, rawMessage, htmlMessage)
+
                 } else {
                     create("Bot - " + userName + " - " + roomId, roomId).then((value: Webhook) => {
-                        let message = "J'ai créé un webhook pour vous 🚀 !\n"
-                        message += "L'URL est la suivante : \n"
-                        message += "https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + value.dataValues.webhook_id + "\n"
-                        message += "La charge utile (body) doit être de la forme suivante :\n"
-                        message += "```json\n"
-                        message += "{\n"
-                        message += "   message: \"Coucou ! Message envoyé avec un webhook =)\n"
-                        message += "}\n"
-                        message += "```\n"
-                        message += "Amusez vous bien ! 🏌️"
-                        sendMessage(client, roomId, message)
+
+                        const rawMessage = getWebhookMessage(false, value.dataValues.webhook_id)
+                        const htmlMessage = getWebhookHtmlMessage(false, value.dataValues.webhook_id)
+                        sendHtmlMessage(client, roomId, rawMessage, htmlMessage)
+
                     }).catch(reason => logger.error("createWebhookIfAsked => create : ", reason));
                 }
             })
