@@ -6,6 +6,7 @@ import {getMailsForUIDs} from "./ldap.service.js";
 import {IWebResponse} from "../utils/IWebResponse.js";
 import {sendMessage} from "../bot/gmcd/helper.js";
 import {getIdentityServerToken} from "../bot/gmcd/init.js";
+import {throws} from "node:assert";
 
 async function runScript(script: string, message: string) {
 
@@ -121,15 +122,19 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
 }
 
 
-async function postMessage(roomId: string, message: string, script: string) {
+async function applyScriptAndPostMessage(roomId: string, message: string, script: string) {
+
+    logger.info("Applying script to message")
 
     // console.log('message before script : ', message);
     await runScript(script, message).then(data => message = data)
     // console.log('message after script : ', message);
 
+    logger.info("Posting message")
+
     return await bot.sendTextMessage(roomId, message).then(() => {
         return {message: "Message sent"}
-    }).catch(e => logger.error(e))
+    }).catch(reason => throws(reason))
 }
 
-export {postMessage, createRoomAndInvite}
+export {applyScriptAndPostMessage, createRoomAndInvite}

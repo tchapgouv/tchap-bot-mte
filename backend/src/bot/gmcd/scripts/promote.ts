@@ -4,7 +4,7 @@ import {sendMessage} from "../helper.js";
 
 export function promoteUserIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /.*(promote me).*/i
+    const regex: RegExp = /.*(promote me|promeut moi).*/i
 
     if (event?.sender?.name &&
         event?.sender?.userId &&

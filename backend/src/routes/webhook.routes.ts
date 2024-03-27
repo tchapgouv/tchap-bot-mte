@@ -1,6 +1,6 @@
 import express from 'express';
 import {create, destroy, findAll, findOne, findOneWithWebhook, update} from "../services/webhook.service.js";
-import {postMessage} from "../services/bot.service.js";
+import {applyScriptAndPostMessage} from "../services/bot.service.js";
 import {verifyToken} from "../controllers/auth.controller.js";
 
 const webhookRouter = express.Router();
@@ -29,7 +29,7 @@ webhookRouter.post("/api/webhook/post/:webhook?", (req, res) => {
         const room_id = data.room_id
         const script = data.script
 
-        postMessage(room_id,
+        applyScriptAndPostMessage(room_id,
             req.body.message,
             script).then(data => {
             res.json(data)
