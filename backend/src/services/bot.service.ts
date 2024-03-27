@@ -6,7 +6,6 @@ import {getMailsForUIDs} from "./ldap.service.js";
 import {IWebResponse} from "../utils/IWebResponse.js";
 import {sendMessage} from "../bot/gmcd/helper.js";
 import {getIdentityServerToken} from "../bot/gmcd/init.js";
-import {throws} from "node:assert";
 
 async function runScript(script: string, message: string) {
 
@@ -40,7 +39,6 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                     power_level_content_override: {
                         users_default: 50
                     },
-                    // invite_3pid: userInviteList,
                     visibility: Visibility.Private,
                 })
                     .then((data) => {
@@ -134,7 +132,7 @@ async function applyScriptAndPostMessage(roomId: string, message: string, script
 
     return await sendMessage(bot, roomId, message).then(() => {
         return {message: "Message sent"}
-    }).catch(reason => throws(reason))
+    }).catch(reason => logger.error("Error occurred sending webhook message to room ;", roomId, "message :", message, "reason :", reason))
 }
 
 export {applyScriptAndPostMessage, createRoomAndInvite}
