@@ -5,6 +5,7 @@ import {sayGoodbyeIfNecessary} from "./scripts/gallantry.js";
 import {norrisIfAsked} from "./scripts/norris.js";
 import {promoteUserIfAsked} from "./scripts/promote.js";
 import {createWebhookIfAsked} from "./scripts/webhoook.js";
+import {leaveRoomIfAsked} from "./scripts/leave.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent) {
 
@@ -25,27 +26,15 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent) {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
-    let shallContinue = true
+    let actionTaken = false
 
     if (!roomId || !message || !event.sender) return
 
     logger.debug("body =", message)
     logger.debug("room_id =", roomId)
 
-    if (shallContinue) shallContinue = !leaveRoomIfAsked(client, roomId, message)
-    if (shallContinue) shallContinue = !promoteUserIfAsked(client, event, message)
-    if (shallContinue) shallContinue = !createWebhookIfAsked(client, event, message)
-    if (shallContinue) sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
-}
-
-function leaveRoomIfAsked(client: MatrixClient, roomId: string, body: string) {
-
-    const leaveRoomOptions = ["oust"]
-    if (roomId && body && leaveRoomOptions.some(option => body.includes(option))) {
-        logger.warning("Someone dismissed me :(")
-        sendMessage(client, roomId, "Au revoir ! 😭")
-        client.leave(roomId).catch(e => logger.error(e));
-        return true
-    }
-    return false
+    if (!actionTaken) actionTaken = leaveRoomIfAsked(client, roomId, message)
+    if (!actionTaken) actionTaken = promoteUserIfAsked(client, event, message)
+    if (!actionTaken) actionTaken = createWebhookIfAsked(client, event, message)
+    if (!actionTaken) sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }

@@ -6,7 +6,7 @@ import {Webhook} from "../../../models/webhook.model.js";
 
 export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /.*(create|créé|ajoute|add).*webhook.*/i
+    const regex: RegExp = /.*(create|créé|créer|ajoute|add).*webhook.*/i
 
     if (regex.test(body)) {
 
@@ -46,9 +46,8 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
             })
                 .catch(reason => logger.error("createWebhookIfAsked : ", reason));
 
-
+            return true
         }
-        return true
     }
 
     return false

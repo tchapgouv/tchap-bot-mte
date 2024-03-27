@@ -6,19 +6,22 @@ export function promoteUserIfAsked(client: MatrixClient, event: MatrixEvent, bod
 
     const regex: RegExp = /.*(promote me|promeut moi).*/i
 
-    if (event?.sender?.name &&
-        event?.sender?.userId &&
-        event?.event?.room_id) {
 
-        const roomId = event.event.room_id
-        const userId = event.sender.userId
+    if (regex.test(body)) {
 
-        if (regex.test(body)) {
+        if (event?.sender?.name &&
+            event?.sender?.userId &&
+            event?.event?.room_id) {
+
+            const roomId = event.event.room_id
+            const userId = event.sender.userId
+
             logger.debug("Promoting " + event.sender.name + ".")
             client.setPowerLevel(roomId, userId, 100);
             sendMessage(client, roomId, "Je viens de promouvoir " + event.sender.name + ". Félicitation ! 🎆")
+
+            return true
         }
-        return true
     }
 
     return false
