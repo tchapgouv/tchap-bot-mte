@@ -55,7 +55,7 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
                 logger.debug(users)
                 for (let user in users) logger.debug(user + ":" + users[user])
 
-                const userPowerlevel = users[userId] | 0
+                const userPowerlevel = users[userId]
                 const isPowerUser = userPowerlevel > 90
                 logger.info(userId + " power = " + userPowerlevel)
                 logger.info("User is poweruser ? " + isPowerUser)
