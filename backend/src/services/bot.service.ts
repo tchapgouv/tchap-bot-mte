@@ -1,6 +1,6 @@
 import bot from "../bot/gmcd/bot.js";
 import vm from "vm"
-import {Preset, Visibility} from "matrix-js-sdk";
+import {Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import {getMailsForUIDs} from "./ldap.service.js";
 import {IWebResponse} from "../utils/IWebResponse.js";
@@ -35,9 +35,9 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                 await bot.createRoom({
                     name: roomName,
                     room_alias_name: roomName,
-                    preset: Preset.TrustedPrivateChat,
+                    // preset: Preset.PrivateChat,
                     power_level_content_override: {
-                        users_default: 50
+                        // users_default: 50
                     },
                     visibility: Visibility.Private,
                 })
@@ -49,6 +49,7 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                         message += "Vous pouvez vous promouvoir administrateur simplement en me le demandant : `@bot-gmcd promote me`. 🍄\n"
                         message += "Enfin, vous pouvez me renvoyer : `@bot-gmcd oust !`. 🪦\n"
                         roomId = data.room_id
+                        bot.se
                     })
                     .catch(reason => {
                         logger.error("Error creating room " + roomName + ". ", reason)
