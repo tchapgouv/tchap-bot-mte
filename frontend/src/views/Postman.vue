@@ -32,16 +32,21 @@
     </div>
     <div style="clear: both"/>
   </div>
-
+  <dsfr-button :label="'Envoyer'"
+               @click="onClick"/>
   <p style="line-break: anywhere">
     E.g. :
     <br/>
     {{
       'curl -d \'{"message":"' + message.replace("\"", "\\\"").replace("\'", "\'\\\'\'") + '", "webhook":"' + webhook_id + '"}\' -H "Content-Type: application/json" -X POST https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post'
+    }}
+    <br/>
+    ou :
+    <br/>
+    {{
+      'curl -d \'{"message":"' + message.replace("\"", "\\\"").replace("\'", "\'\\\'\'") + '"}\' -H "Content-Type: application/json" -X POST https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/' + webhook_id 
     }} </p>
 
-  <dsfr-button :label="'Envoyer'"
-               @click="onClick"/>
   <br/>
 
 </template>

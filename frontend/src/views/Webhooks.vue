@@ -136,7 +136,7 @@ function updateList() {
           {
             component: DsfrButton,
             label: "Copier le webhook",
-            onClick: () => copyWebhook(row.webhook_id),
+            onClick: () => copyWebhook("https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + row.webhook_id),
             icon: "ri-file-copy-line"
           },
           row.room_id,
