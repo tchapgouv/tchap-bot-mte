@@ -4,6 +4,7 @@ import {sendMessage} from "./helper.js";
 import {sayGoodbyeIfNecessary} from "./scripts/gallantry.js";
 import {norrisIfAsked} from "./scripts/norris.js";
 import {promoteUserIfAsked} from "./scripts/promote.js";
+import {createWebhookIfAsked} from "./scripts/webhoook.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent) {
 
@@ -33,6 +34,7 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent) {
 
     if (shallContinue) shallContinue = !leaveRoomIfAsked(client, roomId, message)
     if (shallContinue) shallContinue = !promoteUserIfAsked(client, event, message)
+    if (shallContinue) shallContinue = !createWebhookIfAsked(client, event, message)
     if (shallContinue) sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }
 
