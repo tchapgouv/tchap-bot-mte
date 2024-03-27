@@ -3,6 +3,7 @@ import logger from "../../../utils/logger.js";
 import {sendHtmlMessage} from "../helper.js";
 import {create, findOne} from "../../../services/webhook.service.js";
 import {Webhook} from "../../../models/webhook.model.js";
+import {EventType} from "matrix-js-sdk/src/@types/event.js";
 
 function getWebhookMessage(exists: boolean, webhook_id: any) {
     return (exists ? "Un webhook existe déjà pour ce salon 😉 !\n" : "J'ai créé un webhook pour vous 🚀 !\n") +
@@ -43,10 +44,21 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
     if (regex.test(body)) {
 
         if (event?.sender?.name &&
+            event?.sender?.userId &&
             event?.event?.room_id) {
 
             const roomId = event.event.room_id
             const userName = event.sender.name
+            const userId = event.sender.userId
+
+            const currentUser = client.getStateEvent(roomId, EventType.RoomPowerLevels, "").then(value => {
+                for (const user of value.users) {
+                    logger.debug(user)
+                }
+                const userPowerlevel = value.users[userId]
+                logger.debug(userName + " has powerlevel" + userPowerlevel)
+                logger.debug(userPowerlevel > 90 ? "Not admin" :  "Admin")
+            })
 
             logger.debug("Creating webhook if none exists for " + userName + ".")
 
@@ -55,7 +67,7 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
                 if (webhook) {
 
                     const rawMessage = getWebhookMessage(true, webhook.dataValues.webhook_id)
-                    const htmlMessage = getWebhookHtmlMessage(false, webhook.dataValues.webhook_id)
+                    const htmlMessage = getWebhookHtmlMessage(true, webhook.dataValues.webhook_id)
                     sendHtmlMessage(client, roomId, rawMessage, htmlMessage)
 
                 } else {

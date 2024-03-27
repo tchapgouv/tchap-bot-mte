@@ -63,16 +63,3 @@ export function sendHtmlMessage(client: MatrixClient, room: string, rawMessage: 
         });
     })
 }
-
-export function inviteByMail(client: MatrixClient, room: string, email: string) {
-    logger.debug("Inviting message : ", email)
-
-    const message = "/invite " + email
-
-    const content = {
-        "body": message, "msgtype": MsgType.Text,
-    };
-    client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
-        logger.debug(res);
-    }).catch(e => logger.error(e));
-}
