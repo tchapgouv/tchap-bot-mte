@@ -15,8 +15,8 @@ export function promoteUserIfAsked(client: MatrixClient, event: MatrixEvent, bod
 
         if (regex.test(body)) {
             logger.debug("Promoting " + event.sender.name + ".")
-            sendMessage(client, roomId, "Je viens de promouvoir " + event.sender.name + ". Félicitation ! 🎆")
             client.setPowerLevel(roomId, userId, 100);
+            sendMessage(client, roomId, "Je viens de promouvoir " + event.sender.name + ". Félicitation ! 🎆")
         }
         return true
     }

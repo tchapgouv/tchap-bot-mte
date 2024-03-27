@@ -2,6 +2,7 @@ import express from 'express';
 import {create, destroy, findAll, findOne, findOneWithWebhook, update} from "../services/webhook.service.js";
 import {applyScriptAndPostMessage} from "../services/bot.service.js";
 import {verifyToken} from "../controllers/auth.controller.js";
+import logger from "../utils/logger.js";
 
 const webhookRouter = express.Router();
 
@@ -25,6 +26,8 @@ webhookRouter.post("/api/webhook/post/:webhook?", (req, res) => {
     findOne({where: {webhook_id: webhook}}).then((data) => {
 
         if (!data) throw "Some error occurred while retrieving webhook"
+
+        logger.debug("Posting from webhook : ", data)
 
         const room_id = data.room_id
         const script = data.script
