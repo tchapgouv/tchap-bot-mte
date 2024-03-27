@@ -23,14 +23,21 @@ export function addEmoji(client: MatrixClient, event: MatrixEvent, emoji: string
 }
 
 export function sendMessage(client: MatrixClient, room: string, message: string) {
+
     logger.debug("Sending message : ", message)
 
-    const content = {
-        "body": message, "msgtype": MsgType.Text,
-    };
-    client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
-        logger.debug(res);
-    }).catch(e => logger.error(e));
+    return new Promise((resolve, reject) => {
+        const content = {
+            "body": message, "msgtype": MsgType.Text,
+        };
+        client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
+            resolve(res)
+            logger.debug(res);
+        }).catch(reason => {
+            logger.error(reason)
+            reject(reason)
+        });
+    })
 }
 
 export function inviteByMail(client: MatrixClient, room: string, email: string) {

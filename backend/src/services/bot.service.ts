@@ -113,7 +113,7 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
             })
 
             if (roomId != null) {
-                sendMessage(bot, roomId, message)
+                await sendMessage(bot, roomId, message)
             }
 
             resolve({status: 200, message: "Room created", data: message})
@@ -132,7 +132,7 @@ async function applyScriptAndPostMessage(roomId: string, message: string, script
 
     logger.info("Posting message")
 
-    return await bot.sendTextMessage(roomId, message).then(() => {
+    return await sendMessage(bot, roomId, message).then(() => {
         return {message: "Message sent"}
     }).catch(reason => throws(reason))
 }
