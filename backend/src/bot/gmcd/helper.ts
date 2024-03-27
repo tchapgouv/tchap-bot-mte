@@ -24,6 +24,7 @@ export function addEmoji(client: MatrixClient, event: MatrixEvent, emoji: string
 
 export function sendMessage(client: MatrixClient, room: string, message: string) {
 
+    message = JSON.stringify(message)
     logger.debug("Sending message : ", message)
     logger.debug("room : ", room)
 
