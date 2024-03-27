@@ -7,33 +7,29 @@ const webhookRepository = sequelize.getRepository(Webhook)
 
 
 // Create and Save a new Webhook
-function create(req: Request, res: Response) {
-    if (!req.body.room) {
-        res.sendStatus(400).send({
-            message: "Room id can not be empty!"
-        });
-        return;
-    }
+function create(webhook_label: string,
+                room_id: string,
+                script: string = '// Il est possible de manipuler la variable data (le message), qui sera récupérée et envoyée au bot à la fin du traitement.\ndata = data;'):Promise<Webhook> {
 
-    // Create a Webhook
-    const webhook:Attributes<Webhook> = {
-        webhook_id: generateId(100),
-        webhook_label: req.body.label,
-        room_id: req.body.room,
-        script: '// Il est possible de manipuler la variable data (le message), qui sera récupérée et envoyée au bot à la fin du traitement.\ndata = data;'
-    };
+    return new Promise((resolve, reject) => {
+        // Create a Webhook
+        const webhook: Attributes<Webhook> = {
+            webhook_id: generateId(100),
+            webhook_label: webhook_label,
+            room_id: room_id,
+            script: script
+        };
 
-    // Save Webhook in the database
-    webhookRepository.create(webhook)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.sendStatus(500).send({
-                message:
-                    err.message || "Some error occurred while creating webhook."
+        // Save Webhook in the database
+        webhookRepository.create(webhook)
+            .then(data => {
+                resolve(data);
+            })
+            .catch(err => {
+                reject(err.message || "Some error occurred while creating webhook.")
             });
-        });
+
+    })
 }
 
 function destroy(req: Request, res: Response) {

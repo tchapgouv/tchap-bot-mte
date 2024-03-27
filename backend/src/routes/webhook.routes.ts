@@ -1,5 +1,6 @@
 import express from 'express';
-import {create, destroy, findAll, findOne, findOneWithWebhook, update} from "../services/webhook.service.js";
+import {destroy, findAll, findOne, findOneWithWebhook, update} from "../services/webhook.service.js";
+import {create} from "../controllers/webhook.controller.js";
 import {applyScriptAndPostMessage} from "../services/bot.service.js";
 import {verifyToken} from "../controllers/auth.controller.js";
 import logger from "../utils/logger.js";
