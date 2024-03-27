@@ -12,6 +12,6 @@ export function norrisIfAsked(client: MatrixClient, roomId: string, body: string
             .then(data => {
                 sendMessage(client, roomId, data.joke)
             })
-            .catch(reason => sendMessage(client, roomId, 'Not even Chuck Norris can deal with this one: ' + reason));
+            .catch(reason => sendMessage(client, roomId, JSON.stringify('Not even Chuck Norris can deal with this one: ' + reason)));
     }
 }

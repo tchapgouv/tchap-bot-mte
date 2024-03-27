@@ -104,6 +104,7 @@ client.on(RoomMemberEvent.Membership, function (event, member) {
     if (member.membership === "invite" && member.userId === myUserId) {
         client.joinRoom(member.roomId).then(function () {
             logger.notice("Auto-joined %s", member.roomId);
+            sendMessage(client, member.roomId, "Bonjour, merci pour l'invitation ! 🎆")
         });
     }
 });
