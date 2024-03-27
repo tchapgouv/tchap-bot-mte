@@ -49,7 +49,6 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
                         message += "Vous pouvez vous promouvoir administrateur simplement en me le demandant : `@bot-gmcd promote me`. 🍄\n"
                         message += "Enfin, vous pouvez me renvoyer : `@bot-gmcd oust !`. 🪦\n"
                         roomId = data.room_id
-                        bot.se
                     })
                     .catch(reason => {
                         logger.error("Error creating room " + roomName + ". ", reason)
