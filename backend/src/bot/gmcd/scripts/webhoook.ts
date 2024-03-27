@@ -3,7 +3,6 @@ import logger from "../../../utils/logger.js";
 import {sendHtmlMessage} from "../helper.js";
 import {create, findOne} from "../../../services/webhook.service.js";
 import {Webhook} from "../../../models/webhook.model.js";
-import {EventType} from "matrix-js-sdk/src/@types/event.js";
 
 function getWebhookMessage(exists: boolean, webhook_id: any) {
     return (exists ? "Un webhook existe déjà pour ce salon 😉 !\n" : "J'ai créé un webhook pour vous 🚀 !\n") +
@@ -51,7 +50,7 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
             const userName = event.sender.name
             const userId = event.sender.userId
 
-            const currentUser = client.getStateEvent(roomId, EventType.RoomPowerLevels, "").then(value => {
+            const currentUser = client.getStateEvent(roomId, "m.room.power_levels", "").then(value => {
                 for (const user of value.users) {
                     logger.debug(user)
                 }
