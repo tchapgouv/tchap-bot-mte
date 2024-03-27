@@ -21,19 +21,19 @@ function aLink(url: string) {
 }
 
 function codeBlock(code: string, language: string) {
-    return "<code class='language-" + language + "'>" + code + "</code>"
+    return "<pre><code class='language-" + language + "'>" + code + "</code></pre>"
 }
 
 function getWebhookHtmlMessage(exists: boolean, webhook_id: any) {
     const url = "https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + webhook_id
-    return (exists ? "Un webhook existe déjà pour ce salon 😉 !\n" : "J'ai créé un webhook pour vous 🚀 !\n") +
-        "L'URL est la suivante : \n" +
-        aLink(url) + "\n" +
-        "La charge utile (body) doit être de la forme suivante :\n" +
+    return (exists ? "Un webhook existe déjà pour ce salon 😉 !<br>" : "J'ai créé un webhook pour vous 🚀 !<br>") +
+        "L'URL est la suivante : <br>" +
+        aLink(url) + "<br>" +
+        "La charge utile (body) doit être de la forme suivante :<br>" +
         codeBlock(
-            "{\n" +
-            "   message: \"Coucou ! Message envoyé avec un webhook =)\n" +
-            "}\n", "json") +
+            "{<br>" +
+            "   message: \"Coucou ! Message envoyé avec un webhook =)<br>" +
+            "}<br>", "json") +
         "Amusez vous bien ! 🏌️"
 }
 
