@@ -23,14 +23,14 @@ webhookRouter.post("/api/webhook/post/:webhook?", (req, res) => {
 
     const webhook = req.params.webhook || req.body.webhook
 
-    findOne({where: {webhook_id: webhook}}).then((data) => {
+    findOne({where: {webhook_id: webhook}}).then((webhook) => {
 
-        if (!data) throw "Some error occurred while retrieving webhook"
+        if (!webhook) throw "Some error occurred while retrieving webhook"
 
-        logger.debug("Posting from webhook : ", data)
+        logger.debug("Posting from webhook : ", webhook)
 
-        const room_id = data.room_id
-        const script = data.script
+        const room_id = webhook.dataValues.room_id
+        const script = webhook.dataValues.script
 
         applyScriptAndPostMessage(room_id,
             req.body.message,
