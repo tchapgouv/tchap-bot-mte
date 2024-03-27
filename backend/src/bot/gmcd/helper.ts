@@ -25,6 +25,7 @@ export function addEmoji(client: MatrixClient, event: MatrixEvent, emoji: string
 export function sendMessage(client: MatrixClient, room: string, message: string) {
 
     logger.debug("Sending message : ", message)
+    logger.debug("room : ", room)
 
     return new Promise((resolve, reject) => {
         const content = {
