@@ -30,9 +30,9 @@ function getWebhookHtmlMessage(exists: boolean, webhook_id: any) {
         aLink(url) + "<br>" +
         "La charge utile (body) doit être de la forme suivante :<br>" +
         codeBlock(
-            "{<br>" +
-            "   message: \"Coucou ! Message envoyé avec un webhook =)<br>" +
-            "}<br>", "json") +
+            "{\n<br>" +
+            "   message: \"Coucou ! Message envoyé avec un webhook =)\n<br>" +
+            "}\n<br>", "json") +
         "Amusez vous bien ! 🏌️"
 }
 
