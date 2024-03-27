@@ -24,10 +24,12 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
                     let message = "Un webhook existe déjà pour ce salon 😉 !\n"
                     message += "L'URL est la suivante : \n"
                     message += "https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + webhook.dataValues.webhook_id + "\n"
-                    message += "La charge utils (body) doit être de la forme suivante :\n"
+                    message += "La charge utile (body) doit être de la forme suivante :\n"
+                    message += "```json\n"
                     message += "{\n"
                     message += "   message: \"Coucou ! Message envoyé avec un webhook =)\n"
-                    message += "}"
+                    message += "}\n"
+                    message += "```\n"
                     message += "Amusez vous bien ! 🏌️"
                     sendMessage(client, roomId, message)
                 } else {
@@ -35,10 +37,12 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
                         let message = "J'ai créé un webhook pour vous 🚀 !\n"
                         message += "L'URL est la suivante : \n"
                         message += "https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + value.dataValues.webhook_id + "\n"
-                        message += "La charge utils (body) doit être de la forme suivante :\n"
+                        message += "La charge utile (body) doit être de la forme suivante :\n"
+                        message += "```json\n"
                         message += "{\n"
                         message += "   message: \"Coucou ! Message envoyé avec un webhook =)\n"
-                        message += "}"
+                        message += "}\n"
+                        message += "```\n"
                         message += "Amusez vous bien ! 🏌️"
                         sendMessage(client, roomId, message)
                     }).catch(reason => logger.error("createWebhookIfAsked => create : ", reason));
