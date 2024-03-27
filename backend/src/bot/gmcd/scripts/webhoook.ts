@@ -50,7 +50,11 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
             const userName = event.sender.name
             const userId = event.sender.userId
 
-            const currentUser = client.getStateEvent(roomId, "m.room.power_levels", "").then(value => {
+            client.getStateEvent(roomId, "m.room.power_levels", "").then(value => {
+
+                logger.debug(value)
+                logger.debug(value.users)
+
                 for (const user of value.users) {
                     logger.debug(user)
                 }
