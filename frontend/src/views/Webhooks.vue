@@ -166,7 +166,7 @@ function updateList() {
 
 function copyWebhook(webhookId: string) {
 
-  if (navigator.navigator.clipboard) {
+  if (navigator.clipboard) {
     navigator.clipboard.writeText(webhookId);
     alerteClosed.value = false
     alerteType.value = "success"
