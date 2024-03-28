@@ -35,7 +35,11 @@ webhookRouter.post("/api/webhook/post/:webhook?", (req, res) => {
 
         applyScriptAndPostMessage(room_id,
             req.body.message,
-            script).then(data => {
+            script,
+            {
+                displayName: req.body.displayname ? req.body.displayname : undefined,
+                avatar_url: req.body.avatar_url ? req.body.avatar_url : undefined
+            }).then(data => {
             res.json(data)
         })
             .catch(err => {

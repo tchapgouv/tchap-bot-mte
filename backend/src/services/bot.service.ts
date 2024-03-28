@@ -120,7 +120,7 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
 }
 
 
-async function applyScriptAndPostMessage(roomId: string, message: string, script: string) {
+async function applyScriptAndPostMessage(roomId: string, message: string, script: string, opts: { avatar_url?: string, displayName?: string } = {}) {
 
     logger.info("Applying script to message")
 
@@ -130,7 +130,7 @@ async function applyScriptAndPostMessage(roomId: string, message: string, script
 
     logger.info("Posting message")
 
-    return await sendMessage(bot, roomId, message).then(() => {
+    return await sendMessage(bot, roomId, message, opts).then(() => {
         return {message: "Message sent"}
     }).catch(reason => logger.error("Error occurred sending webhook message to room ;", roomId, "message :", message, "reason :", reason))
 }
