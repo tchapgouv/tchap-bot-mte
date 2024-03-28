@@ -14,10 +14,10 @@ export function helpIfAsked(client: MatrixClient, event: MatrixEvent, body: stri
             const roomId = event.event.room_id
             // const userId = event.sender.userId
 
-            const message = "Voici une liste non exhaustive des commandes auxquelles je sais répondre : " +
-                " - oust (Je quitte le canal)" +
-                " - promote me|promeut moi (Je promeus administrateur un utilisateur si je suis moi même administrateur)" +
-                " - create webhook|créer webhook (Administrateur uniquement ! Je créé un webhook (RIE) pour le canal afin d'y envoyer des messages)" +
+            const message = "Voici une liste non exhaustive des commandes auxquelles je sais répondre :\n " +
+                " - oust (Je quitte le canal)\n" +
+                " - promote me|promeut moi (Je promeus administrateur un utilisateur si je suis moi même administrateur)\n" +
+                " - create webhook|créer webhook (Administrateur uniquement ! Je créé un webhook (RIE) pour le canal afin d'y envoyer des messages)\n" +
                 " - Je dis au revoir 😁"
                 // " - Je connais Chuck Norris"
 
