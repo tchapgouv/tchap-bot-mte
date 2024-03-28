@@ -130,13 +130,13 @@ async function applyScriptAndPostMessage(roomId: string, message: string, script
 
     logger.info("Posting message")
 
-    if (opts.messageFormat === "text") {
-        return await sendMessage(bot, roomId, message).then(() => {
+    if (opts.messageFormat === "html") {
+        return await sendHtmlMessage(bot, roomId, message, message).then(() => {
             return {message: "Message sent"}
         }).catch(reason => logger.error("Error occurred sending webhook message to room ;", roomId, "message :", message, "reason :", reason))
     }
-    if (opts.messageFormat === "html") {
-        return await sendHtmlMessage(bot, roomId, message, message).then(() => {
+    else {
+        return await sendMessage(bot, roomId, message).then(() => {
             return {message: "Message sent"}
         }).catch(reason => logger.error("Error occurred sending webhook message to room ;", roomId, "message :", message, "reason :", reason))
     }
