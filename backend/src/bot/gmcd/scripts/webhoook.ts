@@ -63,6 +63,8 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
 
             getUserPowerLevel(client, event).then(user => {
 
+                logger.debug(user)
+
                 if (user?.isAdministrator) {
 
                     logger.debug("Creating webhook if none exists for " + user.username + ".")

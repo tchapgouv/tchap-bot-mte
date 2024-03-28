@@ -68,31 +68,33 @@ export function sendHtmlMessage(client: MatrixClient, room: string, rawMessage: 
 export function getUserPowerLevel(client: MatrixClient, event: MatrixEvent): Promise<User | null> {
 
     return new Promise((resolve) => {
+        (async () => {
 
-        if (event?.sender?.name &&
-            event?.sender?.userId &&
-            event?.event?.room_id) {
+            if (event?.sender?.name &&
+                event?.sender?.userId &&
+                event?.event?.room_id) {
 
-            const roomId = event.event.room_id
-            const userName = event.sender.name
-            const userId = event.sender.userId
+                const roomId = event.event.room_id
+                const userName = event.sender.name
+                const userId = event.sender.userId
 
-            client.getStateEvent(roomId, "m.room.power_levels", "").then(record => {
+                await client.getStateEvent(roomId, "m.room.power_levels", "").then(record => {
 
-                logger.debug(record)
+                    logger.debug(record)
 
-                const userPowerLevel = record.users[userId]
+                    const userPowerLevel = record.users[userId]
 
-                const user: User = {
-                    id: userId,
-                    powerLevel: userPowerLevel,
-                    username: userName,
-                    isAdministrator: userPowerLevel > 99,
-                    isModerator: userPowerLevel > 49
-                }
-                resolve(user)
-            })
-        }
-        resolve(null)
+                    const user: User = {
+                        id: userId,
+                        powerLevel: userPowerLevel,
+                        username: userName,
+                        isAdministrator: userPowerLevel > 99,
+                        isModerator: userPowerLevel > 49
+                    }
+                    resolve(user)
+                })
+            }
+            resolve(null)
+        })()
     })
 }
