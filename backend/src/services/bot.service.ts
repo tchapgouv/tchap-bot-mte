@@ -4,7 +4,7 @@ import {Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import {getMailsForUIDs} from "./ldap.service.js";
 import {IWebResponse} from "../utils/IWebResponse.js";
-import {sendMessage} from "../bot/gmcd/helper.js";
+import {sendHtmlMessage, sendMessage} from "../bot/gmcd/helper.js";
 import {getIdentityServerToken} from "../bot/gmcd/init.js";
 
 async function runScript(script: string, message: string) {
@@ -120,7 +120,7 @@ async function createRoomAndInvite(roomName: string, userList: string[], roomId?
 }
 
 
-async function applyScriptAndPostMessage(roomId: string, message: string, script: string) {
+async function applyScriptAndPostMessage(roomId: string, message: string, script: string, opts: { messageFormat: string } = {messageFormat: "text"}) {
 
     logger.info("Applying script to message")
 
@@ -130,9 +130,16 @@ async function applyScriptAndPostMessage(roomId: string, message: string, script
 
     logger.info("Posting message")
 
-    return await sendMessage(bot, roomId, message).then(() => {
-        return {message: "Message sent"}
-    }).catch(reason => logger.error("Error occurred sending webhook message to room ;", roomId, "message :", message, "reason :", reason))
+    if (opts.messageFormat === "text") {
+        return await sendMessage(bot, roomId, message).then(() => {
+            return {message: "Message sent"}
+        }).catch(reason => logger.error("Error occurred sending webhook message to room ;", roomId, "message :", message, "reason :", reason))
+    }
+    if (opts.messageFormat === "html") {
+        return await sendHtmlMessage(bot, roomId, message, message).then(() => {
+            return {message: "Message sent"}
+        }).catch(reason => logger.error("Error occurred sending webhook message to room ;", roomId, "message :", message, "reason :", reason))
+    }
 }
 
 export {applyScriptAndPostMessage, createRoomAndInvite}
