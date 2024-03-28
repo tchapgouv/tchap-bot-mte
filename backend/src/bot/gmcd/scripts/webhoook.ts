@@ -20,7 +20,7 @@ function getWebhookMessage(exists: boolean, webhook_id: any) {
 function getWebhookHtmlMessage(exists: boolean, webhook_id: any) {
     const url = "https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + webhook_id
     return (exists ? "Un webhook existe déjà pour ce salon 😉 !<br>" : "J'ai créé un webhook pour vous 🚀 !<br>") +
-        "L'URL est la suivante : <br>" +
+        "L’URL est la suivante : <br>" +
         aLink(url) + "<br>" +
         "La charge utile (body) doit être de la forme suivante :<br>" +
         codeBlock(

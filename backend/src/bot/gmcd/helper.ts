@@ -23,7 +23,7 @@ export function addEmoji(client: MatrixClient, event: MatrixEvent, emoji: string
     }).catch(e => logger.error(e));
 }
 
-export function sendMessage(client: MatrixClient, room: string, message: string, opts: { avatar_url?: string, displayName?: string } = {}) {
+export function sendMessage(client: MatrixClient, room: string, message: string) {
 
     logger.debug("Sending message : ", message)
     logger.debug("room : ", room)
@@ -31,9 +31,7 @@ export function sendMessage(client: MatrixClient, room: string, message: string,
     return new Promise((resolve, reject) => {
         const content = {
             "body": message,
-            "msgtype": MsgType.Text,
-            "avatar_url": opts.avatar_url? opts.avatar_url : undefined,
-            "displayname": opts.displayName? opts.displayName : undefined
+            "msgtype": MsgType.Text
         };
         client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
             resolve(res)
