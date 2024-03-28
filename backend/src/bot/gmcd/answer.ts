@@ -6,6 +6,7 @@ import {norrisIfAsked} from "./scripts/norris.js";
 import {promoteUserIfAsked} from "./scripts/promote.js";
 import {createWebhookIfAsked} from "./scripts/webhoook.js";
 import {leaveRoomIfAsked} from "./scripts/leave.js";
+import {helpIfAsked} from "./scripts/help.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent) {
 
@@ -36,5 +37,6 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent) {
     if (!actionTaken) actionTaken = leaveRoomIfAsked(client, roomId, message)
     if (!actionTaken) actionTaken = promoteUserIfAsked(client, event, message)
     if (!actionTaken) actionTaken = createWebhookIfAsked(client, event, message)
+    if (!actionTaken) actionTaken = helpIfAsked(client, event, message)
     if (!actionTaken) sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }
