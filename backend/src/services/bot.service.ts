@@ -6,6 +6,9 @@ import {getMailsForUIDs} from "./ldap.service.js";
 import {IWebResponse} from "../utils/IWebResponse.js";
 import {sendHtmlMessage, sendMessage} from "../bot/gmcd/helper.js";
 import {getIdentityServerToken} from "../bot/gmcd/init.js";
+import showdown from 'showdown';
+
+const converter = new showdown.Converter()
 
 async function runScript(script: string, message: string) {
 
@@ -130,16 +133,23 @@ async function applyScriptAndPostMessage(roomId: string, message: string, script
 
     logger.info("Posting message")
 
-    if (opts.messageFormat === "html") {
-        return await sendHtmlMessage(bot, roomId, message, message).then(() => {
-            return {message: "Message sent"}
-        }).catch(reason => logger.error("Error occurred sending webhook message to room ;", roomId, "message :", message, "reason :", reason))
+    let promise
+    switch (opts.messageFormat) {
+        case "html":
+            promise = sendHtmlMessage(bot, roomId, message, message)
+            break
+        case "md":
+        case "markdown":
+            message = converter.makeHtml(message)
+            promise = sendMessage(bot, roomId, message)
+            break
+        default:
+            promise = sendMessage(bot, roomId, message)
     }
-    else {
-        return await sendMessage(bot, roomId, message).then(() => {
-            return {message: "Message sent"}
-        }).catch(reason => logger.error("Error occurred sending webhook message to room ;", roomId, "message :", message, "reason :", reason))
-    }
+
+    await promise.then(() => {
+        return {message: "Message sent"}
+    }).catch(reason => logger.error("Error occurred sending webhook message to room ;", roomId, "message :", message, "reason :", reason))
 }
 
 export {applyScriptAndPostMessage, createRoomAndInvite}

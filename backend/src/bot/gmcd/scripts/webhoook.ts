@@ -12,8 +12,10 @@ function getWebhookMessage(exists: boolean, webhook_id: any) {
         "https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + webhook_id + "\n" +
         "La charge utile (body) doit être de la forme suivante :\n" +
         "{\n" +
-        "   \"message\": \"Coucou ! Message envoyé avec un webhook =)\"\n" +
+        "   \"message\": \"Coucou ! Message envoyé avec un webhook =)\",\n" +
+        "   \"message_format\": \"\"\n" +
         "}\n" +
+        "`message_format` est optionnel et peut prendre les valeurs suivantes : `html|md|markdown`" +
         "Amusez vous bien ! 🏌️"
 }
 
@@ -25,8 +27,10 @@ function getWebhookHtmlMessage(exists: boolean, webhook_id: any) {
         "La charge utile (body) doit être de la forme suivante :<br>" +
         codeBlock(
             "{\n" +
-            "   \"message\": \"Coucou ! Message envoyé avec un webhook =)\"\n" +
+            "   \"message\": \"Coucou ! Message envoyé avec un webhook =)\",\n" +
+            "   \"message_format\": \"\"\n" +
             "}\n", "json") +
+        "<code>message_format</code> est optionnel et peut prendre les valeurs suivantes : <code>html|md|markdown</code><br>" +
         "Amusez vous bien ! 🏌️"
 }
 

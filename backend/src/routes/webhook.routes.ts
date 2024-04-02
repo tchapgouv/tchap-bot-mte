@@ -1,9 +1,7 @@
 import express from 'express';
-import {destroy, findAll, findOne, findOneWithWebhook, update} from "../services/webhook.service.js";
+import {destroy, findAll, findOneWithWebhook, postMessage, update} from "../services/webhook.service.js";
 import {create} from "../controllers/webhook.controller.js";
-import {applyScriptAndPostMessage} from "../services/bot.service.js";
 import {verifyToken} from "../controllers/auth.controller.js";
-import logger from "../utils/logger.js";
 
 const webhookRouter = express.Router();
 
@@ -20,38 +18,6 @@ webhookRouter.post("/api/webhook/get", verifyToken, findOneWithWebhook);
 
 webhookRouter.put("/api/webhook/update", verifyToken, update);
 
-webhookRouter.post("/api/webhook/post/:webhook?", (req, res) => {
-
-    const webhook = req.params.webhook || req.body.webhook
-
-    findOne({where: {webhook_id: webhook}}).then((webhook) => {
-
-        if (!webhook) throw "Some error occurred while retrieving webhook"
-
-        logger.debug("Posting from webhook : ", webhook)
-
-        const room_id = webhook.dataValues.room_id
-        const script = webhook.dataValues.script
-
-        applyScriptAndPostMessage(room_id,
-            req.body.message,
-            script,
-            {messageFormat: req.body.messageformat ? req.body.messageformat : undefined}).then(data => {
-            res.json(data)
-        })
-            .catch(err => {
-                res.status(500).send({
-                    message:
-                        err.message || "Some error occurred while posting message."
-                });
-            });
-    })
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "Some error occurred while fetching webhook."
-            });
-        });
-})
+webhookRouter.post("/api/webhook/post/:webhook?", postMessage)
 
 export default webhookRouter

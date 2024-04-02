@@ -2,6 +2,44 @@ import {Request, Response} from "express";
 import {Attributes, FindOptions} from "sequelize/lib/model";
 import sequelize from "../models/index.js";
 import {Webhook} from "../models/webhook.model.js";
+import logger from "../utils/logger.js";
+import {applyScriptAndPostMessage} from "./bot.service.js";
+
+export function postMessage(req: Request, res: Response) {
+
+    const webhook = req.params.webhook || req.body.webhook
+
+    findOne({where: {webhook_id: webhook}}).then((webhook) => {
+
+        if (!webhook) throw "Some error occurred while retrieving webhook"
+
+        logger.debug("Posting from webhook : ", webhook)
+
+        const room_id = webhook.dataValues.room_id
+        const script = webhook.dataValues.script
+        const format = req.body.messageformat || req.body.message_format || undefined
+
+        applyScriptAndPostMessage(room_id,
+            req.body.message,
+            script,
+            {messageFormat: format}).then(data => {
+            res.json(data)
+        })
+            .catch(err => {
+                res.status(500).send({
+                    message:
+                        err.message || "Some error occurred while posting message."
+                });
+            });
+    })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || "Some error occurred while fetching webhook."
+            });
+        });
+}
+
 
 const webhookRepository = sequelize.getRepository(Webhook)
 
@@ -9,7 +47,7 @@ const webhookRepository = sequelize.getRepository(Webhook)
 // Create and Save a new Webhook
 function create(webhook_label: string,
                 room_id: string,
-                script: string = '// Il est possible de manipuler la variable data (le message), qui sera récupérée et envoyée au bot à la fin du traitement.\ndata = data;'):Promise<Webhook> {
+                script: string = '// Il est possible de manipuler la variable data (le message), qui sera récupérée et envoyée au bot à la fin du traitement.\ndata = data;'): Promise<Webhook> {
 
     return new Promise((resolve, reject) => {
         // Create a Webhook

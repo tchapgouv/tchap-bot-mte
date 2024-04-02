@@ -422,6 +422,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/showdown@npm:^2":
+  version: 2.0.6
+  resolution: "@types/showdown@npm:2.0.6"
+  checksum: 10c0/7136e47a9f0b871e74d8f17afcd99bca3d356f9fd81ee4ddb5361beb41be11d6d5705b86cf8f44796b6ca61caa5c4ff408029b772e436f6a1f9021bb73f36f95
+  languageName: node
+  linkType: hard
+
 "@types/validator@npm:^13.11.9":
   version: 13.11.9
   resolution: "@types/validator@npm:13.11.9"
@@ -817,6 +824,13 @@ __metadata:
   bin:
     color-support: bin.js
   checksum: 10c0/8ffeaa270a784dc382f62d9be0a98581db43e11eee301af14734a6d089bd456478b1a8b3e7db7ca7dc5b18a75f828f775c44074020b51c05fc00e6d0992b1cc6
+  languageName: node
+  linkType: hard
+
+"commander@npm:^9.0.0":
+  version: 9.5.0
+  resolution: "commander@npm:9.5.0"
+  checksum: 10c0/5f7784fbda2aaec39e89eb46f06a999e00224b3763dc65976e05929ec486e174fe9aac2655f03ba6a5e83875bd173be5283dc19309b7c65954701c02025b3c1d
   languageName: node
   linkType: hard
 
@@ -2696,6 +2710,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"showdown@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "showdown@npm:2.1.0"
+  dependencies:
+    commander: "npm:^9.0.0"
+  bin:
+    showdown: bin/showdown.js
+  checksum: 10c0/8508e060874c42338b9ebfe884763e8042d9575185d9dd3a12f7380736732893a4738f37140add97bde0c4c87d6bad66ed0761505f310df6044ee3385e2ae349
+  languageName: node
+  linkType: hard
+
 "side-channel@npm:^1.0.4":
   version: 1.0.4
   resolution: "side-channel@npm:1.0.4"
@@ -2928,6 +2953,7 @@ __metadata:
     "@types/jsonwebtoken": "npm:^9.0.5"
     "@types/ldapjs": "npm:^3.0.6"
     "@types/node": "npm:^20.11.19"
+    "@types/showdown": "npm:^2"
     "@types/validator": "npm:^13.11.9"
     cors: "npm:^2.8.5"
     express: "npm:^4.18.2"
@@ -2943,6 +2969,7 @@ __metadata:
     reflect-metadata: "npm:^0.2.1"
     sequelize: "npm:^6.35.2"
     sequelize-typescript: "npm:^2.1.6"
+    showdown: "npm:^2.1.0"
     sqlite3: "npm:^5.1.7"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.3.3"
