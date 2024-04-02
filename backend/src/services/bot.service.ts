@@ -140,8 +140,8 @@ async function applyScriptAndPostMessage(roomId: string, message: string, script
             break
         case "md":
         case "markdown":
-            message = converter.makeHtml(message)
-            promise = sendMessage(bot, roomId, message)
+            const htmlMessage = converter.makeHtml(message)
+            promise = sendHtmlMessage(bot, roomId, message, htmlMessage)
             break
         default:
             promise = sendMessage(bot, roomId, message)
