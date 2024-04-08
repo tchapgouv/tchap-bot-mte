@@ -1,6 +1,6 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
-import {getUserPowerLevel, isSomeoneAdmin, sendHtmlMessage, sendMessage} from "../helper.js";
+import {getUserPowerLevel, sendHtmlMessage, sendMessage} from "../helper.js";
 import webhookService from "../../../services/webhook.service.js";
 import {Webhook} from "../../../models/webhook.model.js";
 import {User} from "../../classes/user.js";
@@ -78,22 +78,13 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
 
                 if (user?.isAdministrator) {
 
-                    isSomeoneAdmin(client, roomId).then(someoneIsAdmin => {
+                    logger.debug("Creating webhook if none exists for " + user.username + ".")
 
-                        if (someoneIsAdmin) {
+                    webhookService.findOne({where: {room_id: roomId}}).then(webhook => {
 
-                            sendMessage(client, roomId, "Il y a déjà un administrateur dans ce salon, demandez lui gentiment peut être ? 🙏")
+                        createOrReturnWebhook(client, roomId, user, webhook)
 
-                        } else {
-                            logger.debug("Creating webhook if none exists for " + user.username + ".")
-
-                            webhookService.findOne({where: {room_id: roomId}}).then(webhook => {
-
-                                createOrReturnWebhook(client, roomId, user, webhook)
-
-                            }).catch(reason => logger.error("createWebhookIfAsked : ", reason));
-                        }
-                    })
+                    }).catch(reason => logger.error("createWebhookIfAsked : ", reason));
 
                 } else {
                     sendMessage(client, roomId, "Désolé, seul un administrateur peut ajouter un webhook ! 🤷")
