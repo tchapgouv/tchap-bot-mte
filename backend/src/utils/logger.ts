@@ -18,28 +18,28 @@ const getIsoDate = function ():string {
 class Logger {
 
     emergency = function (...data: any[]) {
-        if (getLogLevel() >= 1) console.log(getIsoDate + " EMERGENCY: ", data)
+        if (getLogLevel() >= 1) console.log(getIsoDate() + " EMERGENCY: ", data)
     }
     alert = function alert(...data: any[]) {
-        if (getLogLevel() >= 2) console.log(getIsoDate + " ALERT:     ", data)
+        if (getLogLevel() >= 2) console.log(getIsoDate() + " ALERT:     ", data)
     }
     critical = function critical(...data: any[]) {
-        if (getLogLevel() >= 3) console.log(getIsoDate + " CRITICAL:  ", data)
+        if (getLogLevel() >= 3) console.log(getIsoDate() + " CRITICAL:  ", data)
     }
     error = function error(...data: any[]) {
-        if (getLogLevel() >= 4) console.log(getIsoDate + " ERROR:     ", data)
+        if (getLogLevel() >= 4) console.log(getIsoDate() + " ERROR:     ", data)
     }
     warning = function warning(...data: any[]) {
-        if (getLogLevel() >= 5) console.log(getIsoDate + " WARNING:   ", data)
+        if (getLogLevel() >= 5) console.log(getIsoDate() + " WARNING:   ", data)
     }
     notice = function notice(...data: any[]) {
-        if (getLogLevel() >= 6) console.log(getIsoDate + " NOTICE:    ", data)
+        if (getLogLevel() >= 6) console.log(getIsoDate() + " NOTICE:    ", data)
     }
     info = function info(...data: any[]) {
-        if (getLogLevel() >= 7) console.log(getIsoDate + " INFO:      ", data)
+        if (getLogLevel() >= 7) console.log(getIsoDate() + " INFO:      ", data)
     }
     debug = function debug(...data: any[]) {
-        if (getLogLevel() >= 8) console.log(getIsoDate + " DEBUG:     ", data)
+        if (getLogLevel() >= 8) console.log(getIsoDate() + " DEBUG:     ", data)
     }
 }
 
