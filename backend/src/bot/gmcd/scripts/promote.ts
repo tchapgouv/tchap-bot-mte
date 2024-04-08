@@ -2,6 +2,13 @@ import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
 import {getUserPowerLevel, sendMessage} from "../helper.js";
 
+
+/**
+ * @help
+ * command : promote me|promeut moi
+ * return : je promeus administrateur un utilisateur (si je suis moi-même administrateur)
+ * isAnswer : true
+ */
 export function promoteUserIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
     const regex: RegExp = /.*(promote me|promeut moi).*/i

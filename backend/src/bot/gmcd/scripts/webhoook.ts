@@ -1,7 +1,7 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
-import {getUserPowerLevel, sendHtmlMessage, sendMessage} from "../helper.js";
-import {create, findOne} from "../../../services/webhook.service.js";
+import {getUserPowerLevel, isSomeoneAdmin, sendHtmlMessage, sendMessage} from "../helper.js";
+import webhookService from "../../../services/webhook.service.js";
 import {Webhook} from "../../../models/webhook.model.js";
 import {User} from "../../classes/user.js";
 import {aLink, codeBlock} from "../htmlFormatHelpers.js";
@@ -43,7 +43,7 @@ function createOrReturnWebhook(client: MatrixClient, roomId: string, user: User,
 
     } else {
 
-        create("Bot - " + user.username + " - " + roomId, roomId).then((value: Webhook) => {
+        webhookService.create("Bot - " + user.username + " - " + roomId, roomId).then((value: Webhook) => {
 
             const rawMessage = getWebhookMessage(false, value.dataValues.webhook_id)
             const htmlMessage = getWebhookHtmlMessage(false, value.dataValues.webhook_id)
@@ -53,6 +53,13 @@ function createOrReturnWebhook(client: MatrixClient, roomId: string, user: User,
     }
 }
 
+
+/**
+ * @help
+ * command : create webhook|créer webhook
+ * return : je créé un webhook (RIE) pour le canal afin d'y envoyer des messages (Administrateur uniquement !)
+ * isAnswer : true
+ */
 export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
     const regex: RegExp = /.*(create|créé|créer|ajoute|add).*webhook.*/i
@@ -71,13 +78,23 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
 
                 if (user?.isAdministrator) {
 
-                    logger.debug("Creating webhook if none exists for " + user.username + ".")
+                    isSomeoneAdmin(client, roomId).then(someoneIsAdmin => {
 
-                    findOne({where: {room_id: roomId}}).then(webhook => {
+                        if (someoneIsAdmin) {
 
-                        createOrReturnWebhook(client, roomId, user, webhook)
+                            sendMessage(client, roomId, "Il y a déjà un administrateur dans ce salon, demandez lui gentiment peut être ? 🙏")
 
-                    }).catch(reason => logger.error("createWebhookIfAsked : ", reason));
+                        } else {
+                            logger.debug("Creating webhook if none exists for " + user.username + ".")
+
+                            webhookService.findOne({where: {room_id: roomId}}).then(webhook => {
+
+                                createOrReturnWebhook(client, roomId, user, webhook)
+
+                            }).catch(reason => logger.error("createWebhookIfAsked : ", reason));
+                        }
+                    })
+
                 } else {
                     sendMessage(client, roomId, "Désolé, seul un administrateur peut ajouter un webhook ! 🤷")
                 }

@@ -3,14 +3,15 @@ import https from 'https';
 import fs from 'fs';
 import db from './models/index.js'
 import userRouter from './routes/user.routes.js';
-import helpersRouter from './routes/helpers.routes.js';
+import botRouter from './routes/bot.routes.js';
 import authRouter from './routes/auth.routes.js';
 import cors from 'cors';
 import logger from "./utils/logger.js";
-import {create as createUser} from "./services/user.service.js";
+import userService from "./services/user.service.js";
 import webhookRouter from "./routes/webhook.routes.js";
 import path from 'path'
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
+import {syntaxErrorHandler} from "./requestHandlers/syntaxError.handler.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -32,14 +33,16 @@ app.use(express.static(vuePath));
 app.use(webhookRouter);
 app.use(userRouter);
 app.use(authRouter);
-app.use(helpersRouter);
+app.use(botRouter);
+
+app.use(syntaxErrorHandler)
 
 db.sync()
     .then(() => {
         logger.notice("Synced db.");
 
-        createUser("thomas.bouchardon").catch((_reason: any) => logger.error("Could not create user !"))
-        createUser("hugo.tourbez.i").catch((_reason: any) => logger.error("Could not create user !"))
+        userService.create("thomas.bouchardon").catch((_reason: any) => logger.error("Could not create user !"))
+        userService.create("hugo.tourbez.i").catch((_reason: any) => logger.error("Could not create user !"))
 
     })
     .catch((err: any) => {

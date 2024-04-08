@@ -23,78 +23,88 @@ export function addEmoji(client: MatrixClient, event: MatrixEvent, emoji: string
     }).catch(e => logger.error(e));
 }
 
-export function sendMessage(client: MatrixClient, room: string, message: string) {
+export async function sendMessage(client: MatrixClient, room: string, message: string): Promise<void> {
 
     logger.debug("Sending message : ", message)
     logger.debug("room : ", room)
 
-    return new Promise((resolve, reject) => {
-        const content = {
-            "body": message,
-            "msgtype": MsgType.Text
-        };
-        client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
-            resolve(res)
-            logger.debug(res);
-        }).catch(reason => {
-            logger.error(reason)
-            reject(reason)
-        });
-    })
+    const content = {
+        "body": message,
+        "msgtype": MsgType.Text
+    };
+    await client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
+        logger.debug(res);
+    }).catch(reason => {
+        logger.error(reason)
+    });
 }
 
-export function sendHtmlMessage(client: MatrixClient, room: string, rawMessage: string, htmlMessage: string) {
+export async function sendHtmlMessage(client: MatrixClient, room: string, rawMessage: string, htmlMessage: string): Promise<void> {
 
     logger.debug("Sending message : ", rawMessage)
     logger.debug("room : ", room)
 
-    return new Promise((resolve, reject) => {
-        const content = {
-            "body": rawMessage,
-            "formatted_body": htmlMessage,
-            "format": "org.matrix.custom.html",
-            "msgtype": MsgType.Text
-        };
-        client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
-            resolve(res)
-            logger.debug(res);
-        }).catch(reason => {
-            logger.error(reason)
-            reject(reason)
-        });
-    })
+    const content = {
+        "body": rawMessage,
+        "formatted_body": htmlMessage,
+        "format": "org.matrix.custom.html",
+        "msgtype": MsgType.Text
+    };
+    await client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
+        logger.debug(res);
+    }).catch(reason => {
+        logger.error(reason)
+    });
 }
 
-export function getUserPowerLevel(client: MatrixClient, event: MatrixEvent): Promise<User | null> {
+export async function getUserPowerLevel(client: MatrixClient, event: MatrixEvent): Promise<User | null> {
 
-    return new Promise((resolve) => {
-        (async () => {
+    let user: User | undefined
 
-            if (event?.sender?.name &&
-                event?.sender?.userId &&
-                event?.event?.room_id) {
+    if (event?.sender?.name &&
+        event?.sender?.userId &&
+        event?.event?.room_id) {
 
-                const roomId = event.event.room_id
-                const userName = event.sender.name
-                const userId = event.sender.userId
+        const roomId = event.event.room_id
+        const userName = event.sender.name
+        const userId = event.sender.userId
 
-                await client.getStateEvent(roomId, "m.room.power_levels", "").then(record => {
+        await client.getStateEvent(roomId, "m.room.power_levels", "").then(record => {
 
-                    logger.debug(record)
+            logger.debug(record)
 
-                    const userPowerLevel = record.users[userId]
+            const userPowerLevel = record.users[userId]
 
-                    const user: User = {
-                        id: userId,
-                        powerLevel: userPowerLevel,
-                        username: userName,
-                        isAdministrator: userPowerLevel > 99,
-                        isModerator: userPowerLevel > 49
-                    }
-                    resolve(user)
-                })
+            user = {
+                id: userId,
+                powerLevel: userPowerLevel,
+                username: userName,
+                isAdministrator: userPowerLevel > 99,
+                isModerator: userPowerLevel > 49
             }
-            resolve(null)
-        })()
+        })
+    }
+
+    if (!user) return null
+    return user
+}
+
+export async function isSomeoneAdmin(client: MatrixClient, roomId: string): Promise<boolean> {
+
+    let someoneIsAdmin: boolean = false
+
+    await client.getStateEvent(roomId, "m.room.power_levels", "").then(record => {
+
+        logger.debug(record)
+
+        for (const user in record.users) {
+            if (/.*bot-gmcd.*/i.test(user)) continue
+            const powerLevel = record.users[user]
+            if (powerLevel > 99) someoneIsAdmin = true
+        }
     })
+
+    logger.debug("someoneIsAdmin = " + someoneIsAdmin)
+
+    return someoneIsAdmin
 }

@@ -2,7 +2,12 @@ import {MatrixClient} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
 import {sendMessage} from "../helper.js";
 
-
+/**
+ * @help
+ * command : oust
+ * return : je quitte le canal
+ * isAnswer : true
+ */
 export function leaveRoomIfAsked(client: MatrixClient, roomId: string, body: string) {
 
     const leaveRoomOptions = ["oust"]
