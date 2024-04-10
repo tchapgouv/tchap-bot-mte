@@ -63,12 +63,10 @@ export default {
 
         if (roomId != null) {
             logger.notice("Setting guest access to room " + roomId)
-            await bot.setGuestAccess(roomId, {
-                allowJoin: true,
-                allowRead: false
-            }).then(() => {
-                logger.notice("Guest access set for room " + roomId)
-            })
+            await bot.sendStateEvent(roomId, "im.vector.room.access_rules", {rule: "unrestricted"})
+                .then(() => {
+                    logger.notice("Guest access set for room " + roomId)
+                })
         }
 
         message += "\n"
