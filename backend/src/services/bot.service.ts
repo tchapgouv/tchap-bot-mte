@@ -93,6 +93,8 @@ export default {
                 throw (reason)
             })
 
+        logger.debug("Inviting list :", userMailList)
+
         // Maj du token préventivement afin d’éviter de multiples appels en parallèle
         await getIdentityServerToken()
 
