@@ -128,6 +128,7 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
         const isSelfMentioned = userIds && userIds.indexOf(myUserId) > -1;
         logger.debug("Is self mentioned ? ", isSelfMentioned)
         logger.debug("sender = ", event.getSender())
+        logger.debug("event.event.unsigned = ", event.event.unsigned)
         logger.debug("event age = ", event.event.unsigned?.age)
         const isNewMessage = event.event.unsigned?.age && event.event.unsigned.age < 10 * 1000
         logger.debug("isNewMessage ? ", isNewMessage)
