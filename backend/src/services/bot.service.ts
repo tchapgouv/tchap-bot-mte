@@ -62,10 +62,12 @@ export default {
         message += "Bonne journée !\n"
 
         if (roomId != null) {
-            logger.notice("Setting guest access to room : " + roomId)
+            logger.notice("Setting guest access to room " + roomId)
             await bot.setGuestAccess(roomId, {
                 allowJoin: true,
-                allowRead: true
+                allowRead: false
+            }).then(() => {
+                logger.notice("Guest access set for room " + roomId)
             })
         }
 
