@@ -81,7 +81,7 @@ export default {
                 userMailList = data.userMailList
                 for (const username of data.userNotFoundList) {
                     if (username.includes("@")) {
-                        userList.push(username)
+                        userMailList.push(username)
                         message += " ❔ " + username + ", n'a pas été trouvé dans le LDAP, mais ressemble à une adresse mail. Une invitation a été tentée.\n"
                     } else {
                         message += " ❓️ " + username + ", n'a pas été trouvé dans le LDAP, aucune invitation n'a été faite !\n"
