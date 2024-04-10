@@ -132,11 +132,11 @@ client.on(RoomEvent.Timeline, function (event, _room, _toStartOfTimeline) {
         if (event.event.unsigned?.age) {
             logger.debug("event.event.unsigned = ", event.event.unsigned)
             logger.debug("event age = ", event.event.unsigned?.age)
-            isNewMessage = event.event.unsigned?.age && event.event.unsigned.age < 10 * 1000
+            isNewMessage = event.event.unsigned?.age && event.event.unsigned.age < 20 * 1000
         }
         else if (event.event.origin_server_ts) {
             logger.debug("event.event.origin_server_ts = ", event.event.origin_server_ts)
-            isNewMessage = event.event.origin_server_ts - new Date().getTime() < 10 * 1000
+            isNewMessage = new Date().getTime() - event.event.origin_server_ts < 20 * 1000
         }
         logger.debug("isNewMessage ? ", isNewMessage)
 
