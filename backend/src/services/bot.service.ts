@@ -60,6 +60,14 @@ export default {
 
         message += "\n"
         message += "Bonne journée !\n"
+
+        if (roomId != null) {
+            bot.setGuestAccess(roomId, {
+                allowJoin: true,
+                allowRead: true
+            })
+        }
+
         message += "\n"
         message += "\n"
         message += "Rapport d'invitations : \n"
@@ -72,10 +80,8 @@ export default {
                     if (username.includes("@")) {
                         userList.push(username)
                         message += " ❔ " + username + ", n'a pas été trouvé dans le LDAP, mais ressemble à une adresse mail. Une invitation a été tentée.\n"
-                        // inviteErrors.push({mail: username, reason: "No match in LDAP but seams to be an email address"})
                     } else {
                         message += " ❓️ " + username + ", n'a pas été trouvé dans le LDAP, aucune invitation n'a été faite !\n"
-                        // inviteErrors.push({mail: username, reason: "No match in LDAP !"})
                     }
                 }
             })
