@@ -1,0 +1,30 @@
+# Intellij
+
+**/*.iml
+**/.idea/
+
+# Yarn
+
+**/.yarn/*
+**/!.yarn/cache
+**/!.yarn/patches
+**/!.yarn/plugins
+**/!.yarn/releases
+**/!.yarn/sdks
+**/!.yarn/versions
+
+# Node
+
+**/node_modules/
+
+# Project
+
+**/.storage/
+**/database.sqlite
+
+# dotenv environment variable files
+**/.env
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+**/.env.local
