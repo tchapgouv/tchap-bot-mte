@@ -49,7 +49,7 @@ export default {
 
         let webhook
         // Save Webhook in the database
-        webhookRepository.create(webhookPojo)
+        await webhookRepository.create(webhookPojo)
             .then(data => {
                 webhook = data;
             })

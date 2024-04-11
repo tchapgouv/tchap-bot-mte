@@ -60,6 +60,15 @@ export default {
 
         message += "\n"
         message += "Bonne journée !\n"
+
+        if (roomId != null) {
+            logger.notice("Setting guest access to room " + roomId)
+            await bot.sendStateEvent(roomId, "im.vector.room.access_rules", {rule: "unrestricted"})
+                .then(() => {
+                    logger.notice("Guest access set for room " + roomId)
+                })
+        }
+
         message += "\n"
         message += "\n"
         message += "Rapport d'invitations : \n"
@@ -70,12 +79,10 @@ export default {
                 userMailList = data.userMailList
                 for (const username of data.userNotFoundList) {
                     if (username.includes("@")) {
-                        userList.push(username)
+                        userMailList.push(username)
                         message += " ❔ " + username + ", n'a pas été trouvé dans le LDAP, mais ressemble à une adresse mail. Une invitation a été tentée.\n"
-                        // inviteErrors.push({mail: username, reason: "No match in LDAP but seams to be an email address"})
                     } else {
                         message += " ❓️ " + username + ", n'a pas été trouvé dans le LDAP, aucune invitation n'a été faite !\n"
-                        // inviteErrors.push({mail: username, reason: "No match in LDAP !"})
                     }
                 }
             })
@@ -83,6 +90,8 @@ export default {
                 logger.error("createRoomAndInvite : ", reason)
                 throw (reason)
             })
+
+        logger.debug("Inviting list :", userMailList)
 
         // Maj du token préventivement afin d’éviter de multiples appels en parallèle
         await getIdentityServerToken()
