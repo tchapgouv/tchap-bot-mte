@@ -41,7 +41,7 @@ export async function sendMessage(client: MatrixClient, room: string, message: s
 }
 
 
-export function extractHelpFromComments(commandes: { command: string | undefined, return: string, isAnswer: boolean }[], file: string) {
+export function extractHelpFromComments(commandes: { command: string | undefined, return: string, isAnswer: boolean }[], __dirname: string, file: string) {
     if (/.*\.js/i.test(file)) {
         try {
             const data = fs.readFileSync(__dirname + "/" + file, 'utf8');

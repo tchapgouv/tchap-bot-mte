@@ -13,14 +13,14 @@ let __dirname = path.dirname(__filename);
 let files = fs.readdirSync(__dirname);
 
 for (const file of files) {
-    commandes = extractHelpFromComments(commandes, file);
+    commandes = extractHelpFromComments(commandes, __dirname, file);
 }
 
 __dirname = path.resolve(__filename, "../../../common/scripts");
 files = fs.readdirSync(__dirname);
 
 for (const file of files) {
-    commandes = extractHelpFromComments(commandes, file);
+    commandes = extractHelpFromComments(commandes, __dirname, file);
 }
 
 commandes.sort((a, b) => {
