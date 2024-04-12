@@ -1,14 +1,11 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import logger from "../../utils/logger.js";
-import {sendMessage} from "../common/helper.js";
-import {norrisIfAsked} from "./scripts/norris.js";
-import {promoteUserIfAsked} from "./scripts/promote.js";
-import {helpIfAsked} from "./scripts/help.js";
 import {sayGoodbyeIfNecessary} from "../common/scripts/gallantry.js";
 import {leaveRoomIfAsked} from "../common/scripts/leave.js";
 import {createWebhookIfAsked} from "../common/scripts/webhoook.js";
+import {sendMessage} from "../common/helper.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent):void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -16,10 +13,9 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent):void {
     if (!roomId || !message || !event.sender) return
 
     sayGoodbyeIfNecessary(client, event, message)
-    norrisIfAsked(client, roomId, message)
 }
 
-export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent):void {
+export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -31,8 +27,6 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent):voi
     logger.debug("room_id =", roomId)
 
     if (!actionTaken) actionTaken = leaveRoomIfAsked(client, roomId, message)
-    if (!actionTaken) actionTaken = promoteUserIfAsked(client, event, message)
     if (!actionTaken) actionTaken = createWebhookIfAsked(client, event, message)
-    if (!actionTaken) actionTaken = helpIfAsked(client, event, message)
     if (!actionTaken) sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }

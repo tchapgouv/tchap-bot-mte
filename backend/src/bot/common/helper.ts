@@ -1,6 +1,7 @@
 import {EventType, MatrixClient, MatrixEvent, MsgType, RelationType} from "matrix-js-sdk";
 import logger from "../../utils/logger.js";
-import {User} from "../classes/user.js";
+import {User} from "../classes/User.js";
+import fs from "fs";
 
 
 export function addEmoji(client: MatrixClient, event: MatrixEvent, emoji: string) {
@@ -37,6 +38,36 @@ export async function sendMessage(client: MatrixClient, room: string, message: s
     }).catch(reason => {
         logger.error(reason)
     });
+}
+
+
+export function extractHelpFromComments(commandes: { command: string | undefined, return: string, isAnswer: boolean }[], file: string) {
+    if (/.*\.js/i.test(file)) {
+        try {
+            const data = fs.readFileSync(__dirname + "/" + file, 'utf8');
+
+            const regexCommand: RegExp = /[\s\S]* \* @help.*(?:\n \* .*)*\n \* command *: *(.*)/i
+            const regexReturn: RegExp = /[\s\S]* \* @help.*(?:\n \* .*)*\n \* return *: *(.*)/i
+            const regexIsAnswer: RegExp = /[\s\S]* \* @help.*(?:\n \* .*)*\n \* isAnswer *: *(.*)/i
+
+            const matchCommand = data.match(regexCommand)?.at(1)
+            const matchReturn = data.match(regexReturn)?.at(1)
+            const matchIsAnswer = data.match(regexIsAnswer)?.at(1)
+
+            if (!matchReturn) return commandes;
+
+            const command = {
+                command: matchCommand,
+                return: matchReturn,
+                isAnswer: matchIsAnswer ? matchIsAnswer === 'true' : false
+            }
+
+            commandes.push(command)
+        } catch (err) {
+            logger.error(err);
+        }
+    }
+    return commandes
 }
 
 export async function sendHtmlMessage(client: MatrixClient, room: string, rawMessage: string, htmlMessage: string): Promise<void> {

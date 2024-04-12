@@ -20,6 +20,11 @@
               :type="'text'"
               :label-visible="true"/>
 
+  <dsfr-input v-model="webhook.botId"
+              :label="'Bot User ID :'"
+              :type="'text'"
+              :label-visible="true"/>
+
   <dsfr-input v-model="webhook.id"
               :label="'Webhook ID :'"
               :type="'text'"
@@ -90,6 +95,7 @@ const modalDeleteActions:Ref<any[]> = ref([])
 const webhook = ref({
   label: '',
   roomId: '',
+  botId: '',
   id: '',
   script: ''
 })
@@ -116,6 +122,7 @@ function getWebhook (webhookId:string) {
       // console.log(value)
       webhook.value.label = value.webhook_label
       webhook.value.roomId = value.room_id
+      webhook.value.botId = value.bot_id
       webhook.value.id = value.webhook_id
       webhook.value.script = value.script
     })
@@ -191,6 +198,7 @@ function saveWebhook () {
           'webhook_label': webhook.value.label,
           'webhook_id': webhook.value.id,
           'room_id': webhook.value.roomId,
+          'bot_id': webhook.value.botId,
           'script': webhook.value.script,
         },
       })

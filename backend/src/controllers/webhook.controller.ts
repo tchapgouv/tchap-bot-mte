@@ -81,6 +81,12 @@ export async function postMessage(req: Request, res: Response) {
                 "Unauthenticated (Wrong webhook)."
         })
 
+    } else if (!message) {
+        logger.warning("Someone is trying to post an empty message", req.body)
+        res.status(StatusCodes.BAD_REQUEST).send({
+            message:
+                "'message' property is undefined, maybe body is not respecting { 'message' : 'Hi !' } ?"
+        })
     } else {
         await webhookService.postMessage(webhook, message, format)
             .then(data => {
@@ -94,6 +100,7 @@ export async function postMessage(req: Request, res: Response) {
                 });
             });
     }
+
 }
 
 export async function update(req: Request, res: Response) {
@@ -132,8 +139,10 @@ export async function create(req: Request, res: Response) {
         return;
     }
 
-    await webhookService.create(req.body.label,
-        req.body.room
+    await webhookService.create(
+        req.body.label,
+        req.body.room,
+        req.body.bot_id
     )
         .then(data => {
             res.send(data);

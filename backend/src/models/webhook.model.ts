@@ -10,6 +10,8 @@ export class Webhook extends Model<InferAttributes<Webhook>, InferCreationAttrib
     @Column(DataType.TEXT)
     webhook_id!: string;
     @Column(DataType.TEXT)
+    bot_id!: string;
+    @Column(DataType.TEXT)
     room_id!: string;
     @Column(DataType.TEXT)
     script!: string;
