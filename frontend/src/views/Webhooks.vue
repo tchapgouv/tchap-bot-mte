@@ -23,14 +23,27 @@
               :type="'text'"
               :label-visible="true">test
   </dsfr-input>
-  <br/>
   <dsfr-button :label="'Générer'"
-               @click="onClickGenerate"></dsfr-button>
-  <dsfr-table :title="'Liste des Webhooks'"
-              :headers="['Label', 'Webhook', 'Room Id', 'Action']"
-              :rows="webhookList"
-              v-if="webhookList.length > 0"
-              style="margin-top: 2em;"/>
+               @click="onClickGenerate"
+               :style="'margin-bottom:25px; margin-top:25px; float: right;'"/>
+
+  <!--  float clear hack  -->
+  <div style="clear: both"/>
+
+  <h4>Liste des Webhooks</h4>
+
+  <dsfr-input v-model="filter"
+              :label="'filtre :'"
+              :type="'text'"
+              :label-visible="true"
+              :style="'width : 25%;'"/>
+
+  <dsfr-table :headers="['Label', 
+              'Webhook', 
+              'Room Id', 
+              'Action']"
+              :rows="filteredWebhooks"
+              v-if="filteredWebhooks.length > -1"/>
 
   <br/>
 
@@ -59,6 +72,7 @@ table {
 
 <script setup
         lang="ts">
+
 import {DsfrButton, DsfrButtonGroup, DsfrInput} from "@gouvminint/vue-dsfr";
 import fetchWithError from "../scripts/fetchWithError";
 import {useRouter} from "vue-router";
@@ -67,6 +81,7 @@ const router = useRouter()
 
 const hookLabel = ref('Webhook infra');
 const roomId = ref('!pKaqgPaNhBnAvPHjjr:agent.dev-durable.tchap.gouv.fr');
+const filter = ref('');
 const webhookList = shallowRef([])
 const apiPath = import.meta.env.VITE_API_ENDPOINT
 
@@ -83,10 +98,20 @@ const modalDeleteText = ref('')
 const modalDeleteOpened = ref(false)
 const modalDeleteActions = ref([])
 
-
 declare global {
   const navigator: any;
 }
+
+const filteredWebhooks = computed(() => {
+  let webhooks: any[] = []
+  for (const webhook in webhookList.value) {
+    if (webhook.webhook_label.includes(filter.value) ||
+      webhook.room_id.includes(filter.value) ||
+      webhook.bot_id.includes(filter.value)) webhooks.push(webhook)
+  }
+  return webhooks
+})
+
 
 onMounted(() => {
   updateList()
@@ -132,14 +157,15 @@ function updateList() {
     .then(value => {
       if (value.map) webhookList.value = value.map(
         (row: WebhookRow) => [
-          row.webhook_label,
+          row.webhook_label.replaceAll(/:.*?($| )/g, "$1"),
           {
             component: DsfrButton,
             label: "Copier le webhook",
             onClick: () => copyWebhook("https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + row.webhook_id),
             icon: "ri-file-copy-line"
           },
-          row.room_id,
+          row.room_id.replaceAll(/:.*?($| )/g, "$1"),
+          row.bot_id.replaceAll(/:.*?($| )/g, "$1"),
           {
             component: DsfrButtonGroup,
             inlineLayoutWhen: "always",
@@ -182,6 +208,7 @@ interface WebhookRow {
   webhook_id: string
   webhook_label: string
   room_id: string
+  bot_id: string
 }
 
 </script>

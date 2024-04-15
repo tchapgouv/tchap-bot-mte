@@ -60,13 +60,13 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
 
-  if (to.meta.requiresAuth) {
-    if (!(await useCheckAuth())) {
-      if (to.path !== '/login') {
-        return next({name: 'Login'})
-      }
-    }
-  }
+  // if (to.meta.requiresAuth) {
+  //   if (!(await useCheckAuth())) {
+  //     if (to.path !== '/login') {
+  //       return next({name: 'Login'})
+  //     }
+  //   }
+  // }
   next()
 })
 
