@@ -2,7 +2,11 @@ import {EventType, MatrixClient, MatrixEvent, MsgType, RelationType} from "matri
 import logger from "../../utils/logger.js";
 import {User} from "../classes/User.js";
 import fs from "fs";
+import showdown from "showdown";
+import path from "path";
+import {fileURLToPath} from "url";
 
+const converter = new showdown.Converter()
 
 export function addEmoji(client: MatrixClient, event: MatrixEvent, emoji: string) {
     logger.debug("Sending emoji : ", emoji)
@@ -22,6 +26,12 @@ export function addEmoji(client: MatrixClient, event: MatrixEvent, emoji: string
     client.sendEvent(room, EventType.Reaction, content).then((res) => {
         logger.debug(res);
     }).catch(e => logger.error(e));
+}
+
+export async function sendMarkdownMessage(client: MatrixClient, roomId: string, message: string): Promise<void> {
+
+    const htmlMessage = converter.makeHtml(message)
+    return sendHtmlMessage(client, roomId, message, htmlMessage)
 }
 
 export async function sendMessage(client: MatrixClient, room: string, message: string): Promise<void> {
@@ -138,4 +148,72 @@ export async function isSomeoneAdmin(client: MatrixClient, roomId: string): Prom
     logger.debug("someoneIsAdmin = " + someoneIsAdmin)
 
     return someoneIsAdmin
+}
+
+
+export function redactHelp(commandes: { command: string | undefined; return: string; isAnswer: boolean }[]): string {
+
+    let help = "Voici une liste non exhaustive des commandes auxquelles je sais répondre :\n"
+    for (const commande of commandes) {
+        help += " - "
+        if (commande.command) {
+            help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
+            help += "`" + commande.command + "`, "
+        }
+        help += commande.return + "\n"
+    }
+    logger.notice(help)
+    return help
+}
+
+export function generateHelp(dirname?: string): string {
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.resolve(__filename, "../../../common/scripts");
+    let files = fs.readdirSync(__dirname);
+
+    let commands: { command: string | undefined; return: string; isAnswer: boolean }[] = []
+
+    if (dirname) {
+        for (const file of files) {
+            commands = extractHelpFromComments(commands, dirname, file);
+        }
+    }
+
+    for (const file of files) {
+        commands = extractHelpFromComments(commands, __dirname, file);
+    }
+
+    commands.sort((a, b) => {
+        if (a.command && !b.command) return 1
+        if (!a.command && b.command) return -1
+        if (a.isAnswer && !b.isAnswer) return 1
+        if (!a.isAnswer && b.isAnswer) return -1
+        if (a.command && b.command) return a.command < b.command ? 1 : -1
+        return a.return < b.return ? 1 : -1
+    }).reverse()
+
+    // logger.notice(commands);
+
+    return redactHelp(commands)
+}
+
+export function answerHelp(body: string, event: MatrixEvent, client: MatrixClient, help: string) {
+    const regex: RegExp = /.*(help|aide).*/i
+
+    if (regex.test(body)) {
+
+        if (event?.sender?.name &&
+            event?.sender?.userId &&
+            event?.event?.room_id) {
+
+            const roomId = event.event.room_id
+
+            sendMarkdownMessage(client, roomId, help)
+
+            return true
+        }
+    }
+
+    return false
 }

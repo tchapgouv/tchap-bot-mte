@@ -4,16 +4,13 @@ import vm from "vm"
 import {Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import ldapService from "./ldap.service.js";
-import {sendHtmlMessage, sendMessage} from "../bot/common/helper.js";
-import showdown from 'showdown';
+import {sendHtmlMessage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
 import {Bot} from "../bot/common/Bot.js";
 
 const bots: Bot[] = [
     gmcdBot,
     psinBot
 ]
-
-const converter = new showdown.Converter()
 
 async function runScript(script: string, message: string) {
 
@@ -158,8 +155,7 @@ export default {
                 break
             case "md":
             case "markdown":
-                const htmlMessage = converter.makeHtml(message)
-                promise = sendHtmlMessage(client, roomId, message, htmlMessage)
+                promise = sendMarkdownMessage(client, roomId, message)
                 break
             default:
                 promise = sendMessage(client, roomId, message)
