@@ -169,7 +169,7 @@ export function redactHelp(commandes: { command: string | undefined; return: str
 export function generateHelp(dirname?: string): string {
 
     const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.resolve(__filename, "./scripts");
+    const __dirname = path.resolve(__filename, "../scripts");
     let files = fs.readdirSync(__dirname);
 
     let commands: { command: string | undefined; return: string; isAnswer: boolean }[] = []
