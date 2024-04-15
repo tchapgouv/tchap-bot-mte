@@ -41,9 +41,10 @@
   <dsfr-table :headers="['Label', 
               'Webhook', 
               'Room Id', 
+              'Bot Id', 
               'Action']"
               :rows="filteredWebhooks"
-              v-if="filteredWebhooks.length > -1"/>
+              v-if="filteredWebhooks.length > 0"/>
 
   <br/>
 
@@ -82,7 +83,7 @@ const router = useRouter()
 const hookLabel = ref('Webhook infra');
 const roomId = ref('!pKaqgPaNhBnAvPHjjr:agent.dev-durable.tchap.gouv.fr');
 const filter = ref('');
-const webhookList = shallowRef([])
+const webhookList = ref([])
 const apiPath = import.meta.env.VITE_API_ENDPOINT
 
 const alerteType = ref('error')
@@ -103,12 +104,21 @@ declare global {
 }
 
 const filteredWebhooks = computed(() => {
+
   let webhooks: any[] = []
-  for (const webhook in webhookList.value) {
-    if (webhook.webhook_label.includes(filter.value) ||
-      webhook.room_id.includes(filter.value) ||
-      webhook.bot_id.includes(filter.value)) webhooks.push(webhook)
+  for (const webhook of webhookList.value) {
+    let push = false
+    for (const index in webhook) {
+      const value = webhook[index]
+      if (typeof value === 'string') {
+        if (value.includes(filter.value)) {
+          push = true
+        }
+      }
+    }
+    if (push) webhooks.push(webhook)
   }
+
   return webhooks
 })
 
