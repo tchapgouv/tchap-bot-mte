@@ -109,7 +109,7 @@ const filteredWebhooks = computed(() => {
   for (const webhook of webhookList.value) {
     let push = false
     for (const index in webhook) {
-      const value = webhook[index]
+      const value:any = webhook[index]
       if (typeof value === 'string') {
         if (value.includes(filter.value)) {
           push = true
