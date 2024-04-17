@@ -132,7 +132,11 @@ export default {
     },
 
 
-    async applyScriptAndPostMessage(roomId: string, message: string, script: string, botId: string, opts: { messageFormat: string } = {messageFormat: "text"}): Promise<{ message: string } | void> {
+    async applyScriptAndPostMessage(roomId: string,
+                                    message: { formattedMessage: string; rawMessage: string | undefined },
+                                    script: string,
+                                    botId: string,
+                                    opts: { messageFormat: string } = {messageFormat: "text"}): Promise<{ message: string } | void> {
 
         logger.info("Applying script to message")
 
@@ -143,7 +147,7 @@ export default {
         if (!client) client = gmcdBot.client
 
         // console.log('message before script : ', message);
-        await runScript(script, message).then(data => message = data)
+        await runScript(script, message.formattedMessage).then(data => message.formattedMessage = data)
         // console.log('message after script : ', message);
 
         logger.info("Posting message")
@@ -151,14 +155,14 @@ export default {
         let promise
         switch (opts.messageFormat) {
             case "html":
-                promise = sendHtmlMessage(client, roomId, message, message)
+                promise = sendHtmlMessage(client, roomId, message.rawMessage || message.formattedMessage, message.formattedMessage)
                 break
             case "md":
             case "markdown":
-                promise = sendMarkdownMessage(client, roomId, message)
+                promise = sendMarkdownMessage(client, roomId, message.formattedMessage)
                 break
             default:
-                promise = sendMessage(client, roomId, message)
+                promise = sendMessage(client, roomId, message.formattedMessage)
         }
 
         return await promise.then(() => {

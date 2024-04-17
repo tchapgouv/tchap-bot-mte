@@ -67,7 +67,8 @@ export async function postMessage(req: Request, res: Response) {
 
     const webhookId: string = req.params.webhook || req.body.webhook
     const format: string = req.body.messageformat || req.body.message_format || undefined
-    const message: string = req.body.message || req.body.text
+    const message: string = req.body.message || req.body.text || req.body.data
+    const rawMessage: string = req.body.rawmessage || req.body.raw_message || req.body.text || req.body.raw_text || undefined
 
     let webhook: Webhook | null | undefined
 
@@ -88,7 +89,7 @@ export async function postMessage(req: Request, res: Response) {
                 "'message' property is undefined, maybe body is not respecting { 'message' : 'Hi !' } ?"
         })
     } else {
-        await webhookService.postMessage(webhook, message, format)
+        await webhookService.postMessage(webhook, {formattedMessage: message, rawMessage: rawMessage}, format)
             .then(data => {
                 res.json(data)
             })
@@ -100,7 +101,6 @@ export async function postMessage(req: Request, res: Response) {
                 });
             });
     }
-
 }
 
 export async function update(req: Request, res: Response) {

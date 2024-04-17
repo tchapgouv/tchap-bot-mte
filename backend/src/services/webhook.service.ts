@@ -20,7 +20,7 @@ function generateId(length: number) {
 
 export default {
 
-    async postMessage(webhook: Webhook, message: string, messageFormat: string = "") {
+    async postMessage(webhook: Webhook, message: { formattedMessage: string; rawMessage: string | undefined }, messageFormat: string = "") {
 
         logger.debug("Posting from webhook : ", webhook)
 
