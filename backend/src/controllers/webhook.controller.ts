@@ -91,6 +91,7 @@ export async function postMessage(req: Request, res: Response) {
     logger.debug('script : ', webhook.script)
     await botService.runScript(webhook.script, message).then(data => {
         logger.debug('Script applied.')
+        logger.debug('Resulting data :', data)
         if (typeof data === 'string') message = data
         if (data.message && typeof data.message === 'string') message = data.message
         if (data.rawMessage && typeof data.rawMessage === 'string') rawMessage = data.rawMessage
