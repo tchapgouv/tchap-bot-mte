@@ -66,6 +66,8 @@ export async function findOneWithWebhook(req: Request, res: Response) {
 
 export async function postMessage(req: Request, res: Response) {
 
+    logger.debug("Webhook posting request received.")
+
     const webhookId: string = req.params.webhook || req.body.webhook
     const format: string = req.body.messageformat || req.body.message_format || undefined
     let message: string | any = req.body.message || req.body.text || req.body
@@ -75,7 +77,7 @@ export async function postMessage(req: Request, res: Response) {
 
     await webhookService.findOne({where: {webhook_id: webhookId}}).then((value) => {
         webhook = value
-        logger.debug("webhook :", webhook)
+        logger.debug("Webhook :", webhook)
     })
 
     if (!webhook) {
