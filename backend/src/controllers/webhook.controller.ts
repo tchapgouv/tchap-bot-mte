@@ -75,6 +75,7 @@ export async function postMessage(req: Request, res: Response) {
 
     await webhookService.findOne({where: {webhook_id: webhookId}}).then((value) => {
         webhook = value
+        logger.debug("webhook :", webhook)
     })
 
     if (!webhook) {
@@ -96,7 +97,7 @@ export async function postMessage(req: Request, res: Response) {
         if (data.message && typeof data.message === 'string') message = data.message
         if (data.rawMessage && typeof data.rawMessage === 'string') rawMessage = data.rawMessage
     }).catch(reason => {
-        logger.warning('An error occurred while applying script.', reason)
+        logger.warning('An error occurred while applying script.', webhook?.webhook_id, reason)
     })
     logger.debug('Message after script : ', message);
 
