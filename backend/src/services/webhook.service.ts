@@ -22,7 +22,7 @@ export default {
 
     async postMessage(webhook: Webhook, message: { formattedMessage: string; rawMessage: string | undefined }, messageFormat: string = "") {
 
-        logger.debug("Posting from webhook : ", webhook)
+        logger.debug("Posting from webhook : ", webhook.dataValues.webhook_id)
 
         return await botService.postMessage(webhook.dataValues.room_id,
             message,
