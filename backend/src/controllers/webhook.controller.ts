@@ -91,15 +91,15 @@ export async function postMessage(req: Request, res: Response) {
     logger.info("Applying script to message")
 
     logger.debug('Message before script : ', message);
-    logger.debug('script : ', webhook.script)
-    await botService.runScript(webhook.script, message).then(data => {
+    logger.debug('script : ', webhook.dataValues.script)
+    await botService.runScript(webhook.dataValues.script, message).then(data => {
         logger.debug('Script applied.')
         logger.debug('Resulting data :', data)
         if (typeof data === 'string') message = data
         if (data.message && typeof data.message === 'string') message = data.message
         if (data.rawMessage && typeof data.rawMessage === 'string') rawMessage = data.rawMessage
     }).catch(reason => {
-        logger.warning('An error occurred while applying script.', webhook?.webhook_id, reason)
+        logger.warning('An error occurred while applying script.', webhook?.dataValues.webhook_id, reason)
     })
     logger.debug('Message after script : ', message);
 
