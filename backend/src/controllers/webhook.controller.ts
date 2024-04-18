@@ -69,7 +69,7 @@ export async function postMessage(req: Request, res: Response) {
     logger.debug("Webhook posting request received.")
 
     const webhookId: string = req.params.webhook || req.body.webhook
-    const format: string = req.body.messageformat || req.body.message_format || undefined
+    let format: string = req.body.messageformat || req.body.message_format || undefined
     let message: string | any = req.body.message || req.body.text || req.body
     let rawMessage: string = req.body.rawmessage || req.body.raw_message || req.body.text || req.body.raw_text || undefined
 
@@ -98,6 +98,7 @@ export async function postMessage(req: Request, res: Response) {
         if (typeof data === 'string') message = data
         if (data.message && typeof data.message === 'string') message = data.message
         if (data.rawMessage && typeof data.rawMessage === 'string') rawMessage = data.rawMessage
+        if (data.format && typeof data.format === 'string') format = data.format
     }).catch(reason => {
         logger.warning('An error occurred while applying script.', webhook?.dataValues.webhook_id, reason)
     })
