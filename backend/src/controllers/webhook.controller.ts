@@ -3,6 +3,7 @@ import webhookService from "../services/webhook.service.js";
 import {Webhook} from "../models/webhook.model.js";
 import {StatusCodes} from "http-status-codes";
 import logger from "../utils/logger.js";
+import botService from "../services/bot.service.js";
 
 export async function destroy(req: Request, res: Response) {
 
@@ -67,8 +68,8 @@ export async function postMessage(req: Request, res: Response) {
 
     const webhookId: string = req.params.webhook || req.body.webhook
     const format: string = req.body.messageformat || req.body.message_format || undefined
-    const message: string = req.body.message || req.body.text || req.body.data
-    const rawMessage: string = req.body.rawmessage || req.body.raw_message || req.body.text || req.body.raw_text || undefined
+    let message: string | any = req.body.message || req.body.text || req.body
+    let rawMessage: string = req.body.rawmessage || req.body.raw_message || req.body.text || req.body.raw_text || undefined
 
     let webhook: Webhook | null | undefined
 
@@ -81,26 +82,38 @@ export async function postMessage(req: Request, res: Response) {
             message:
                 "Unauthenticated (Wrong webhook)."
         })
+        return
+    }
 
-    } else if (!message) {
+    // console.log('message before script : ', message);
+    await botService.runScript(webhook.script, message).then(data => {
+        if (typeof message === 'string') message = data
+        if (data.message && typeof data.message === 'string') message = data.message
+        if (data.rawMessage && typeof data.rawMessage === 'string') rawMessage = data.rawMessage
+    })
+    // console.log('message after script : ', message);
+
+    if (typeof message !== 'string') {
+
         logger.warning("Someone is trying to post an empty message", req.body)
         res.status(StatusCodes.BAD_REQUEST).send({
             message:
                 "'message' property is undefined, maybe body is not respecting { 'message' : 'Hi !' } ?"
         })
-    } else {
-        await webhookService.postMessage(webhook, {formattedMessage: message, rawMessage: rawMessage}, format)
-            .then(data => {
-                res.json(data)
-            })
-            .catch(err => {
-                logger.error("Error posting message :", err)
-                res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-                    message:
-                        err.message || "Some error occurred while posting message."
-                });
-            });
+        return
     }
+
+    await webhookService.postMessage(webhook, {formattedMessage: message, rawMessage: rawMessage}, format)
+        .then(data => {
+            res.json(data)
+        })
+        .catch(err => {
+            logger.error("Error posting message :", err)
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+                message:
+                    err.message || "Some error occurred while posting message."
+            });
+        });
 }
 
 export async function update(req: Request, res: Response) {

@@ -24,9 +24,8 @@ export default {
 
         logger.debug("Posting from webhook : ", webhook)
 
-        return await botService.applyScriptAndPostMessage(webhook.dataValues.room_id,
+        return await botService.postMessage(webhook.dataValues.room_id,
             message,
-            webhook.dataValues.script,
             webhook.dataValues.bot_id,
             {messageFormat: messageFormat})
     },

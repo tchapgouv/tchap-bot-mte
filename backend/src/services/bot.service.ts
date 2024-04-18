@@ -12,17 +12,17 @@ const bots: Bot[] = [
     psinBot
 ]
 
-async function runScript(script: string, message: string) {
-
-    const context = {'data': message};
-    vm.createContext(context); // Contextualize the object.
-    await vm.runInContext(script, context);
-
-    // console.log(context.data);
-    return context.data
-}
-
 export default {
+
+    async runScript(script: string, message: any) {
+
+        const context = {'data': message};
+        vm.createContext(context); // Contextualize the object.
+        await vm.runInContext(script, context);
+
+        // console.log(context.data);
+        return context.data
+    },
 
     async createRoomAndInvite(roomName: string, userList: string[], roomId?: string): Promise<void> {
 
@@ -132,11 +132,10 @@ export default {
     },
 
 
-    async applyScriptAndPostMessage(roomId: string,
-                                    message: { formattedMessage: string; rawMessage: string | undefined },
-                                    script: string,
-                                    botId: string,
-                                    opts: { messageFormat: string } = {messageFormat: "text"}): Promise<{ message: string } | void> {
+    async postMessage(roomId: string,
+                      message: { formattedMessage: string; rawMessage: string | undefined },
+                      botId: string,
+                      opts: { messageFormat: string } = {messageFormat: "text"}): Promise<{ message: string } | void> {
 
         logger.info("Applying script to message")
 
@@ -145,10 +144,6 @@ export default {
             if (bot.client.getUserId() === botId) client = bot.client
         }
         if (!client) client = gmcdBot.client
-
-        // console.log('message before script : ', message);
-        await runScript(script, message.formattedMessage).then(data => message.formattedMessage = data)
-        // console.log('message after script : ', message);
 
         logger.info("Posting message")
 
