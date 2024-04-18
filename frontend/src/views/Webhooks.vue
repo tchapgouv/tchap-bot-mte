@@ -109,7 +109,7 @@ const filteredWebhooks = computed(() => {
   for (const webhook of webhookList.value) {
     let push = false
     for (const index in webhook) {
-      const value:any = webhook[index]
+      const value: any = webhook[index]
       if (typeof value === 'string') {
         if (value.toLowerCase().includes(filter.value.toLowerCase())) {
           push = true
@@ -157,6 +157,11 @@ function onClickGenerate() {
     })
 }
 
+function hasScript(script: string) {
+  if (script === '// Il est possible de manipuler la variable data (le message), qui sera récupérée et envoyée au bot à la fin du traitement.\ndata = data;') return false
+  return script !== '';
+}
+
 function updateList() {
   fetchWithError(apiPath + '/api/webhook/list',
     {
@@ -167,7 +172,7 @@ function updateList() {
     .then(value => {
       if (value.map) webhookList.value = value.map(
         (row: WebhookRow) => [
-          row.webhook_label.replaceAll(/:.*?($| )/g, "$1"),
+          row.webhook_label.replaceAll(/:.*?($| )/g, "$1") + (hasScript(row.script) ? " (w. script)" : ""),
           {
             component: DsfrButton,
             label: "Copier le webhook",
@@ -217,6 +222,7 @@ function copyWebhook(webhookId: string) {
 interface WebhookRow {
   webhook_id: string
   webhook_label: string
+  script: string
   room_id: string
   bot_id: string
 }
