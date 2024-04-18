@@ -85,13 +85,15 @@ export async function postMessage(req: Request, res: Response) {
         return
     }
 
-    // console.log('message before script : ', message);
+    logger.info("Applying script to message")
+
+    logger.debug('message before script : ', message);
     await botService.runScript(webhook.script, message).then(data => {
-        if (typeof message === 'string') message = data
+        if (typeof data === 'string') message = data
         if (data.message && typeof data.message === 'string') message = data.message
         if (data.rawMessage && typeof data.rawMessage === 'string') rawMessage = data.rawMessage
     })
-    // console.log('message after script : ', message);
+    logger.debug('message after script : ', message);
 
     if (typeof message !== 'string') {
 

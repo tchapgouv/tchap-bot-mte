@@ -137,8 +137,6 @@ export default {
                       botId: string,
                       opts: { messageFormat: string } = {messageFormat: "text"}): Promise<{ message: string } | void> {
 
-        logger.info("Applying script to message")
-
         let client
         for (const bot of bots) {
             if (bot.client.getUserId() === botId) client = bot.client
