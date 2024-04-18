@@ -30,6 +30,8 @@ export function addEmoji(client: MatrixClient, event: MatrixEvent, emoji: string
 
 export async function sendMarkdownMessage(client: MatrixClient, roomId: string, message: string): Promise<void> {
 
+    logger.debug("Converting markdown message.")
+
     const htmlMessage = converter.makeHtml(message)
     return sendHtmlMessage(client, roomId, message, htmlMessage)
 }
@@ -82,7 +84,7 @@ export function extractHelpFromComments(commandes: { command: string | undefined
 
 export async function sendHtmlMessage(client: MatrixClient, room: string, rawMessage: string, htmlMessage: string): Promise<void> {
 
-    logger.debug("Sending message : ", rawMessage)
+    logger.debug("Sending Html message : ", rawMessage)
     logger.debug("room : ", room)
 
     const content = {
