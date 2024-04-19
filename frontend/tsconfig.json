@@ -3,7 +3,13 @@
   "ts-node": {
     "transpileOnly": true,
     "compilerOptions": {
-      "module": "ES2015"
+      "module": "ES2015",
+      "paths": {
+        "@/*": [
+          // set path `@/*` as alias of `src/*`
+          "./src/*"
+        ]
+      }
     }
   },
   "references": [

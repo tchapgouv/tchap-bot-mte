@@ -14,3 +14,7 @@ export {
   RiDeleteBinLine,
   RiSaveLine
 } from 'oh-vue-icons/icons/ri/index.js'
+
+export {
+  PxWarningBox,
+} from 'oh-vue-icons/icons/px/index.js'

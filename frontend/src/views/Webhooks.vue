@@ -75,15 +75,21 @@ table {
         lang="ts">
 
 import {DsfrButton, DsfrButtonGroup, DsfrInput} from "@gouvminint/vue-dsfr";
-import fetchWithError from "../scripts/fetchWithError";
+import fetchWithError from "@/scripts/fetchWithError";
 import {useRouter} from "vue-router";
+import Span from "@/components/Span.vue";
+import {storeToRefs} from 'pinia';
+import {useWebhookFilterStore} from '@/stores/webhooks'
+
+const filterStore = useWebhookFilterStore()
 
 const router = useRouter()
 
 const hookLabel = ref('Webhook infra');
 const roomId = ref('!pKaqgPaNhBnAvPHjjr:agent.dev-durable.tchap.gouv.fr');
-const filter = ref('');
-const webhookList = ref([])
+const {filter} = storeToRefs(filterStore);
+// const filter = ref("");
+const webhookList = shallowRef([])
 const apiPath = import.meta.env.VITE_API_ENDPOINT
 
 const alerteType = ref('error')
@@ -109,7 +115,8 @@ const filteredWebhooks = computed(() => {
   for (const webhook of webhookList.value) {
     let push = false
     for (const index in webhook) {
-      const value: any = webhook[index]
+      let value: any = webhook[index]
+      if (value?.label) value = value.label
       if (typeof value === 'string') {
         if (value.toLowerCase().includes(filter.value.toLowerCase())) {
           push = true
@@ -163,46 +170,72 @@ function hasScript(script: string) {
 }
 
 function updateList() {
-  fetchWithError(apiPath + '/api/webhook/list',
+  // fetchWithError(apiPath + '/api/webhook/list',
+  //   {
+  //     method: "GET",
+  //   }
+  // )
+  //   .then(stream => stream.json())
+  //   .then(value => {
+  const value = [
     {
-      method: "GET",
+      "id": 6,
+      "webhook_label": "GMCD - Supervision MDrive",
+      "webhook_id": "6Hlwue23itcJhOcroungSg9DaKVMOooKeQdVQQnFNx6XSBi5rWRopAhmAogtHKGDAyTAWYLPESpUdZDR1jbOZbEAZbu5TtIvdycL",
+      "bot_id": "@bot-gmcd-developpement-durable.gouv.fr:agent.dev-durable.tchap.gouv.fr",
+      "room_id": "!yqiHKBlKlRImYxvChb:agent.dev-durable.tchap.gouv.fr",
+      "script": "// Il est possible de manipuleazeazeazer la variable data (le message), qui sera récupérée et envoyée au bot à la fin du traitement.\ndata = data;",
+      "createdAt": "2024-03-27T08:22:40.386Z",
+      "updatedAt": "2024-03-27T08:22:40.386Z"
+    },
+    {
+      "id": 7,
+      "webhook_label": "GMCD - Bot",
+      "webhook_id": "SW2eTVTTd2W5HwCMydUAyyCwSm6AEOIj1V5q2Ucac3uChcs6bfvW6rnQfyCS0s61o4M2dfZbVTtKQWeAGXvlUSawBiFw5QOU69jz",
+      "bot_id": "@bot-gmcd-developpement-durable.gouv.fr:agent.dev-durable.tchap.gouv.fr",
+      "room_id": "!pKaqgPaNhBnAvPHjjr:agent.dev-durable.tchap.gouv.fr",
+      "script": "// Il est possible de manipuler la variable data (le message), qui sera récupérée et envoyée au bot à la fin du traitement.\ndata = data;",
+      "createdAt": "2024-03-27T19:10:25.752Z",
+      "updatedAt": "2024-03-27T19:11:50.518Z"
     }
-  )
-    .then(stream => stream.json())
-    .then(value => {
-      if (value.map) webhookList.value = value.map(
-        (row: WebhookRow) => [
-          row.webhook_label.replaceAll(/:.*?($| )/g, "$1") + (hasScript(row.script) ? " (w. script)" : ""),
-          {
-            component: DsfrButton,
-            label: "Copier le webhook",
-            onClick: () => copyWebhook("https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + row.webhook_id),
-            icon: "ri-file-copy-line"
-          },
-          row.room_id.replaceAll(/:.*?($| )/g, "$1"),
-          row.bot_id.replaceAll(/:.*?($| )/g, "$1"),
-          {
-            component: DsfrButtonGroup,
-            inlineLayoutWhen: "always",
-            buttons:
-              [
-                {
-                  label: "Éditer",
-                  iconOnly: true,
-                  onClick: () => router.push('/webhook/' + row.webhook_id),
-                  icon: "fr-icon-edit-line"
-                },
-                {
-                  label: "Tester",
-                  iconOnly: true,
-                  onClick: () => router.push('/postman/' + row.webhook_id),
-                  tertiary: "true",
-                  icon: {name: 'ri-flask-line', fill: 'var(--yellow-moutarde-sun-348-moon-860)'}
-                }
-              ]
-          }
-        ]);
-    })
+  ]
+  if (value.map) webhookList.value = value.map(
+    (row: WebhookRow) => [
+      {
+        component: Span,
+        label: row.webhook_label.replaceAll(/:.*?($| )/g, "$1") + (hasScript(row.script) ? " (w. script)" : ""),
+        hasScript: hasScript(row.script)
+      },
+      {
+        component: DsfrButton,
+        label: "Copier le webhook",
+        onClick: () => copyWebhook("https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + row.webhook_id),
+        icon: "ri-file-copy-line"
+      },
+      row.room_id.replaceAll(/:.*?($| )/g, "$1"),
+      row.bot_id.replaceAll(/:.*?($| )/g, "$1"),
+      {
+        component: DsfrButtonGroup,
+        inlineLayoutWhen: "always",
+        buttons:
+          [
+            {
+              label: "Éditer",
+              iconOnly: true,
+              onClick: () => router.push('/webhook/' + row.webhook_id),
+              icon: "fr-icon-edit-line"
+            },
+            {
+              label: "Tester",
+              iconOnly: true,
+              onClick: () => router.push('/postman/' + row.webhook_id),
+              tertiary: true,
+              icon: {name: 'ri-flask-line', fill: 'var(--yellow-moutarde-sun-348-moon-860)'}
+            }
+          ]
+      }
+    ]);
+  // })
 }
 
 function copyWebhook(webhookId: string) {
