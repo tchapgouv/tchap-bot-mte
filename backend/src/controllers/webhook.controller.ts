@@ -71,7 +71,10 @@ export async function postMessage(req: Request, res: Response) {
     const webhookId: string = req.params.webhook || req.body.webhook
     let format: string = req.body.messageformat || req.body.message_format || undefined
     let message: string | any = req.body.message || req.body.text || req.body
-    let rawMessage: string = req.body.rawmessage || req.body.raw_message || req.body.text || req.body.raw_text || undefined
+    let rawMessage: string =
+        req.body.rawmessage || req.body.raw_message || req.body.message_raw || req.body.messageraw ||
+        req.body.rawtext || req.body.raw_text || req.body.text_raw || req.body.textraw ||
+        undefined
 
     let webhook: Webhook | null | undefined
 

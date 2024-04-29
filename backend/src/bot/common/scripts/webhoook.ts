@@ -15,8 +15,10 @@ function getWebhookMessage(exists: boolean, webhook_id: any) {
         "{\n" +
         "   \"message\": \"Coucou ! Message envoyé avec un webhook =)\",\n" +
         "   \"message_format\": \"\"\n" +
+        "   \"message_raw\": \"\"\n" +
         "}\n" +
-        "`message_format` est optionnel et peut prendre les valeurs suivantes : `html|md|markdown`" +
+        "`message_format` est optionnel. Il peut prendre les valeurs suivantes : `html|md|markdown`" +
+        "`message_raw` est optionnel. Il permet de fournir une alternative texte brut au message si un format est spécifié (Typiquement pour les clients mobiles)" +
         "Amusez vous bien ! 🏌️"
 }
 
@@ -30,8 +32,10 @@ function getWebhookHtmlMessage(exists: boolean, webhook_id: any) {
             "{\n" +
             "   \"message\": \"Coucou ! Message envoyé avec un webhook =)\",\n" +
             "   \"message_format\": \"\"\n" +
+            "   \"message_raw\": \"\"\n" +
             "}\n", "json") +
-        "<code>message_format</code> est optionnel et peut prendre les valeurs suivantes : <code>html|md|markdown</code><br>" +
+        "<code>message_format</code> est optionnel. Il peut prendre les valeurs suivantes : <code>html|md|markdown</code><br>" +
+        "<code>message_raw</code> est optionnel. Il permet de fournir une alternative texte brut au message si un format est spécifié (Typiquement pour les clients mobiles)<br>" +
         "Amusez vous bien ! 🏌️"
 }
 
