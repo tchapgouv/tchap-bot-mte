@@ -1,6 +1,6 @@
 import fetchWithError from "../../../utils/fetchWithError.js";
 import {MatrixClient} from "matrix-js-sdk";
-import {sendMessage} from "../helper.js";
+import {sendMessage} from "../../common/helper.js";
 
 
 /**

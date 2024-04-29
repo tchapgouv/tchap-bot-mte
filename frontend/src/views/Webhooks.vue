@@ -23,14 +23,28 @@
               :type="'text'"
               :label-visible="true">test
   </dsfr-input>
-  <br/>
   <dsfr-button :label="'Générer'"
-               @click="onClickGenerate"></dsfr-button>
-  <dsfr-table :title="'Liste des Webhooks'"
-              :headers="['Label', 'Webhook', 'Room Id', 'Action']"
-              :rows="webhookList"
-              v-if="webhookList.length > 0"
-              style="margin-top: 2em;"/>
+               @click="onClickGenerate"
+               :style="'margin-bottom:25px; margin-top:25px; float: right;'"/>
+
+  <!--  float clear hack  -->
+  <div style="clear: both"/>
+
+  <h4>Liste des Webhooks</h4>
+
+  <dsfr-input v-model="filter"
+              :label="'filtre :'"
+              :type="'text'"
+              :label-visible="true"
+              :style="'width : 25%;'"/>
+
+  <dsfr-table :headers="['Label', 
+              'Webhook', 
+              'Room Id', 
+              'Bot Id', 
+              'Action']"
+              :rows="filteredWebhooks"
+              v-if="filteredWebhooks.length > 0"/>
 
   <br/>
 
@@ -59,18 +73,26 @@ table {
 
 <script setup
         lang="ts">
-import {DsfrButton, DsfrButtonGroup, DsfrInput} from "@gouvminint/vue-dsfr";
-import fetchWithError from "../scripts/fetchWithError";
+
+import {type DsfrAlertType, DsfrButton, DsfrButtonGroup, DsfrInput} from "@gouvminint/vue-dsfr";
+import fetchWithError from "@/scripts/fetchWithError";
 import {useRouter} from "vue-router";
+import Span from "@/components/Span.vue";
+import {storeToRefs} from 'pinia';
+import {useWebhookFilterStore} from '@/stores/webhooks'
+
+const filterStore = useWebhookFilterStore()
 
 const router = useRouter()
 
 const hookLabel = ref('Webhook infra');
 const roomId = ref('!pKaqgPaNhBnAvPHjjr:agent.dev-durable.tchap.gouv.fr');
+const {filter} = storeToRefs(filterStore);
+// const filter = ref("");
 const webhookList = shallowRef([])
 const apiPath = import.meta.env.VITE_API_ENDPOINT
 
-const alerteType = ref('error')
+const alerteType = ref<DsfrAlertType>('error')
 const alerteDescription = ref('')
 const alerteTitle = ref('')
 const alerteClosed = ref(true)
@@ -83,10 +105,30 @@ const modalDeleteText = ref('')
 const modalDeleteOpened = ref(false)
 const modalDeleteActions = ref([])
 
-
 declare global {
   const navigator: any;
 }
+
+const filteredWebhooks = computed(() => {
+
+  let webhooks: any[] = []
+  for (const webhook of webhookList.value) {
+    let push = false
+    for (const index in webhook) {
+      let value: any = webhook[index]
+      if (value?.label) value = value.label
+      if (typeof value === 'string') {
+        if (value.toLowerCase().includes(filter.value.toLowerCase())) {
+          push = true
+        }
+      }
+    }
+    if (push) webhooks.push(webhook)
+  }
+
+  return webhooks
+})
+
 
 onMounted(() => {
   updateList()
@@ -122,6 +164,11 @@ function onClickGenerate() {
     })
 }
 
+function hasScript(script: string) {
+  if (script === '// Il est possible de manipuler la variable data (le message), qui sera récupérée et envoyée au bot à la fin du traitement.\ndata = data;') return false
+  return script !== '';
+}
+
 function updateList() {
   fetchWithError(apiPath + '/api/webhook/list',
     {
@@ -132,14 +179,19 @@ function updateList() {
     .then(value => {
       if (value.map) webhookList.value = value.map(
         (row: WebhookRow) => [
-          row.webhook_label,
+          {
+            component: Span,
+            label: row.webhook_label.replace(/:.*?($| )/g, "$1") + (hasScript(row.script) ? " (w. script)" : ""),
+            hasScript: hasScript(row.script)
+          },
           {
             component: DsfrButton,
             label: "Copier le webhook",
             onClick: () => copyWebhook("https://tchap-bot.mel.e2.rie.gouv.fr/api/webhook/post/" + row.webhook_id),
             icon: "ri-file-copy-line"
           },
-          row.room_id,
+          row.room_id.replace(/:.*?($| )/g, "$1"),
+          row.bot_id.replace(/:.*?($| )/g, "$1"),
           {
             component: DsfrButtonGroup,
             inlineLayoutWhen: "always",
@@ -155,7 +207,7 @@ function updateList() {
                   label: "Tester",
                   iconOnly: true,
                   onClick: () => router.push('/postman/' + row.webhook_id),
-                  tertiary: "true",
+                  tertiary: true,
                   icon: {name: 'ri-flask-line', fill: 'var(--yellow-moutarde-sun-348-moon-860)'}
                 }
               ]
@@ -181,7 +233,9 @@ function copyWebhook(webhookId: string) {
 interface WebhookRow {
   webhook_id: string
   webhook_label: string
+  script: string
   room_id: string
+  bot_id: string
 }
 
 </script>

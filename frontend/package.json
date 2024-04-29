@@ -16,6 +16,7 @@
     "focus-trap": "^7.5.4",
     "focus-trap-vue": "^4.0.3",
     "oh-vue-icons": "1.0.0-rc3",
+    "pinia": "^2.1.7",
     "vue": "^3.3.10",
     "vue-router": "^4.2.5"
   },

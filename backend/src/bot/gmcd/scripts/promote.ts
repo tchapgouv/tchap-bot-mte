@@ -1,6 +1,6 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
-import {getUserPowerLevel, isSomeoneAdmin, sendMessage} from "../helper.js";
+import {getUserPowerLevel, isSomeoneAdmin, sendMessage} from "../../common/helper.js";
 
 
 /**

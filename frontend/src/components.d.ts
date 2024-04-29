@@ -16,5 +16,7 @@ declare module 'vue' {
     DsfrTable: typeof import('@gouvminint/vue-dsfr')['DsfrTable']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Span: typeof import('./components/Span.vue')['default']
+    VIcon: typeof import('oh-vue-icons')['OhVueIcon']
   }
 }

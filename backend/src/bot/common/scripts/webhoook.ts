@@ -3,8 +3,9 @@ import logger from "../../../utils/logger.js";
 import {getUserPowerLevel, sendHtmlMessage, sendMessage} from "../helper.js";
 import webhookService from "../../../services/webhook.service.js";
 import {Webhook} from "../../../models/webhook.model.js";
-import {User} from "../../classes/user.js";
+import {User} from "../../classes/User.js";
 import {aLink, codeBlock} from "../htmlFormatHelpers.js";
+import {Op} from "sequelize";
 
 function getWebhookMessage(exists: boolean, webhook_id: any) {
     return (exists ? "Un webhook existe déjà pour ce salon 😉 !\n" : "J'ai créé un webhook pour vous 🚀 !\n") +
@@ -14,8 +15,10 @@ function getWebhookMessage(exists: boolean, webhook_id: any) {
         "{\n" +
         "   \"message\": \"Coucou ! Message envoyé avec un webhook =)\",\n" +
         "   \"message_format\": \"\"\n" +
+        "   \"message_raw\": \"\"\n" +
         "}\n" +
-        "`message_format` est optionnel et peut prendre les valeurs suivantes : `html|md|markdown`" +
+        "`message_format` est optionnel. Il peut prendre les valeurs suivantes : `html|md|markdown`" +
+        "`message_raw` est optionnel. Il permet de fournir une alternative texte brut au message si un format est spécifié (Typiquement pour les clients mobiles)" +
         "Amusez vous bien ! 🏌️"
 }
 
@@ -29,12 +32,15 @@ function getWebhookHtmlMessage(exists: boolean, webhook_id: any) {
             "{\n" +
             "   \"message\": \"Coucou ! Message envoyé avec un webhook =)\",\n" +
             "   \"message_format\": \"\"\n" +
+            "   \"message_raw\": \"\"\n" +
             "}\n", "json") +
-        "<code>message_format</code> est optionnel et peut prendre les valeurs suivantes : <code>html|md|markdown</code><br>" +
+        "<code>message_format</code> est optionnel. Il peut prendre les valeurs suivantes : <code>html|md|markdown</code><br>" +
+        "<code>message_raw</code> est optionnel. Il permet de fournir une alternative texte brut au message si un format est spécifié (Typiquement pour les clients mobiles)<br>" +
         "Amusez vous bien ! 🏌️"
 }
 
 function createOrReturnWebhook(client: MatrixClient, roomId: string, user: User, webhook: Webhook | null) {
+
     if (webhook) {
 
         const rawMessage = getWebhookMessage(true, webhook.dataValues.webhook_id)
@@ -43,7 +49,9 @@ function createOrReturnWebhook(client: MatrixClient, roomId: string, user: User,
 
     } else {
 
-        webhookService.create("Bot - " + user.username + " - " + roomId, roomId).then((value: Webhook) => {
+        const roomName = client.getRoom(roomId)?.name || roomId
+
+        webhookService.create("Bot - " + user.username + " - " + roomName, roomId, client.getUserId() || "" + process.env.BOT_USER_ID).then((value: Webhook) => {
 
             const rawMessage = getWebhookMessage(false, value.dataValues.webhook_id)
             const htmlMessage = getWebhookHtmlMessage(false, value.dataValues.webhook_id)
@@ -80,7 +88,7 @@ export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, b
 
                     logger.debug("Creating webhook if none exists for " + user.username + ".")
 
-                    webhookService.findOne({where: {room_id: roomId}}).then(webhook => {
+                    webhookService.findOne({where: {[Op.and]: [{room_id: roomId}, {bot_id: client.getUserId()}]}}).then(webhook => {
 
                         createOrReturnWebhook(client, roomId, user, webhook)
 

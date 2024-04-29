@@ -3,6 +3,7 @@ import webhookService from "../services/webhook.service.js";
 import {Webhook} from "../models/webhook.model.js";
 import {StatusCodes} from "http-status-codes";
 import logger from "../utils/logger.js";
+import botService from "../services/bot.service.js";
 
 export async function destroy(req: Request, res: Response) {
 
@@ -65,14 +66,21 @@ export async function findOneWithWebhook(req: Request, res: Response) {
 
 export async function postMessage(req: Request, res: Response) {
 
+    logger.debug("Webhook posting request received.")
+
     const webhookId: string = req.params.webhook || req.body.webhook
-    const format: string = req.body.messageformat || req.body.message_format || undefined
-    const message: string = req.body.message
+    let format: string = req.body.messageformat || req.body.message_format || undefined
+    let message: string | any = req.body.message || req.body.text || req.body
+    let rawMessage: string =
+        req.body.rawmessage || req.body.raw_message || req.body.message_raw || req.body.messageraw ||
+        req.body.rawtext || req.body.raw_text || req.body.text_raw || req.body.textraw ||
+        undefined
 
     let webhook: Webhook | null | undefined
 
     await webhookService.findOne({where: {webhook_id: webhookId}}).then((value) => {
         webhook = value
+        logger.debug("Webhook :", webhook)
     })
 
     if (!webhook) {
@@ -80,20 +88,46 @@ export async function postMessage(req: Request, res: Response) {
             message:
                 "Unauthenticated (Wrong webhook)."
         })
-
-    } else {
-        await webhookService.postMessage(webhook, message, format)
-            .then(data => {
-                res.json(data)
-            })
-            .catch(err => {
-                logger.error("Error posting message :", err)
-                res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-                    message:
-                        err.message || "Some error occurred while posting message."
-                });
-            });
+        return
     }
+
+    logger.info("Applying script to message")
+
+    logger.debug('Message before script : ', message);
+    logger.debug('script : ', webhook.dataValues.script)
+    await botService.runScript(webhook.dataValues.script, message).then(data => {
+        logger.debug('Script applied.')
+        logger.debug('Resulting data :', data)
+        if (typeof data === 'string') message = data
+        if (data.message && typeof data.message === 'string') message = data.message
+        if (data.rawMessage && typeof data.rawMessage === 'string') rawMessage = data.rawMessage
+        if (data.format && typeof data.format === 'string') format = data.format
+    }).catch(reason => {
+        logger.warning('An error occurred while applying script.', webhook?.dataValues.webhook_id, reason)
+    })
+    logger.debug('Message after script : ', message);
+
+    if (typeof message !== 'string') {
+
+        logger.warning("Someone is trying to post an empty message", req.body)
+        res.status(StatusCodes.BAD_REQUEST).send({
+            message:
+                "'message' property is undefined, maybe body is not respecting { 'message' : 'Hi !' } ?"
+        })
+        return
+    }
+
+    await webhookService.postMessage(webhook, {formattedMessage: message, rawMessage: rawMessage}, format)
+        .then(data => {
+            res.json(data)
+        })
+        .catch(err => {
+            logger.error("Error posting message :", err)
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+                message:
+                    err.message || "Some error occurred while posting message."
+            });
+        });
 }
 
 export async function update(req: Request, res: Response) {
@@ -132,8 +166,10 @@ export async function create(req: Request, res: Response) {
         return;
     }
 
-    await webhookService.create(req.body.label,
-        req.body.room
+    await webhookService.create(
+        req.body.label,
+        req.body.room,
+        req.body.bot_id
     )
         .then(data => {
             res.send(data);

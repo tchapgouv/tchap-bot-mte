@@ -20,16 +20,13 @@ function generateId(length: number) {
 
 export default {
 
-    async postMessage(webhook: Webhook, message: string, messageFormat: string = "") {
+    async postMessage(webhook: Webhook, message: { formattedMessage: string; rawMessage: string | undefined }, messageFormat: string = "") {
 
-        logger.debug("Posting from webhook : ", webhook)
+        logger.debug("Posting from webhook : ", webhook.dataValues.webhook_id)
 
-        const room_id = webhook.dataValues.room_id
-        const script = webhook.dataValues.script
-
-        return await botService.applyScriptAndPostMessage(room_id,
+        return await botService.postMessage(webhook.dataValues.room_id,
             message,
-            script,
+            webhook.dataValues.bot_id,
             {messageFormat: messageFormat})
     },
 
@@ -37,12 +34,14 @@ export default {
 // Create and Save a new Webhook
     async create(webhook_label: string,
                  room_id: string,
+                 bot_id: string,
                  script: string = '// Il est possible de manipuler la variable data (le message), qui sera récupérée et envoyée au bot à la fin du traitement.\ndata = data;'): Promise<Webhook> {
 
         // Create a Webhook
         const webhookPojo: Attributes<Webhook> = {
             webhook_id: generateId(100),
             webhook_label: webhook_label,
+            bot_id: bot_id ? bot_id : "" + process.env.BOT_USER_ID,
             room_id: room_id,
             script: script
         };
