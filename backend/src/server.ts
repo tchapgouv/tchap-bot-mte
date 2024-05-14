@@ -12,6 +12,8 @@ import webhookRouter from "./routes/webhook.routes.js";
 import path from 'path'
 import {fileURLToPath} from 'url';
 import {syntaxErrorHandler} from "./requestHandlers/syntaxError.handler.js";
+import swaggerUi from "swagger-ui-express"
+import {specs} from "./swagger.config.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -22,6 +24,12 @@ logger.notice("Static path : ", vuePath)
 
 const corsOptions = {origin: true, credentials: true};
 app.use(cors(corsOptions));
+
+app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(specs)
+);
 
 // parse requests of content-type - application/json
 app.use(express.json({limit: '1mb'}));

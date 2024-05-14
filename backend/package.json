@@ -11,6 +11,7 @@
     "start-prod": "node --env-file=.env src/server.js"
   },
   "dependencies": {
+    "@types/swagger-ui-express": "^4.1.6",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
@@ -28,6 +29,8 @@
     "sequelize-typescript": "^2.1.6",
     "showdown": "^2.1.0",
     "sqlite3": "^5.1.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "typescript": "^5.3.3"
   },
   "devDependencies": {
@@ -38,6 +41,7 @@
     "@types/mime": "^4.0.0",
     "@types/node": "^20.11.19",
     "@types/showdown": "^2",
+    "@types/swagger-jsdoc": "^6.0.4",
     "@types/validator": "^13.11.9",
     "ts-node": "^10.9.2"
   }
