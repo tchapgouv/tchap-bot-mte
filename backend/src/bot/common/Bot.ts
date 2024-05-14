@@ -79,7 +79,7 @@ export class Bot {
                 this.client.joinRoom(member.roomId).then(() => {
                     logger.notice("Auto-joined %s", member.roomId);
                     // sendMessage(client, member.roomId, "Bonjour, merci pour l’invitation ! 🎆")
-                });
+                }).catch(reason => logger.error("Error joining room ! ", reason));
             }
         });
 
