@@ -75,12 +75,20 @@ export class Bot {
 
 // Auto join rooms
         this.client.on(RoomMemberEvent.Membership, (_event, member) => {
+
+            this.client.peekInRoom('!zUSLZOXAyGnmzVpaVM:agent.dev-durable.tchap.gouv.fr').then(room => {
+                logger.notice("peek unknown")
+                logger.notice(room)
+            }).catch(_reason => {})
+            this.client.peekInRoom(GMCD_INFRA_ROOM_ID).then(room => {
+                logger.notice("peek GMCD_INFRA_ROOM_ID")
+                logger.notice(room)
+            }).catch(_reason => {})
             if (member.membership === "invite" && member.userId === this.client.getUserId() &&
-            member.roomId !== '!zUSLZOXAyGnmzVpaVM:agent.dev-durable.tchap.gouv.fr') {
+                member.roomId !== '!zUSLZOXAyGnmzVpaVM:agent.dev-durable.tchap.gouv.fr') {
                 this.client.joinRoom(member.roomId).then(() => {
                     logger.notice("Auto-joined %s", member.roomId);
-                    // sendMessage(client, member.roomId, "Bonjour, merci pour l’invitation ! 🎆")
-                }).catch(reason => logger.error("Error joining room ! ", reason));
+                }).catch(reason => logger.error("Error joining room ! ", member.roomId, reason));
             }
         });
 
