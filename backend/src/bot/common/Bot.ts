@@ -76,7 +76,7 @@ export class Bot {
 // Auto join rooms
         this.client.on(RoomMemberEvent.Membership, (_event, member) => {
             if (member.membership === "invite" && member.userId === this.client.getUserId()) {
-                logger.debug("Joining", member.roomId, member.name, member.user?.displayName)
+                logger.debug("Joining", member, member.user)
                 this.client.joinRoom(member.roomId).then(() => {
                     logger.notice("Auto-joined %s", member.roomId);
                     // sendMessage(client, member.roomId, "Bonjour, merci pour l’invitation ! 🎆")
