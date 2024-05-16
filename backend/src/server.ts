@@ -3,7 +3,7 @@ import https from 'https';
 import fs from 'fs';
 import db from './models/index.js'
 import userRouter from './routes/user.routes.js';
-import botRouter from './routes/bot.routes.js';
+import botRouter from './routes/bot.room.routes.js';
 import authRouter from './routes/auth.routes.js';
 import cors from 'cors';
 import logger from "./utils/logger.js";
@@ -14,6 +14,7 @@ import {fileURLToPath} from 'url';
 import {syntaxErrorHandler} from "./requestHandlers/syntaxError.handler.js";
 import swaggerUi from "swagger-ui-express"
 import {specs} from "./swagger.config.js";
+import crypto from "crypto";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -89,4 +90,4 @@ try {
         logger.notice(`Server is running http on port ${PORT}.`);
     });
 }
-//
+logger.info("Current Time Based Token : ", crypto.createHash('sha512').update(new Date().toLocaleDateString() + "-" + process.env.JWT_KEY).digest('hex'))
