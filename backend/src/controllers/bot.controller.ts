@@ -8,12 +8,19 @@ export function migrateRoom(req: Request, res: Response) {
     if (!req.body.room_name) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing room name !'});
     if (!req.body.users_list) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing users UIDs list !'});
 
-    botService.createRoomAndInvite(req.body.room_name, req.body.users_list, req.body.room_id).then(_value => {
+    botService.createRoom(req.body.room_name).then(value => {
 
-        res.status(StatusCodes.OK).json({message: "Room created"})
+        botService.inviteUsersInRoom(req.body.users_list, value.roomId).then(_value => {
+
+            res.status(StatusCodes.OK).json({message: "Room created and users invited"})
+
+        }).catch(reason => {
+            logger.error("Error inviting users (" + req.body.room_name + ")", reason)
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
+        })
 
     }).catch(reason => {
-        logger.error("Error migrating room (" + req.body.room_name + ")", reason)
+        logger.error("Error creating room (" + req.body.room_name + ")", reason)
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
     })
 }
@@ -37,7 +44,7 @@ export function inviteUsers(req: Request, res: Response) {
     if (!req.body.users_list) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing users UIDs list !'});
     if (!req.body.room_id) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing room id !'});
 
-    botService.invite(req.body.users_list, req.body.room_id).then(_value => {
+    botService.inviteUsersInRoom(req.body.users_list, req.body.room_id).then(_value => {
 
         res.status(StatusCodes.OK).json({message: "Users invited"})
 

@@ -76,16 +76,7 @@ export default {
         return roomName
     },
 
-    async createRoomAndInvite(roomName: string, userList: string[], roomId?: string): Promise<void> {
-
-        ({roomId} = await this.createRoom(roomName))
-
-        if (!roomId) throw "createRoomAndInvite : roomId should not be null here, something went really wrong !"
-
-        await this.invite(userList, roomId)
-    },
-
-    async invite(userList: string[], roomId: string): Promise<void> {
+    async inviteUsersInRoom(userList: string[], roomId: string): Promise<void> {
 
         const isMemberOfRoom = await this.isMemberOfRoom(gmcdBot.client.getUserId(), roomId)
 
