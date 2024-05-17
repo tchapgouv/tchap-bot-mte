@@ -123,7 +123,7 @@ export default {
                 for (const [userId, _value] of Object.entries(joinedMembers.joined)) {
                     getPowerLevel(gmcdBot.client, roomId, userId).then(powerLevel => {
                         logger.debug(userId + " power level  = " + powerLevel)
-                        if (powerLevel < 100) {
+                        if (!powerLevel || powerLevel < 100) {
                             logger.debug("Kicking " + userId)
                             gmcdBot.client.kick(roomId, userId, kickReason)
                         }
