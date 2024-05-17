@@ -6,7 +6,6 @@ import logger from "../utils/logger.js";
 import ldapService from "./ldap.service.js";
 import {getPowerLevel, sendHtmlMessage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
 import {Bot} from "../bot/common/Bot.js";
-import {GMCD_INFRA_ROOM_ID} from "../bot/common/config.js";
 
 const bots: Bot[] = [
     gmcdBot,
@@ -118,6 +117,8 @@ export default {
 
         await gmcdBot.client.getJoinedRoomMembers(roomId)
             .then(joinedMembers => {
+
+                logger.debug("joinedMembers.joined", joinedMembers.joined)
 
                 for (const [userId, _value] of Object.entries(joinedMembers.joined)) {
                     getPowerLevel(gmcdBot.client, roomId, userId).then(powerLevel => {
