@@ -19,6 +19,7 @@ export const verifyToken: RequestHandler = (req, res, next) => {
     logger.debug(">>>> verifyToken")
 
     // TODO !
+    logger.debug(!isFromIntranet(req))
     // if (!isFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'});
     if (!req.headers.cookie) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Cookie)'});
 
