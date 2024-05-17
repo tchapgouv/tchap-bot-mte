@@ -8,10 +8,10 @@ import {StatusCodes} from "http-status-codes";
 
 function isFromIntranet(req: Request) {
 
-    logger.info("X-MineqProvenance = ", req.headers['X-MineqProvenance'])
+    logger.info("X-MineqProvenance = ", req.headers['x-mineqprovenance'])
     logger.debug("headers = ", req.headers)
 
-    return req.headers['X-MineqProvenance'] === 'INTRANET';
+    return req.headers['x-mineqprovenance'] === 'intranet';
 }
 
 export const verifyToken: RequestHandler = (req, res, next) => {
