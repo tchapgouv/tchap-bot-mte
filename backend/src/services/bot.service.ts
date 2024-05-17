@@ -111,7 +111,7 @@ export default {
 
         await getPowerLevel(gmcdBot.client, roomId, "" + process.env.BOT_USER_ID).then(powerLevel => {
             if (powerLevel < 100) {
-                throw("Oups ! Désolé, je dois être administrateur afin de supprimer un salon")
+                throw ("Oups ! Désolé, je dois être administrateur afin de supprimer un salon")
             }
         })
 
@@ -122,7 +122,9 @@ export default {
 
                 for (const [userId, _value] of Object.entries(joinedMembers.joined)) {
                     getPowerLevel(gmcdBot.client, roomId, userId).then(powerLevel => {
+                        logger.debug(userId + " power level  = " + powerLevel)
                         if (powerLevel < 100) {
+                            logger.debug("Kicking " + userId)
                             gmcdBot.client.kick(roomId, userId, kickReason)
                         }
                     })
@@ -206,9 +208,11 @@ export default {
                       opts: { messageFormat: string } = {messageFormat: "text"}): Promise<{ message: string } | void> {
 
         let client
+
         for (const bot of bots) {
             if (bot.client.getUserId() === botId) client = bot.client
         }
+
         if (!client) client = gmcdBot.client
 
         logger.info("Posting message")
