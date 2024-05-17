@@ -118,7 +118,7 @@ export default {
 
     async inviteUsersInRoom(userList: string[], roomId: string): Promise<void> {
 
-        const isMemberOfRoom = await this.isMemberOfRoom(gmcdBot.client.getUserId(), roomId)
+        const isMemberOfRoom = await this.isMemberOfRoom(roomId)
 
         if (!isMemberOfRoom) throw "I am not able to invite has i am not a member of the room !"
 
@@ -208,7 +208,7 @@ export default {
         }).catch(reason => logger.error("Error occurred sending webhook message to room ;", roomId, "message :", message, "reason :", reason))
     },
 
-    async isMemberOfRoom(roomId: string | null, userId: string | null) {
+    async isMemberOfRoom(roomId: string | null, userId?: string) {
 
         if (!roomId) throw "isMemberOfRoom ? roomId cannot be empty"
 
