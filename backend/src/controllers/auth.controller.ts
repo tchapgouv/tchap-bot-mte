@@ -8,10 +8,11 @@ import {StatusCodes} from "http-status-codes";
 
 function isFromIntranet(req: Request) {
 
-    logger.info("X-MineqProvenance = ", req.headers['x-mineqprovenance'])
-    logger.debug("headers = ", req.headers)
+    logger.debug("X-MineqProvenance = ", req.headers['x-mineqprovenance'])
+    const isFromIntranet = req.headers['x-mineqprovenance'] === 'intranet'
+    logger.debug("isFromIntranet ?", isFromIntranet)
 
-    return req.headers['x-mineqprovenance'] === 'intranet';
+    return isFromIntranet;
 }
 
 export const verifyToken: RequestHandler = (req, res, next) => {
@@ -19,8 +20,7 @@ export const verifyToken: RequestHandler = (req, res, next) => {
     logger.debug(">>>> verifyToken")
 
     // TODO !
-    logger.debug(!isFromIntranet(req))
-    // if (!isFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'});
+    if (!isFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'});
     if (!req.headers.cookie) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Cookie)'});
 
     // get cookie from header with name token
