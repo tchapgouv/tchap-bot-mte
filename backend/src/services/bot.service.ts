@@ -50,13 +50,14 @@ export default {
                         message = " 🤷 " + userMail + " était déjà présent.\n"
                         invited = true
                     } else {
-                        logger.error("Error inviting " + userMail, reason)
+                        logger.error("Error inviting " + userMail + " will retry in 5 seconds", reason)
                         if (tries == retries) {
                             message = " ❗️ " + userMail + ", " + reason.data.error + "\n"
                         }
                     }
                 })
             tries++
+            if (!invited && tries <= retries) await new Promise(res => setTimeout(res, 5000));
         }
 
         return message;
@@ -159,8 +160,8 @@ export default {
         await gmcdBot.getIdentityServerToken()
 
         // on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit du endpoint en lui même = 1k/s).
-        let tasks:Promise<string>[] = [];
-        userMailList.map(async (userMail,index) => {
+        let tasks: Promise<string>[] = [];
+        userMailList.map(async (userMail, index) => {
             tasks.push(new Promise(async (resolve) => {
                 const delay = rateLimitDelay * index
                 await new Promise(res => setTimeout(res, delay));
