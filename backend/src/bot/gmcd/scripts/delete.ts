@@ -11,7 +11,7 @@ import botService from "../../../services/bot.service.js";
  */
 export function deleteRoomIfAsked(client: MatrixClient, roomId: string, userId: string, body: string) {
 
-    const leaveRoomOptions = ["delete room " + roomId]
+    const leaveRoomOptions = ["delete room " + roomId.toLowerCase()]
 
     if (roomId && body && leaveRoomOptions.some(option => body.includes(option))) {
 
