@@ -12,7 +12,7 @@ const bots: Bot[] = [
     psinBot
 ]
 
-const rateLimit = 150
+const rateLimit = 100
 const rateLimitDelay = 60 / rateLimit * 1000
 
 export default {
