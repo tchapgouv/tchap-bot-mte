@@ -8,7 +8,8 @@ import {StatusCodes} from "http-status-codes";
 
 function isFromIntranet(req: Request) {
 
-    logger.debug("X-MineqProvenance = ", req.headers['X-MineqProvenance'])
+    logger.info("X-MineqProvenance = ", req.headers['X-MineqProvenance'])
+    logger.debug("headers = ", req.headers)
 
     return req.headers['X-MineqProvenance'] === 'INTRANET';
 }
