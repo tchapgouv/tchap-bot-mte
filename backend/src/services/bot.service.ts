@@ -4,8 +4,9 @@ import vm from "vm"
 import {Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import ldapService from "./ldap.service.js";
-import {sendHtmlMessage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
+import {getPowerLevel, sendHtmlMessage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
 import {Bot} from "../bot/common/Bot.js";
+import {GMCD_INFRA_ROOM_ID} from "../bot/common/config.js";
 
 const bots: Bot[] = [
     gmcdBot,
@@ -105,6 +106,28 @@ export default {
         }
 
         return {roomId, message}
+    },
+
+    async deleteRoom(roomId: string, kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
+
+        await getPowerLevel(gmcdBot.client, roomId, "" + process.env.BOT_USER_ID).then(powerLevel => {
+            if (powerLevel < 100) {
+                throw("Oups ! Désolé, je dois être administrateur afin de supprimer un salon")
+            }
+        })
+
+        await gmcdBot.client.getJoinedRoomMembers(roomId)
+            .then(joinedMembers => {
+
+                for (const [userId, _value] of Object.entries(joinedMembers.joined)) {
+                    getPowerLevel(gmcdBot.client, roomId, userId).then(powerLevel => {
+                        if (powerLevel < 100) {
+                            gmcdBot.client.kick(roomId, userId, kickReason)
+                        }
+                    })
+                }
+                //gmcdBot.client.leave(roomId)
+            })
     },
 
     async getRoomName(roomId: string) {

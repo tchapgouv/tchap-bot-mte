@@ -1,6 +1,6 @@
 import express from 'express';
 import {verifyTimeBasedToken} from "../controllers/auth.controller.js";
-import {createRoom, getRoomName, inviteUsers, migrateRoom} from "../controllers/bot.controller.js";
+import {createRoom, deleteRoom, getRoomName, inviteUsers, migrateRoom} from "../controllers/bot.controller.js";
 
 const botRouter = express.Router();
 
@@ -113,6 +113,31 @@ botRouter.post("/api/room/invite", verifyTimeBasedToken, inviteUsers)
  *         description:
  */
 botRouter.post("/api/room/name", verifyTimeBasedToken, getRoomName)
+
+/**
+ * @openapi
+ * /api/room/name:
+ *   delete:
+ *     description: Chose la plus proche d’une suppression dans le contexte Matrix. Kick tous les users non-admin puis quitte le salon. (Matrix Purge automatiquement les salons vides)
+ *     requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 room_id:
+ *                   type: string
+ *               required:
+ *                 - token
+ *                 - room_id
+ *     responses:
+ *       200:
+ *         description:
+ */
+botRouter.delete("/api/room/delete", verifyTimeBasedToken, deleteRoom)
 
 /**
  * @openapi

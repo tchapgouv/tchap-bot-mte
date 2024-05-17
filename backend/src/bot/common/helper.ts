@@ -112,11 +112,7 @@ export async function getUserPowerLevel(client: MatrixClient, event: MatrixEvent
         const userName = event.sender.name
         const userId = event.sender.userId
 
-        await client.getStateEvent(roomId, "m.room.power_levels", "").then(record => {
-
-            logger.debug(record)
-
-            const userPowerLevel = record.users[userId]
+        await getPowerLevel(client, roomId, userId).then(userPowerLevel => {
 
             user = {
                 id: userId,
@@ -131,6 +127,20 @@ export async function getUserPowerLevel(client: MatrixClient, event: MatrixEvent
     if (!user) return null
     return user
 }
+
+export async function getPowerLevel(client: MatrixClient, roomId: string, userId: string): Promise<number> {
+
+    let userPowerLevel = 0
+    await client.getStateEvent(roomId, "m.room.power_levels", "").then(record => {
+
+        logger.debug(record)
+
+        userPowerLevel = record.users[userId]
+    })
+
+    return userPowerLevel
+}
+
 
 export async function isSomeoneAdmin(client: MatrixClient, roomId: string): Promise<boolean> {
 

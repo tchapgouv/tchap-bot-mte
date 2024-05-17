@@ -19,7 +19,6 @@ export const verifyToken: RequestHandler = (req, res, next) => {
 
     logger.debug(">>>> verifyToken")
 
-    // TODO !
     if (!isFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'});
     if (!req.headers.cookie) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Cookie)'});
 
@@ -47,6 +46,7 @@ export const verifyTimeBasedToken: RequestHandler = (req, res, next) => {
 
     logger.debug(">>>> verifyTimeToken")
 
+    if (!isFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'});
     if (!req.body.token) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Token)'});
 
     const token = req.body.token

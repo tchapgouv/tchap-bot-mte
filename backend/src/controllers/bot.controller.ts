@@ -39,6 +39,20 @@ export function createRoom(req: Request, res: Response) {
     })
 }
 
+export function deleteRoom(req: Request, res: Response) {
+
+    if (!req.body.room_id) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing room id !'});
+
+    botService.deleteRoom(req.body.room_id, req.body.kick_reason).then(_value => {
+
+        res.status(StatusCodes.OK).json({message: "Room deleted"})
+
+    }).catch(reason => {
+        logger.error("Error deleting room (" + req.body.room_id + ")", reason)
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
+    })
+}
+
 export function inviteUsers(req: Request, res: Response) {
 
     if (!req.body.users_list) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing users UIDs list !'});
