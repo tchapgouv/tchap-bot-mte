@@ -45,8 +45,7 @@ export default {
                     message = " ✅ " + userMail + " invité.\n"
                 })
                 .catch(reason => {
-
-                    if (reason.data.error.includes("already in the room")) {
+                    if (reason.data?.error?.includes("already in the room")) {
                         message = " 🤷 " + userMail + " était déjà présent.\n"
                         invited = true
                     } else {
