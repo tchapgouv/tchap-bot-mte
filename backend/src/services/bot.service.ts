@@ -12,6 +12,9 @@ const bots: Bot[] = [
     psinBot
 ]
 
+const rateLimit = 200
+const rateLimitDelay = 60 / rateLimit * 1000
+
 export default {
 
     async runScript(script: string, message: any) {
@@ -21,6 +24,42 @@ export default {
         await vm.runInContext(script, context);
 
         return context.data
+    },
+
+    async inviteUserInRoom(userMail: string, roomId: string, retries: number = 5) {
+
+        let message = ""
+
+        const roomName = await this.getRoomName(roomId)
+
+        if (!userMail) return message
+
+        logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + "). retries " + retries + "/4")
+        let invited = false
+        let tries = 0
+        while (!invited && tries <= retries) {
+            await gmcdBot.client.inviteByEmail(roomId, userMail)
+                .then(() => {
+                    logger.notice(userMail + " successfully invited.")
+                    invited = true
+                    message = " ✅ " + userMail + " invité.\n"
+                })
+                .catch(reason => {
+
+                    if (reason.data.error.includes("already in the room")) {
+                        message = " 🤷 " + userMail + " était déjà présent.\n"
+                        invited = true
+                    } else {
+                        logger.error("Error inviting " + userMail, reason)
+                        if (tries == retries) {
+                            message = " ❗️ " + userMail + ", " + reason.data.error + "\n"
+                        }
+                    }
+                })
+            tries++
+        }
+
+        return message;
     },
 
     async createRoom(roomName: string) {
@@ -82,8 +121,6 @@ export default {
 
         if (!isMemberOfRoom) throw "I am not able to invite has i am not a member of the room !"
 
-        const roomName = await this.getRoomName(roomId)
-
         let message: string = "Rapport d'invitations : \n"
 
         let userMailList: string[] = []
@@ -121,25 +158,17 @@ export default {
         // Maj du token préventivement afin d’éviter de multiples appels en parallèle
         await gmcdBot.getIdentityServerToken()
 
-        await Promise.all(userMailList.map(async (userMail) => {
-            if (!userMail) return
+        // on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit du endpoint en lui même = 1k/s).
+        let tasks:Promise<string>[] = [];
+        userMailList.map(async (userMail,index) => {
+            tasks.push(new Promise(async (resolve) => {
+                const delay = rateLimitDelay * index
+                await new Promise(res => setTimeout(res, delay));
+                await this.inviteUserInRoom(userMail, roomId).then(value => resolve(value))
+            }).then(value => message += value))
+        })
 
-            logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + ")")
-            await gmcdBot.client.inviteByEmail(roomId, userMail)
-                .then(() => {
-                    logger.notice(userMail + " successfully invited.")
-                    message += " ✅ " + userMail + " invité.\n"
-                })
-                .catch(reason => {
-                    logger.error("Error inviting " + userMail, reason)
-                    if (!reason.data.error.includes("already in the room")) {
-                        message += " ❗️ " + userMail + ", " + reason.data.error + "\n"
-                    } else {
-                        message += " 🤷 " + userMail + " était déjà présent.\n"
-                    }
-                })
-
-        })).catch(reason => {
+        await Promise.all(tasks).catch(reason => {
             logger.error("Promise.all(inviteByEmail) : ", reason)
             throw (reason)
         })
