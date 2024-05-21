@@ -116,7 +116,7 @@ botRouter.post("/api/room/name", verifyTimeBasedToken, getRoomName)
 
 /**
  * @openapi
- * /api/room/name:
+ * /api/room/delete:
  *   delete:
  *     description: Chose la plus proche d’une suppression dans le contexte Matrix. Kick tous les users non-admin puis quitte le salon. (Matrix Purge automatiquement les salons vides)
  *     requestBody:
