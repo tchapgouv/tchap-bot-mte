@@ -138,7 +138,8 @@ export default {
 
         if (adminList.length > 0) sendMessage(gmcdBot.client, roomId, "Quelques Administrateurs demeurent dans ce salon et je ne peux les exclure.\nCe salon ne sera pas purgé tant qu'ils ne l'auront pas quitté.\nN'oubliez pas d'éteindre la lumière en partant ! 💡\n 👋")
         else sendMessage(gmcdBot.client, roomId, "🚪")
-        //gmcdBot.client.leave(roomId)
+
+        gmcdBot.client.leave(roomId)
 
         return adminList
     },
