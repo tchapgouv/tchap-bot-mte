@@ -2,7 +2,6 @@ import {MatrixClient} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
 import {getPowerLevel, sendMessage} from "../../common/helper.js";
 import botService from "../../../services/bot.service.js";
-import {StatusCodes} from "http-status-codes";
 
 /**
  * @help
