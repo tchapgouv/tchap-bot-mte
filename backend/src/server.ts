@@ -91,4 +91,8 @@ try {
     });
 }
 const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString() + "-" + process.env.JWT_KEY).digest('hex')
-logger.info("Current Time Based Token : ", currentToken.substring(0, 15) + "***************" + currentToken.substring(currentToken.length - 15, currentToken.length))
+logger.info("Current Time Based Token : ",
+    currentToken.substring(0, 15) + "***************" + currentToken.substring(currentToken.length - 15, currentToken.length),
+    "Based on : ",
+    new Date().toLocaleDateString() + "-JWT_KEY")
+
