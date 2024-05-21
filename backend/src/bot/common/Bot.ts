@@ -112,7 +112,7 @@ export class Bot {
                 const userIds = event.getContent()["m.mentions"]?.user_ids;
 
                 let isSelfMentioned = userIds && userIds.indexOf(botId) > -1;
-                if (isSelfMentioned === undefined && botName) isSelfMentioned = event.event.content?.body.toLowerCase().includes(botName)
+                if (isSelfMentioned === undefined && botName) isSelfMentioned = event.event.content?.body.toLowerCase().includes(botName.toLowerCase())
 
                 logger.debug("Is self mentioned ? ", isSelfMentioned)
                 logger.debug("sender = ", event.getSender())
