@@ -1,4 +1,5 @@
 import gmcdBot from "../bot/gmcd/bot.js";
+import gmcdBotConfig from "../bot/gmcd/config.js";
 import psinBot from "../bot/psin/bot.js";
 import vm from "vm"
 import {Visibility} from "matrix-js-sdk";
@@ -115,22 +116,28 @@ export default {
             }
         })
 
-        await gmcdBot.client.getJoinedRoomMembers(roomId)
-            .then(joinedMembers => {
+        let adminList: { name: string, userId: string }[] = []
 
-                logger.debug("joinedMembers.joined", joinedMembers.joined)
+        gmcdBot.client.getRoom(roomId)?.getMembers().forEach(roomMember => {
 
-                for (const [userId, _value] of Object.entries(joinedMembers.joined)) {
-                    getPowerLevel(gmcdBot.client, roomId, userId).then(powerLevel => {
-                        logger.debug(userId + " power level  = " + powerLevel)
-                        if (!powerLevel || powerLevel < 100) {
-                            logger.debug("Kicking " + userId)
-                            gmcdBot.client.kick(roomId, userId, kickReason)
-                        }
-                    })
-                }
-                //gmcdBot.client.leave(roomId)
-            })
+            if (roomMember.userId === gmcdBotConfig.userId) return
+
+            logger.debug("roomMember", roomMember)
+
+            logger.debug(roomMember.userId + " power level  = " + roomMember.powerLevel)
+            if (!roomMember.powerLevel || roomMember.powerLevel < 100) {
+                logger.debug("Kicking " + roomMember.userId)
+                gmcdBot.client.kick(roomId, roomMember.userId, kickReason)
+            }
+
+            if (roomMember.powerLevel === 100) adminList.push({name: roomMember.name, userId: roomMember.userId})
+        })
+
+        if (adminList.length > 0) sendMessage(gmcdBot.client, roomId, "Quelques Administrateurs demeurent dans ce salon et je ne peux les exclure.\nCe salon ne sera pas purgé tant qu'ils ne l'auront pas quitté.\nN'oubliez pas d'éteindre la lumière en partant ! 💡\n 👋")
+        else sendMessage(gmcdBot.client, roomId, "🚪")
+        //gmcdBot.client.leave(roomId)
+
+        return adminList
     },
 
     async getRoomName(roomId: string) {
