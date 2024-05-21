@@ -6,10 +6,20 @@ import * as crypto from "crypto";
 import jwt from "jsonwebtoken";
 import {StatusCodes} from "http-status-codes";
 
+function isFromIntranet(req: Request) {
+
+    logger.debug("X-MineqProvenance = ", req.headers['x-mineqprovenance'])
+    const isFromIntranet = req.headers['x-mineqprovenance'] === 'intranet'
+    logger.debug("isFromIntranet ?", isFromIntranet)
+
+    return isFromIntranet;
+}
+
 export const verifyToken: RequestHandler = (req, res, next) => {
 
     logger.debug(">>>> verifyToken")
 
+    if (!isFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'});
     if (!req.headers.cookie) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Cookie)'});
 
     // get cookie from header with name token
@@ -36,12 +46,16 @@ export const verifyTimeBasedToken: RequestHandler = (req, res, next) => {
 
     logger.debug(">>>> verifyTimeToken")
 
+    if (!isFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'});
     if (!req.body.token) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Token)'});
 
     const token = req.body.token
-    const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString() + "-" + process.env.JWT_KEY).digest('hex')
+    const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString("fr-FR") + "-" + process.env.JWT_KEY).digest('hex')
 
-    if (token !== currentToken) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Token Error)'});
+    if (token !== currentToken) {
+        logger.alert("Wrong token provided : ", token, "Current token is :", currentToken.substring(0, 15) + "***************" + currentToken.substring(currentToken.length - 15, currentToken.length))
+        return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Token Error)'});
+    }
 
     next()
 }

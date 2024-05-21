@@ -3,7 +3,7 @@ import https from 'https';
 import fs from 'fs';
 import db from './models/index.js'
 import userRouter from './routes/user.routes.js';
-import botRouter from './routes/bot.routes.js';
+import botRouter from './routes/bot.room.routes.js';
 import authRouter from './routes/auth.routes.js';
 import cors from 'cors';
 import logger from "./utils/logger.js";
@@ -12,6 +12,9 @@ import webhookRouter from "./routes/webhook.routes.js";
 import path from 'path'
 import {fileURLToPath} from 'url';
 import {syntaxErrorHandler} from "./requestHandlers/syntaxError.handler.js";
+import swaggerUi from "swagger-ui-express"
+import {specs} from "./swagger.config.js";
+import crypto from "crypto";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -22,6 +25,12 @@ logger.notice("Static path : ", vuePath)
 
 const corsOptions = {origin: true, credentials: true};
 app.use(cors(corsOptions));
+
+app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(specs)
+);
 
 // parse requests of content-type - application/json
 app.use(express.json({limit: '1mb'}));
@@ -81,4 +90,9 @@ try {
         logger.notice(`Server is running http on port ${PORT}.`);
     });
 }
-//
+const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString("fr-FR") + "-" + process.env.JWT_KEY).digest('hex')
+logger.info("Current Time Based Token : ",
+    currentToken.substring(0, 15) + "***************" + currentToken.substring(currentToken.length - 15, currentToken.length),
+    "Based on : ",
+    new Date().toLocaleDateString("fr-FR") + "-JWT_KEY")
+

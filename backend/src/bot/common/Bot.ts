@@ -75,11 +75,20 @@ export class Bot {
 
 // Auto join rooms
         this.client.on(RoomMemberEvent.Membership, (_event, member) => {
-            if (member.membership === "invite" && member.userId === this.client.getUserId()) {
+
+            // this.client.peekInRoom('!zUSLZOXAyGnmzVpaVM:agent.dev-durable.tchap.gouv.fr').then(room => {
+            //     logger.notice("peek unknown")
+            //     logger.notice(room)
+            // }).catch(_reason => {})
+            // this.client.peekInRoom(GMCD_INFRA_ROOM_ID).then(room => {
+            //     logger.notice("peek GMCD_INFRA_ROOM_ID")
+            //     logger.notice(room)
+            // }).catch(_reason => {})
+            if (member.membership === "invite" && member.userId === this.client.getUserId() &&
+                member.roomId !== '!zUSLZOXAyGnmzVpaVM:agent.dev-durable.tchap.gouv.fr') {
                 this.client.joinRoom(member.roomId).then(() => {
                     logger.notice("Auto-joined %s", member.roomId);
-                    // sendMessage(client, member.roomId, "Bonjour, merci pour l’invitation ! 🎆")
-                });
+                }).catch(reason => logger.error("Error joining room ! ", member.roomId, reason));
             }
         });
 
@@ -99,11 +108,11 @@ export class Bot {
                     return
                 }
 
-                const botName = this.client.getUser(botId)?.displayName
+                const botName = this.client.getUser(botId)?.displayName?.replace(/ \[.*/, "")
                 const userIds = event.getContent()["m.mentions"]?.user_ids;
 
                 let isSelfMentioned = userIds && userIds.indexOf(botId) > -1;
-                if (isSelfMentioned === undefined && botName) isSelfMentioned = event.event.content?.body.toLowerCase().includes(botName)
+                if (isSelfMentioned === undefined && botName) isSelfMentioned = event.event.content?.body.toLowerCase().includes("@" + botName.toLowerCase())
 
                 logger.debug("Is self mentioned ? ", isSelfMentioned)
                 logger.debug("sender = ", event.getSender())
