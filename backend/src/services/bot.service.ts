@@ -118,7 +118,7 @@ export default {
 
         let adminList: { name: string, userId: string }[] = []
 
-        gmcdBot.client.getRoom(roomId)?.getMembers().forEach(roomMember => {
+        gmcdBot.client.getRoom(roomId)?.getMembers().forEach(async (roomMember) => {
 
             if (roomMember.userId === gmcdBotConfig.userId) return
 
@@ -127,7 +127,10 @@ export default {
             logger.debug(roomMember.userId + " power level  = " + roomMember.powerLevel)
             if (!roomMember.powerLevel || roomMember.powerLevel < 100) {
                 logger.debug("Kicking " + roomMember.userId)
-                gmcdBot.client.kick(roomId, roomMember.userId, kickReason)
+                await gmcdBot.client.kick(roomId, roomMember.userId, kickReason)
+                    .catch(reason => {
+                        logger.error("Error kicking " + roomMember.name, reason)
+                    })
             }
 
             if (roomMember.powerLevel === 100) adminList.push({name: roomMember.name, userId: roomMember.userId})
