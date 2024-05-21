@@ -154,6 +154,8 @@ export default {
 
         if (!isMemberOfRoom) throw "I am not able to invite has i am not a member of the room !"
 
+        if (!gmcdBot.client.getRoom(roomId)?.canInvite(gmcdBotConfig.userId)) throw "I am do not have permissions to invite in this room !"
+
         let message: string = "Rapport d'invitations : \n"
 
         let userMailList: string[] = []
