@@ -50,7 +50,7 @@ export const verifyTimeBasedToken: RequestHandler = (req, res, next) => {
     if (!req.body.token) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Token)'});
 
     const token = req.body.token
-    const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString() + "-" + process.env.JWT_KEY).digest('hex')
+    const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString("fr-FR") + "-" + process.env.JWT_KEY).digest('hex')
 
     if (token !== currentToken) {
         logger.alert("Wrong token provided : ", token, "Current token is :", currentToken.substring(0, 15) + "***************" + currentToken.substring(currentToken.length - 15, currentToken.length))
