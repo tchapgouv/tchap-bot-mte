@@ -90,4 +90,5 @@ try {
         logger.notice(`Server is running http on port ${PORT}.`);
     });
 }
-logger.info("Current Time Based Token : ", crypto.createHash('sha512').update(new Date().toLocaleDateString() + "-" + process.env.JWT_KEY).digest('hex'))
+const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString() + "-" + process.env.JWT_KEY).digest('hex')
+logger.info("Current Time Based Token : ", currentToken.substring(0, 15) + "***************" + currentToken.substring(currentToken.length - 15, currentToken.length))

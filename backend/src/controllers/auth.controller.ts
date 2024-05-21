@@ -52,7 +52,10 @@ export const verifyTimeBasedToken: RequestHandler = (req, res, next) => {
     const token = req.body.token
     const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString() + "-" + process.env.JWT_KEY).digest('hex')
 
-    if (token !== currentToken) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Token Error)'});
+    if (token !== currentToken) {
+        logger.alert("Wrong token provided : ", token, "Current is :", currentToken.substring(0, 15) + "***************" + currentToken.substring(currentToken.length - 15, currentToken.length))
+        return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Token Error)'});
+    }
 
     next()
 }
