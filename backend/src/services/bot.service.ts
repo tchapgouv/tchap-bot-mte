@@ -2,7 +2,7 @@ import gmcdBot from "../bot/gmcd/bot.js";
 import gmcdBotConfig from "../bot/gmcd/config.js";
 import psinBot from "../bot/psin/bot.js";
 import vm from "vm"
-import {Visibility} from "matrix-js-sdk";
+import {MatrixClient, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import ldapService from "./ldap.service.js";
 import {getPowerLevel, sendHtmlMessage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
@@ -108,9 +108,13 @@ export default {
         return {roomId, message}
     },
 
-    async deleteRoom(roomId: string, kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
+    async deleteRoom(client: MatrixClient, roomId: string, kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
 
-        await getPowerLevel(gmcdBot.client, roomId, "" + process.env.BOT_USER_ID).then(powerLevel => {
+        const botId = client.getUserId()
+
+        if (!botId) throw ("deleteRoom : Bot id should not be null !")
+
+        await getPowerLevel(client, roomId, botId).then(powerLevel => {
             if (powerLevel < 100) {
                 throw ("Oups ! Désolé, je dois être administrateur afin de supprimer un salon")
             }
@@ -118,16 +122,16 @@ export default {
 
         let adminList: { name: string, userId: string }[] = []
 
-        gmcdBot.client.getRoom(roomId)?.getMembers().forEach(async (roomMember) => {
+        client.getRoom(roomId)?.getMembers().forEach(async (roomMember) => {
 
-            if (roomMember.userId === gmcdBotConfig.userId) return
+            if (roomMember.userId === botId) return
 
             logger.debug("roomMember", roomMember)
 
             logger.debug(roomMember.userId + " power level  = " + roomMember.powerLevel)
             if (!roomMember.powerLevel || roomMember.powerLevel < 100) {
                 logger.debug("Kicking " + roomMember.userId)
-                await gmcdBot.client.kick(roomId, roomMember.userId, kickReason)
+                await client.kick(roomId, roomMember.userId, kickReason)
                     .catch(reason => {
                         logger.error("Error kicking " + roomMember.name, reason)
                     })
@@ -136,10 +140,10 @@ export default {
             if (roomMember.powerLevel === 100) adminList.push({name: roomMember.name, userId: roomMember.userId})
         })
 
-        if (adminList.length > 0) sendMessage(gmcdBot.client, roomId, "Quelques Administrateurs demeurent dans ce salon et je ne peux les exclure.\nCe salon ne sera pas purgé tant qu'ils ne l'auront pas quitté.\nN'oubliez pas d'éteindre la lumière en partant ! 💡\n 👋")
-        else sendMessage(gmcdBot.client, roomId, "🚪")
+        if (adminList.length > 0) sendMessage(client, roomId, "Quelques Administrateurs demeurent dans ce salon et je ne peux les exclure.\nCe salon ne sera pas purgé tant qu'ils ne l'auront pas quitté.\nN'oubliez pas d'éteindre la lumière en partant ! 💡\n 👋")
+        else sendMessage(client, roomId, "🚪")
 
-        gmcdBot.client.leave(roomId)
+        client.leave(roomId)
 
         return adminList
     },

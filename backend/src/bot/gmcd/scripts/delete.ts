@@ -2,6 +2,7 @@ import {MatrixClient} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
 import {getPowerLevel, sendMessage} from "../../common/helper.js";
 import botService from "../../../services/bot.service.js";
+import {StatusCodes} from "http-status-codes";
 
 /**
  * @help
@@ -21,7 +22,10 @@ export function deleteRoomIfAsked(client: MatrixClient, roomId: string, userId: 
 
                 logger.warning(userId + " deleted room : " + roomId)
                 sendMessage(client, roomId, "This is 'The End of the ******* World' ! 😭")
-                botService.deleteRoom(roomId).catch(reason => sendMessage(client, roomId, reason))
+                botService.deleteRoom(client, roomId).catch(reason => sendMessage(client, roomId, reason)).catch(reason => {
+                    logger.error("Error deleting room (" + roomId + ")", reason)
+                    sendMessage(client, roomId, "Désolé, une erreur est survenue ! 🤷")
+                })
 
             } else {
                 sendMessage(client, roomId, "Désolé, seul un administrateur me demander cela ! 🤷")
