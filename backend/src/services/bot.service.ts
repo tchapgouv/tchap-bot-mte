@@ -13,7 +13,7 @@ const bots: Bot[] = [
     psinBot
 ]
 
-const rateLimit = 100
+const rateLimit = 50
 const rateLimitDelay = 60 / rateLimit * 1000
 
 export default {
@@ -50,14 +50,14 @@ export default {
                         message = " 🤷 " + userMail + " était déjà présent.\n"
                         invited = true
                     } else {
-                        logger.error("Error inviting " + userMail + " will retry in 5 seconds", reason)
+                        logger.error("Error inviting " + userMail + " will retry in 1 minute", reason)
                         if (tries == retries) {
                             message = " ❗️ " + userMail + ", " + reason.data.error + "\n"
                         }
                     }
                 })
             tries++
-            if (!invited && tries <= retries) await new Promise(res => setTimeout(res, 5000));
+            if (!invited && tries <= retries) await new Promise(res => setTimeout(res, 60 * 1000));
         }
 
         return message;
