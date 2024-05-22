@@ -20,6 +20,8 @@ const botRouter = express.Router();
  *                   type: string
  *                 room_name:
  *                   type: string
+ *                 is_private:
+ *                   type: boolean
  *                 users_list:
  *                   type: array
  *                   items:
@@ -50,6 +52,8 @@ botRouter.post("/api/migrate/room", verifyTimeBasedToken, migrateRoom)
  *                   type: string
  *                 room_name:
  *                   type: string
+ *                 is_private:
+ *                   type: boolean
  *               required:
  *                 - token
  *                 - room_name
