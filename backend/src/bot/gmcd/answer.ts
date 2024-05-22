@@ -2,7 +2,7 @@ import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import logger from "../../utils/logger.js";
 import {sendMessage} from "../common/helper.js";
 import {norrisIfAsked} from "./scripts/norris.js";
-import {promoteUserIfAsked} from "./scripts/promote.js";
+import {promoteUserIfAsked} from "../common/scripts/promote.js";
 import {helpIfAsked} from "./scripts/help.js";
 import {sayGoodbyeIfNecessary} from "../common/scripts/gallantry.js";
 import {leaveRoomIfAsked} from "../common/scripts/leave.js";
