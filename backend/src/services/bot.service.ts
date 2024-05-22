@@ -86,7 +86,7 @@ export default {
                 .then((data) => {
                     logger.notice("Room created : ", data)
                     message += roomName + " a été créé. ✌️\n"
-                    message += "Ce salon est privé, à ce titre il est crypté.\n"
+                    message += isPrivate ? "Ce salon est privé, à ce titre il est crypté.\n" : ""
                     message += "Vous pouvez vous promouvoir administrateur simplement en me le demandant : `@bot-gmcd promote me`. 🍄\n"
                     message += "Enfin, vous pouvez me renvoyer : `@bot-gmcd oust !`. 🪦\n"
                     roomId = data.room_id
@@ -195,6 +195,8 @@ export default {
             await gmcdBot.client.sendStateEvent(roomId, "im.vector.room.access_rules", {rule: "unrestricted"})
                 .then(() => {
                     logger.notice("Guest access set for room " + roomId)
+                }).catch(_ => {
+                    logger.notice("access_rules is not allowed in this context (Public room)")
                 })
         }
 
