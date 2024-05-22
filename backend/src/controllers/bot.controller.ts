@@ -5,12 +5,12 @@ import {StatusCodes} from "http-status-codes";
 
 export function migrateRoom(req: Request, res: Response) {
 
-    if (!req.body.room_name) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing room name !'});
+    if (!req.body.room_name && !req.body.room_id) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing room name or room id !'});
     if (!req.body.users_list) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing users UIDs list !'});
 
-    botService.createRoom(req.body.room_name).then(value => {
+    if (req.body.room_id) {
 
-        botService.inviteUsersInRoom(req.body.users_list, value.roomId).then(_value => {
+        botService.inviteUsersInRoom(req.body.users_list, req.body.room_id).then(_value => {
 
             res.status(StatusCodes.OK).json({message: "Room created and users invited"})
 
@@ -19,10 +19,24 @@ export function migrateRoom(req: Request, res: Response) {
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
         })
 
-    }).catch(reason => {
-        logger.error("Error creating room (" + req.body.room_name + ")", reason)
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
-    })
+    } else {
+
+        botService.createRoom(req.body.room_name, req.body.is_private).then(value => {
+
+            botService.inviteUsersInRoom(req.body.users_list, value.roomId).then(_value => {
+
+                res.status(StatusCodes.OK).json({message: "Room created and users invited"})
+
+            }).catch(reason => {
+                logger.error("Error inviting users (" + req.body.room_name + ")", reason)
+                res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
+            })
+
+        }).catch(reason => {
+            logger.error("Error creating room (" + req.body.room_name + ")", reason)
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
+        })
+    }
 }
 
 export function createRoom(req: Request, res: Response) {

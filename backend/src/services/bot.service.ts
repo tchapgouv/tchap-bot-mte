@@ -63,7 +63,7 @@ export default {
         return message;
     },
 
-    async createRoom(roomName: string) {
+    async createRoom(roomName: string, isPrivate: boolean = true) {
 
         let message: string = ""
         let roomId: any
@@ -77,11 +77,11 @@ export default {
             await gmcdBot.client.createRoom({
                 name: roomName,
                 room_alias_name: roomName,
-                // preset: Preset.PrivateChat,
-                power_level_content_override: {
-                    // users_default: 50
-                },
-                visibility: Visibility.Private,
+                visibility: isPrivate ? Visibility.Private : Visibility.Public,
+                // preset: isPrivate ? Preset.PrivateChat : Preset.PublicChat,
+                // power_level_content_override: {
+                // users_default: 50
+                // },
             })
                 .then((data) => {
                     logger.notice("Room created : ", data)
