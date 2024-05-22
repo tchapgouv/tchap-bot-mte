@@ -52,7 +52,11 @@ export default {
                     } else {
                         logger.error("Error inviting " + userMail + " will retry in 10 seconds", reason)
                         if (tries == retries) {
-                            message = " ❗️ " + userMail + ", " + reason.data.error + "\n"
+                            if (typeof reason === 'string') {
+                                if (reason.includes('Server returned 502 error')) message = " ❗️ " + userMail + ", server returned 502...\n"
+                            } else {
+                                message = " ❗️ " + userMail + ", " + reason?.data?.error + "\n"
+                            }
                         }
                     }
                 })
