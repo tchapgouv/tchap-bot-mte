@@ -13,7 +13,7 @@ const bots: Bot[] = [
     psinBot
 ]
 
-const rateLimit = 50
+const rateLimit = 100
 const rateLimitDelay = 60 / rateLimit * 1000
 
 export default {
@@ -27,7 +27,7 @@ export default {
         return context.data
     },
 
-    async inviteUserInRoom(userMail: string, roomId: string, retries: number = 5) {
+    async inviteUserInRoom(userMail: string, roomId: string, retries: number = 2) {
 
         let message = ""
 
@@ -50,14 +50,14 @@ export default {
                         message = " 🤷 " + userMail + " était déjà présent.\n"
                         invited = true
                     } else {
-                        logger.error("Error inviting " + userMail + " will retry in 1 minute", reason)
+                        logger.error("Error inviting " + userMail + " will retry in 10 seconds", reason)
                         if (tries == retries) {
                             message = " ❗️ " + userMail + ", " + reason.data.error + "\n"
                         }
                     }
                 })
             tries++
-            if (!invited && tries <= retries) await new Promise(res => setTimeout(res, 60 * 1000));
+            if (!invited && tries <= retries) await new Promise(res => setTimeout(res, 10 * 1000));
         }
 
         return message;
@@ -203,20 +203,35 @@ export default {
         // Maj du token préventivement afin d’éviter de multiples appels en parallèle
         await gmcdBot.getIdentityServerToken()
 
-        // on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit du endpoint en lui même = 1k/s).
+        // On invite par groupes de 10 et on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit du endpoint en lui même = 1k/s).
+        let tasksBlocks: Promise<string>[][] = []
         let tasks: Promise<string>[] = [];
-        userMailList.map(async (userMail, index) => {
-            tasks.push(new Promise(async (resolve) => {
-                const delay = rateLimitDelay * index
-                await new Promise(res => setTimeout(res, delay));
-                await this.inviteUserInRoom(userMail, roomId).then(value => resolve(value))
-            }).then(value => message += value))
-        })
+        let count = 0
 
-        await Promise.all(tasks).catch(reason => {
-            logger.error("Promise.all(inviteByEmail) : ", reason)
-            throw (reason)
-        })
+        for (const mail of userMailList) {
+
+            tasks.push(new Promise(async (resolve) => {
+                const delay = rateLimitDelay * count
+                await new Promise(res => setTimeout(res, delay));
+                await this.inviteUserInRoom(mail, roomId).then(value => resolve(value))
+            }).then(value => message += value))
+
+            count++
+
+            if (count === 10) {
+                tasksBlocks.push(tasks)
+                tasks = []
+                count = 0
+            }
+
+        }
+
+        for (const tasks of tasksBlocks) {
+            await Promise.all(tasks).catch(reason => {
+                logger.error("Promise.all(inviteByEmail) : ", reason)
+                throw (reason)
+            })
+        }
 
         await sendMessage(gmcdBot.client, roomId, message)
     },
