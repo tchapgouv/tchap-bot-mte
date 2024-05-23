@@ -1,6 +1,6 @@
 import {MatrixClient} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
-import {getPowerLevel, sendMessage} from "../../common/helper.js";
+import {getPowerLevel, sendMessage} from "../helper.js";
 import botService from "../../../services/bot.service.js";
 
 /**

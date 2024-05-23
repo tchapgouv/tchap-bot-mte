@@ -7,7 +7,7 @@ import {helpIfAsked} from "./scripts/help.js";
 import {sayGoodbyeIfNecessary} from "../common/scripts/gallantry.js";
 import {leaveRoomIfAsked} from "../common/scripts/leave.js";
 import {createWebhookIfAsked} from "../common/scripts/webhoook.js";
-import {deleteRoomIfAsked} from "./scripts/delete.js";
+import {deleteRoomIfAsked} from "../common/scripts/delete.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent):void {
 
