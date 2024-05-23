@@ -267,7 +267,9 @@ export default {
         if (mailInError.length > 0 && retry < 5) {
             await sendMessage(gmcdBot.client, roomId, " ❗️ Certaines invitations sont en erreur et seront retentées dans 5 minutes.\n")
             setTimeout(() => {
-                this.inviteUsersInRoom(mailInError, roomId, retry++, false)
+                this.inviteUsersInRoom(mailInError, roomId, retry++, false).catch(reason => {
+                    throw reason
+                })
             }, 5 * 60 * 1000)
         }
     },
