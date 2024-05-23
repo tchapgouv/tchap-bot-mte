@@ -236,6 +236,6 @@ export function answerHelp(body: string, event: MatrixEvent, client: MatrixClien
 
 export function isSupport(userId: string) {
     return ADMINS.some(admin => {
-        userId.includes(admin)
+        return userId.includes(admin)
     })
 }
