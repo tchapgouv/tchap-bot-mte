@@ -27,7 +27,7 @@ export default {
         return context.data
     },
 
-    async inviteUserInRoom(userMail: string, roomId: string, opts = {retries: 2, logAlreadyInvited: true}) {
+    async inviteUserInRoom(userMail: string, roomId: string, opts = {retries: 0, logAlreadyInvited: true}) {
 
         let message = ""
 
@@ -63,7 +63,7 @@ export default {
                         opts.logAlreadyInvited ? message = " 🤷 " + userMail + " était déjà présent.\n" : ""
                         invited = true
                     } else {
-                        logger.debug("typeof reason :", typeof reason)
+                        logger.debug("typeof reason :", typeof reason, reason?.HTTPError, reason?.httpStatus)
                         logger.error("Error inviting " + userMail + " will retry in 10 seconds", reason)
                         if (tries == opts.retries) {
                             if (typeof reason === 'string') {
@@ -264,13 +264,13 @@ export default {
 
         await sendMessage(gmcdBot.client, roomId, message)
 
-        if (mailInError.length > 0 && retry < 5) {
-            await sendMessage(gmcdBot.client, roomId, " ❗️ Certaines invitations sont en erreur et seront retentées dans 5 minutes.\n")
+        if (mailInError.length > 0 && retry < 3) {
+            await sendMessage(gmcdBot.client, roomId, " ❗️ Certaines invitations semblent en erreur et seront retentées dans 30 minutes.\n")
             setTimeout(() => {
                 this.inviteUsersInRoom(mailInError, roomId, retry++, false).catch(reason => {
                     throw reason
                 })
-            }, 5 * 60 * 1000)
+            }, 30 * 60 * 1000)
         }
     },
 
