@@ -27,18 +27,31 @@ export default {
         return context.data
     },
 
-    async inviteUserInRoom(userMail: string, roomId: string, retries: number = 2) {
+    async inviteUserInRoom(userMail: string, roomId: string, opts = {retries: 2, logAlreadyInvited: true}) {
 
         let message = ""
 
         const roomName = await this.getRoomName(roomId)
 
-        if (!userMail) return message
+        if (!userMail) return {message, hasError: true}
 
-        logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + "). retries " + retries + "/4")
+        logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + "). retries " + opts.retries + "/4")
         let invited = false
+
+        const uid = userMail.toLowerCase().replace(/@.*/, "")
+        const alreadyInvited = gmcdBot.client.getRoom(roomId)?.getMembers().some(roomMember => {
+            roomMember.userId.toLowerCase().includes(uid)
+        })
+
+        if (alreadyInvited) {
+            message = opts.logAlreadyInvited ? " 🤷 " + userMail + " était déjà présent ou a déjà été invité.\n" : ""
+            invited = true
+        }
+
+        let hasError = false;
+
         let tries = 0
-        while (!invited && tries <= retries) {
+        while (!invited && tries <= opts.retries) {
             await gmcdBot.client.inviteByEmail(roomId, userMail)
                 .then(() => {
                     logger.notice(userMail + " successfully invited.")
@@ -47,24 +60,26 @@ export default {
                 })
                 .catch(reason => {
                     if (reason.data?.error?.includes("already in the room")) {
-                        message = " 🤷 " + userMail + " était déjà présent.\n"
+                        opts.logAlreadyInvited ? message = " 🤷 " + userMail + " était déjà présent.\n" : ""
                         invited = true
                     } else {
+                        logger.debug("typeof reason :", typeof reason)
                         logger.error("Error inviting " + userMail + " will retry in 10 seconds", reason)
-                        if (tries == retries) {
+                        if (tries == opts.retries) {
                             if (typeof reason === 'string') {
                                 if (reason.includes('Server returned 502 error')) message = " ❗️ " + userMail + ", server returned 502...\n"
                             } else {
-                                message = " ❗️ " + userMail + ", " + reason?.data?.error + "\n"
+                                message = " ❗️ " + userMail + ", " + (reason?.data?.error) + "\n"
+                                hasError = true
                             }
                         }
                     }
                 })
             tries++
-            if (!invited && tries <= retries) await new Promise(res => setTimeout(res, 10 * 1000));
+            if (!invited && tries <= opts.retries) await new Promise(res => setTimeout(res, 10 * 1000));
         }
 
-        return message;
+        return {message, hasError};
     },
 
     async createRoom(roomName: string, isPrivate: boolean = true) {
@@ -160,7 +175,7 @@ export default {
         return roomName
     },
 
-    async inviteUsersInRoom(userList: string[], roomId: string): Promise<void> {
+    async inviteUsersInRoom(userList: string[], roomId: string, retry = 0, logAlreadyInvited = true): Promise<void> {
 
         const isMemberOfRoom = await this.isMemberOfRoom(roomId)
 
@@ -208,17 +223,28 @@ export default {
         await gmcdBot.getIdentityServerToken()
 
         // On invite par groupes de 10 et on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit du endpoint en lui même = 1k/s).
-        let tasksBlocks: Promise<string>[][] = []
-        let tasks: Promise<string>[] = [];
+        let tasksBlocks: Promise<void>[][] = []
+        let tasks: Promise<void>[] = [];
         let count = 0
+        let mailInError: string[] = []
 
         for (const mail of userMailList) {
 
-            tasks.push(new Promise(async (resolve) => {
-                const delay = rateLimitDelay * count
-                await new Promise(res => setTimeout(res, delay));
-                await this.inviteUserInRoom(mail, roomId).then(value => resolve(value))
-            }).then(value => message += value))
+            tasks.push(
+                new Promise<{ message: string, hasError: boolean }>(async (resolve) => {
+
+                    const delay = rateLimitDelay * count
+                    await new Promise(res => setTimeout(res, delay));
+                    let inviteResult = {message: "", hasError: false}
+                    await this.inviteUserInRoom(mail, roomId, {retries: 0, logAlreadyInvited: logAlreadyInvited}).then(value => inviteResult = value)
+                    resolve(inviteResult)
+
+                }).then((value: { message: string, hasError: boolean }) => {
+                        message += value.message
+                        if (value.hasError) mailInError.push(mail)
+                    }
+                )
+            )
 
             count++
 
@@ -227,17 +253,23 @@ export default {
                 tasks = []
                 count = 0
             }
-
         }
 
-        for (const tasks of tasksBlocks) {
-            await Promise.all(tasks).catch(reason => {
+        for (const tasksBlock of tasksBlocks) {
+            await Promise.all(tasksBlock).catch(reason => {
                 logger.error("Promise.all(inviteByEmail) : ", reason)
                 throw (reason)
             })
         }
 
         await sendMessage(gmcdBot.client, roomId, message)
+
+        if (mailInError.length > 0 && retry < 5) {
+            await sendMessage(gmcdBot.client, roomId, " ❗️ Certaines invitations sont en erreur et seront retentées dans 5 minutes.\n")
+            setTimeout(() => {
+                this.inviteUsersInRoom(mailInError, roomId, retry++, false)
+            }, 5 * 60 * 1000)
+        }
     },
 
     async postMessage(roomId: string,
