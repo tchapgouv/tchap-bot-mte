@@ -1,6 +1,6 @@
 import {MatrixClient} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
-import {sendMessage} from "../helper.js";
+import {getPowerLevel, sendMessage} from "../helper.js";
 
 /**
  * @help
@@ -8,15 +8,24 @@ import {sendMessage} from "../helper.js";
  * return : je quitte le canal
  * isAnswer : true
  */
-export function leaveRoomIfAsked(client: MatrixClient, roomId: string, body: string) {
+export function leaveRoomIfAsked(client: MatrixClient, roomId: string, userId: string, body: string) {
 
     const leaveRoomOptions = ["oust"]
 
     if (roomId && body && leaveRoomOptions.some(option => body.includes(option))) {
 
-        logger.warning("Someone dismissed me :(")
-        sendMessage(client, roomId, "Au revoir ! 😭")
-        client.leave(roomId).catch(e => logger.error(e));
+        getPowerLevel(client, roomId, userId).then(powerLevel => {
+
+            if (powerLevel === 100) {
+
+                logger.warning("Someone dismissed me :(")
+                sendMessage(client, roomId, "Au revoir ! 😭")
+                client.leave(roomId).catch(e => logger.error(e));
+
+            } else {
+                sendMessage(client, roomId, "Désolé, seul un administrateur peut me renvoyer ! 🤷")
+            }
+        })
 
         return true
     }
