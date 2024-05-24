@@ -21,7 +21,7 @@ export function deleteRoomIfAsked(client: MatrixClient, roomId: string, userId: 
 
                 logger.warning(userId + " deleted room : " + roomId)
                 sendMessage(client, roomId, "This is 'The End of the ******* World' ! 😭")
-                botService.deleteRoom(client, roomId).catch(reason => sendMessage(client, roomId, reason)).catch(reason => {
+                botService.deleteRoom(roomId, {client: client}).catch(reason => sendMessage(client, roomId, reason)).catch(reason => {
                     logger.error("Error deleting room (" + roomId + ")", reason)
                     sendMessage(client, roomId, "Désolé, une erreur est survenue ! 🤷")
                 })

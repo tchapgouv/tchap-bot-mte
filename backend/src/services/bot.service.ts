@@ -127,8 +127,10 @@ export default {
         return {roomId, message}
     },
 
-    async deleteRoom(client: MatrixClient, roomId: string, kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
+    async deleteRoom(roomId: string, opts:{kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷", client?: MatrixClient, }) {
 
+        if (!opts.client) opts.client = gmcdBot.client
+        const client = opts.client
         const botId = client.getUserId()
 
         if (!botId) throw ("deleteRoom : Bot id should not be null !")
@@ -150,7 +152,7 @@ export default {
             logger.debug(roomMember.userId + " power level  = " + roomMember.powerLevel)
             if (!roomMember.powerLevel || roomMember.powerLevel < 100) {
                 logger.debug("Kicking " + roomMember.userId)
-                await client.kick(roomId, roomMember.userId, kickReason)
+                await client.kick(roomId, roomMember.userId, opts.kickReason)
                     .catch(reason => {
                         logger.error("Error kicking " + roomMember.name, reason)
                     })

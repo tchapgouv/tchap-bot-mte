@@ -57,7 +57,7 @@ export function deleteRoom(req: Request, res: Response) {
 
     if (!req.body.room_id) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing room id !'});
 
-    botService.deleteRoom(req.body.room_id, req.body.kick_reason).then(_value => {
+    botService.deleteRoom(req.body.room_id, {kickReason: req.body.kick_reason}).then(_value => {
 
         res.status(StatusCodes.OK).json({message: "Room deleted"})
 
