@@ -29,6 +29,8 @@ export default {
 
     async inviteUserInRoom(userMail: string, roomId: string, opts = {retries: 0, logAlreadyInvited: true}) {
 
+        logger.debug("inviteUserInRoom", userMail, roomId, opts)
+
         let message = ""
 
         const roomName = await this.getRoomName(roomId)
@@ -84,6 +86,8 @@ export default {
 
     async createRoom(roomName: string, isPrivate: boolean = true) {
 
+        logger.debug("createRoom", roomName, isPrivate)
+
         let message: string = ""
         let roomId: any
 
@@ -127,7 +131,9 @@ export default {
         return {roomId, message}
     },
 
-    async deleteRoom(roomId: string, opts:{kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷", client?: MatrixClient, }) {
+    async deleteRoom(roomId: string, opts: { kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷", client?: MatrixClient, }) {
+
+        logger.debug("deleteRoom", roomId)
 
         if (!opts.client) opts.client = gmcdBot.client
         const client = opts.client
@@ -170,6 +176,9 @@ export default {
     },
 
     async getRoomName(roomId: string) {
+
+        logger.debug("getRoomName", roomId)
+
         const roomName = gmcdBot.client.getRoom(roomId)?.name
 
         if (!roomName) throw "Cannot find room name for Id : " + roomId + ". Do I know this room ?"
@@ -178,6 +187,8 @@ export default {
     },
 
     async inviteUsersInRoom(userList: string[], roomId: string, retry = 0, logAlreadyInvited = true): Promise<void> {
+
+        logger.debug("inviteUsersInRoom", userList.length, roomId, retry, logAlreadyInvited)
 
         const isMemberOfRoom = await this.isMemberOfRoom(roomId)
 
@@ -311,6 +322,8 @@ export default {
     },
 
     async isMemberOfRoom(roomId: string | null, userId?: string) {
+
+        logger.debug("isMemberOfRoom", roomId, userId)
 
         if (!roomId) throw "isMemberOfRoom ? roomId cannot be empty"
 

@@ -6,6 +6,8 @@ export default {
 
     async getMailsForUIDs(usernames: string[]): Promise<{ userMailList: string[], userNotFoundList: string[] }> {
 
+        logger.debug("getMailsForUIDs", usernames.length)
+
         let userMailList: string[] = []
 
         const client = ldap.createClient({
@@ -30,6 +32,8 @@ export default {
 
     async getMailPRForUID(client: ldap.Client, username: string): Promise<string> {
 
+        logger.debug("getMailPRForUID", username)
+
         let mailPR: string | undefined
 
         await this.getUserForUID(client, username).then((user: any) => {
@@ -46,6 +50,8 @@ export default {
     },
 
     async getUserForUID(client: ldap.Client, username: string) {
+
+        logger.debug("getUserForUID", username)
 
         const opts: SearchOptions = {
             attributes: ['uid', 'cn', 'mail', 'mailPR', 'displayName'],
