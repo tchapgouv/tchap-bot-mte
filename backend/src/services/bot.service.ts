@@ -125,7 +125,7 @@ export default {
         message += "Bonne journée !\n"
 
         if (roomId != null) {
-            await sendMessage(gmcdBot.client, roomId, message)
+            sendMessage(gmcdBot.client, roomId, message)
         }
 
         return {roomId, message}
@@ -275,10 +275,10 @@ export default {
             })
         }
 
-        await sendMessage(gmcdBot.client, roomId, message)
+        sendMessage(gmcdBot.client, roomId, message)
 
         if (mailInError.length > 0 && retry <= 2) {
-            await sendMessage(gmcdBot.client, roomId, " ❗️ Certaines invitations semblent en erreur et seront retentées dans 30 minutes.\n")
+            sendMessage(gmcdBot.client, roomId, " ❗️ Certaines invitations semblent en erreur et seront retentées dans 30 minutes.\n")
             setTimeout(() => {
                 retry++
                 this.inviteUsersInRoom(mailInError, roomId, retry, false).catch(reason => {
