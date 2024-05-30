@@ -35,7 +35,7 @@ export default {
 
         if (!userMail) return {message, hasError: true}
 
-        logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + "). retries " + opts.retries + "/4")
+        logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + "). retries " + opts.retries)
         let invited = false
 
         const uid = userMail.toLowerCase().replace(/@.*/, "")
