@@ -237,31 +237,25 @@ export default {
         await gmcdBot.getIdentityServerToken()
 
         // On invite par groupes de 10 et on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit du endpoint en lui même = 1k/s).
-        let tasksBlocks: Promise<void>[][] = []
-        let tasks: Promise<void>[] = [];
+        let tasksBlocks: Promise<{ message: string, hasError: boolean, mail: string }>[][] = []
+        let tasks: Promise<{ message: string, hasError: boolean, mail: string }>[] = [];
         let count = 0
         let mailInError: string[] = []
 
         for (const mail of userMailList) {
 
             tasks.push(
-                new Promise<{ message: string, hasError: boolean }>(async (resolve) => {
+                new Promise<{ message: string, hasError: boolean, mail: string }>(async (resolve) => {
 
                     const delay = rateLimitDelay * count
                     await new Promise(res => setTimeout(res, delay));
-                    let inviteResult = {message: "", hasError: false}
+                    let inviteResult = {message: "", hasError: false, mail: ""}
                     await this.inviteUserInRoom(mail, roomId, {retries: 0, logAlreadyInvited: logAlreadyInvited})
                         .then(value => {
-                            inviteResult = value
+                            inviteResult = {message: value.message, hasError: value.hasError, mail: mail}
                         })
                     resolve(inviteResult)
-
-                }).then((value: { message: string, hasError: boolean }) => {
-                        message += value.message
-                        if (value.hasError) mailInError.push(mail)
-                        logger.debug("inviteResult : ", value)
-                    }
-                )
+                })
             )
 
             count++
@@ -274,7 +268,13 @@ export default {
         }
 
         for (const tasksBlock of tasksBlocks) {
-            await Promise.all(tasksBlock).catch(reason => {
+            await Promise.all(tasksBlock).then(results => {
+                for (const result of results) {
+                    message += result.message
+                    if (result.hasError) mailInError.push(result.mail)
+                    logger.debug("inviteResult : ", result)
+                }
+            }).catch(reason => {
                 logger.error("Promise.all(inviteByEmail) : ", reason)
                 throw (reason)
             })
