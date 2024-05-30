@@ -47,6 +47,7 @@ export default {
 
         if (alreadyInvited) {
             message = opts.logAlreadyInvited ? " 🤷 " + userMail + " était déjà présent ou a déjà été invité.\n" : ""
+            logger.notice(userMail + "already in the room")
             invited = true
         }
 
@@ -249,12 +250,16 @@ export default {
                     const delay = rateLimitDelay * count
                     await new Promise(res => setTimeout(res, delay));
                     let inviteResult = {message: "", hasError: false}
-                    await this.inviteUserInRoom(mail, roomId, {retries: 0, logAlreadyInvited: logAlreadyInvited}).then(value => inviteResult = value)
+                    await this.inviteUserInRoom(mail, roomId, {retries: 0, logAlreadyInvited: logAlreadyInvited})
+                        .then(value => {
+                            inviteResult = value
+                        })
                     resolve(inviteResult)
 
                 }).then((value: { message: string, hasError: boolean }) => {
                         message += value.message
                         if (value.hasError) mailInError.push(mail)
+                        logger.debug("inviteResult : ", value)
                     }
                 )
             )
