@@ -238,7 +238,6 @@ export default {
         await gmcdBot.getIdentityServerToken()
 
         // On invite par groupes de 10 et on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit du endpoint en lui même = 1k/s).
-        let tasksBlocks: Promise<{ message: string, hasError: boolean, mail: string }>[][] = []
         let tasks: Promise<{ message: string, hasError: boolean, mail: string }>[] = [];
         let count = 0
         let mailInError: string[] = []
@@ -247,9 +246,9 @@ export default {
 
             tasks.push(
                 new Promise<{ message: string, hasError: boolean, mail: string }>(async (resolve) => {
-
                     const delay = rateLimitDelay * count
-                    await new Promise(res => setTimeout(res, delay));
+                    logger.debug("inviteUserInRoom " + mail + " in " + delay + "ms")
+                    await new Promise(resolve => setTimeout(resolve, delay));
                     let inviteResult = {message: "", hasError: false, mail: ""}
                     await this.inviteUserInRoom(mail, roomId, {retries: 0, logAlreadyInvited: logAlreadyInvited})
                         .then(value => {
@@ -260,26 +259,19 @@ export default {
             )
 
             count++
+        }
 
-            if (count === 10) {
-                tasksBlocks.push(tasks)
-                tasks = []
-                count = 0
+        logger.debug("Awaiting " + tasks.length + " tasks.")
+        await Promise.all(tasks).then(results => {
+            for (const result of results) {
+                message += result.message
+                if (result.hasError) mailInError.push(result.mail)
+                logger.debug("inviteResult : ", result)
             }
-        }
-
-        for (const tasksBlock of tasksBlocks) {
-            await Promise.all(tasksBlock).then(results => {
-                for (const result of results) {
-                    message += result.message
-                    if (result.hasError) mailInError.push(result.mail)
-                    logger.debug("inviteResult : ", result)
-                }
-            }).catch(reason => {
-                logger.error("Promise.all(inviteByEmail) : ", reason)
-                throw (reason)
-            })
-        }
+        }).catch(reason => {
+            logger.error("Promise.all(inviteByEmail) : ", reason)
+            throw (reason)
+        })
 
         sendMessage(gmcdBot.client, roomId, message)
 
