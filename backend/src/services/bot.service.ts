@@ -42,8 +42,8 @@ export default {
 
         const uid = userMail.toLowerCase().replace(/@.*/, "")
         const alreadyInvited = gmcdBot.client.getRoom(roomId)?.getMembers().some(roomMember => {
-            logger.debug(roomMember, "vs", uid)
-            roomMember.userId.toLowerCase().includes(uid)
+            logger.debug(roomMember.userId.toLowerCase(), "vs", uid)
+            return roomMember.userId.toLowerCase().includes(uid)
         })
 
         if (alreadyInvited) {
