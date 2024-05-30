@@ -37,11 +37,12 @@ export default {
 
         if (!userMail) return {message, hasError: true}
 
-        logger.notice("Inviting " + userMail + " into " + roomName + "(" + roomId + "). retries " + opts.retries)
+        logger.notice("Inviting " + userMail + " into " + roomName + " (" + roomId + "). retries " + opts.retries)
         let invited = false
 
         const uid = userMail.toLowerCase().replace(/@.*/, "")
         const alreadyInvited = gmcdBot.client.getRoom(roomId)?.getMembers().some(roomMember => {
+            logger.debug(roomMember, "vs", uid)
             roomMember.userId.toLowerCase().includes(uid)
         })
 
