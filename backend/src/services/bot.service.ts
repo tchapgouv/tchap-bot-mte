@@ -182,7 +182,10 @@ export default {
         for (const roomMember of members) {
 
             if (!roomMember.userId.toLowerCase().includes(userId.toLowerCase())) continue
-            if (roomMember.userId === gmcdBot.client.getUserId()) continue
+            if (roomMember.userId === gmcdBot.client.getUserId()) {
+                message += "Did you really thought i would kick myself ?!"
+                continue
+            }
 
             logger.debug("roomMember", roomMember)
             logger.debug(roomMember.userId + " power level  = " + roomMember.powerLevel)
@@ -204,6 +207,8 @@ export default {
                 message += "Cannot kick admin " + roomMember.name + ".\n"
             }
         }
+
+        if (message === "") message = "Found no matching member to kick."
 
         return {message, isAdmin, hasError}
 
