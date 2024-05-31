@@ -7,6 +7,7 @@ import logger from "../utils/logger.js";
 import ldapService from "./ldap.service.js";
 import {getPowerLevel, sendHtmlMessage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
 import {Bot} from "../bot/common/Bot.js";
+import {splitEvery} from "../utils/utils.js";
 
 const bots: Bot[] = [
     gmcdBot,
@@ -240,7 +241,7 @@ export default {
         // On invite par groupes de 10 et on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit du endpoint en lui même = 1k/s).
         let tasks: Promise<{ message: string, hasError: boolean, mail: string }>[] = [];
         let count = 0
-        let mailInError: string[] = []
+        let mailInErrorList: string[] = []
 
         for (const mail of userMailList) {
 
@@ -261,25 +262,32 @@ export default {
             count++
         }
 
-        logger.debug("Awaiting " + tasks.length + " tasks.")
-        await Promise.all(tasks).then(results => {
-            for (const result of results) {
-                message += result.message
-                if (result.hasError) mailInError.push(result.mail)
-                logger.debug("inviteResult : ", result)
-            }
-        }).catch(reason => {
-            logger.error("Promise.all(inviteByEmail) : ", reason)
-            throw (reason)
-        })
-
         sendMessage(gmcdBot.client, roomId, message)
 
-        if (mailInError.length > 0 && retry <= 2) {
+        logger.debug("Awaiting " + tasks.length + " inviting tasks.")
+
+        splitEvery(10, tasks).map(async (chunk) => {
+            let inviteResultMessage = ""
+            await Promise.all(chunk).then(results => {
+                for (const result of results) {
+                    inviteResultMessage += result.message
+                    if (result.hasError) mailInErrorList.push(result.mail)
+                    logger.debug("inviteResult : ", result)
+                }
+            }).catch(reason => {
+                logger.error("Promise.all(inviteByEmail) : ", reason)
+                throw (reason)
+            })
+            sendMessage(gmcdBot.client, roomId, inviteResultMessage)
+        })
+
+        logger.debug("Inviting tasks completed")
+
+        if (mailInErrorList.length > 0 && retry <= 2) {
             sendMessage(gmcdBot.client, roomId, " ❗️ Certaines invitations semblent en erreur et seront retentées dans 30 minutes.\n")
             setTimeout(() => {
                 retry++
-                this.inviteUsersInRoom(mailInError, roomId, retry, false).catch(reason => {
+                this.inviteUsersInRoom(mailInErrorList, roomId, retry, false).catch(reason => {
                     throw reason
                 })
             }, 30 * 60 * 1000)
