@@ -183,7 +183,7 @@ export default {
 
             if (!roomMember.userId.toLowerCase().includes(userId.toLowerCase())) continue
             if (roomMember.userId === gmcdBot.client.getUserId()) {
-                message += "Did you really thought i would kick myself ?!"
+                message += "Did you really thought i would kick myself ?!\n"
                 continue
             }
 
@@ -195,7 +195,7 @@ export default {
                 logger.debug("Kicking " + roomMember.userId)
                 await gmcdBot.client.kick(roomId, roomMember.userId, kickReason)
                     .then(() => {
-                        message += roomMember.name + " kicked."
+                        message += roomMember.name + " kicked.\n"
                     })
                     .catch(reason => {
                         hasError = true
