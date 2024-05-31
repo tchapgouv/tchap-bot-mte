@@ -8,6 +8,7 @@ import ldapService from "./ldap.service.js";
 import {getPowerLevel, sendHtmlMessage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
 import {Bot} from "../bot/common/Bot.js";
 import {splitEvery} from "../utils/utils.js";
+import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
 
 const bots: Bot[] = [
     gmcdBot,
@@ -152,23 +153,14 @@ export default {
 
         let adminList: { name: string, userId: string }[] = []
 
-        client.getRoom(roomId)?.getMembers().forEach(async (roomMember) => {
+        let members: RoomMember[] | undefined = gmcdBot.client.getRoom(roomId)?.getMembers();
 
-            if (roomMember.userId === botId) return
-
-            logger.debug("roomMember", roomMember)
-
-            logger.debug(roomMember.userId + " power level  = " + roomMember.powerLevel)
-            if (!roomMember.powerLevel || roomMember.powerLevel < 100) {
-                logger.debug("Kicking " + roomMember.userId)
-                await client.kick(roomId, roomMember.userId, opts.kickReason)
-                    .catch(reason => {
-                        logger.error("Error kicking " + roomMember.name, reason)
-                    })
+        if (members) {
+            for (const roomMember of members) {
+                await this.kickUser(roomId, roomMember.userId, opts.kickReason)
+                if (roomMember.powerLevel === 100) adminList.push({name: roomMember.name, userId: roomMember.userId})
             }
-
-            if (roomMember.powerLevel === 100) adminList.push({name: roomMember.name, userId: roomMember.userId})
-        })
+        }
 
         if (adminList.length > 0) sendMessage(client, roomId, "Quelques Administrateurs demeurent dans ce salon et je ne peux les exclure.\nCe salon ne sera pas purgé tant qu'ils ne l'auront pas quitté.\nN'oubliez pas d'éteindre la lumière en partant ! 💡\n 👋")
         else sendMessage(client, roomId, "🚪")
@@ -176,6 +168,45 @@ export default {
         client.leave(roomId)
 
         return adminList
+    },
+
+    async kickUser(roomId: string, userId: string, kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
+
+        let message = ""
+        let isAdmin = false
+        let hasError = false
+        let members: RoomMember[] | undefined = gmcdBot.client.getRoom(roomId)?.getMembers();
+
+        if (!members) return {message: "No room members found !", isAdmin: false, hasError: true}
+
+        for (const roomMember of members) {
+
+            if (!roomMember.userId.toLowerCase().includes(userId.toLowerCase())) continue
+            if (roomMember.userId === gmcdBot.client.getUserId()) continue
+
+            logger.debug("roomMember", roomMember)
+            logger.debug(roomMember.userId + " power level  = " + roomMember.powerLevel)
+
+            if (!roomMember.powerLevel || roomMember.powerLevel < 100) {
+
+                logger.debug("Kicking " + roomMember.userId)
+                await gmcdBot.client.kick(roomId, roomMember.userId, kickReason)
+                    .then(() => {
+                        message += roomMember.name + " kicked."
+                    })
+                    .catch(reason => {
+                        hasError = true
+                        logger.error("Error kicking " + roomMember.name, reason)
+                    })
+            } else {
+                isAdmin = true
+                hasError = true
+                message += "Cannot kick admin " + roomMember.name + ".\n"
+            }
+        }
+
+        return {message, isAdmin, hasError}
+
     },
 
     async getRoomName(roomId: string) {
@@ -238,7 +269,7 @@ export default {
         // Maj du token préventivement afin d’éviter de multiples appels en parallèle
         await gmcdBot.getIdentityServerToken()
 
-        // On invite par groupes de 10 et on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit du endpoint en lui même = 1k/s).
+        // On invite par groupes de 10 et on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit de l’endpoint en lui-même = 1k/s).
         let tasks: Promise<{ message: string, hasError: boolean, mail: string }>[] = [];
         let count = 0
         let mailInErrorList: string[] = []

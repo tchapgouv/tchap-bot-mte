@@ -72,6 +72,21 @@ export async function deleteRoom(req: Request, res: Response) {
     })
 }
 
+export async function kickUser(req: Request, res: Response) {
+
+    if (!req.body.room_id) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing room id !'});
+    if (!req.body.user_id) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing user id !'});
+
+    await botService.kickUser(req.body.room_id, req.body.user_id, req.body.kick_reason).then(message => {
+
+        res.status(StatusCodes.OK).json(message)
+
+    }).catch(reason => {
+        logger.error("Error kicking user", reason)
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
+    })
+}
+
 export async function inviteUsers(req: Request, res: Response) {
 
     if (!req.body.users_list) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing users UIDs list !'});
