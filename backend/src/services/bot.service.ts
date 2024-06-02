@@ -15,7 +15,7 @@ const bots: Bot[] = [
     psinBot
 ]
 
-const rateLimit = 100
+const rateLimit = 10
 const rateLimitDelay = 60 / rateLimit * 1000
 
 export default {
@@ -72,8 +72,9 @@ export default {
                         logger.debug("typeof reason :", typeof reason, reason?.HTTPError, reason?.httpStatus)
                         logger.error("Error inviting " + userMail + " will retry in 10 seconds", reason)
                         if (tries == opts.retries) {
-                            if (typeof reason === 'string') {
-                                if (reason.includes('Server returned 502 error')) message = " ❗️ " + userMail + ", server returned 502...\n"
+
+                            if (reason?.httpStatus === '502') {
+                                message = " ❗️ " + userMail + ", Tchap returned 502...\n"
                             } else {
                                 message = " ❗️ " + userMail + ", " + (reason?.data?.error) + "\n"
                                 hasError = true
