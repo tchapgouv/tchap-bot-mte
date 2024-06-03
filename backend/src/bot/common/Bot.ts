@@ -76,14 +76,6 @@ export class Bot {
 // Auto join rooms
         this.client.on(RoomMemberEvent.Membership, (_event, member) => {
 
-            // this.client.peekInRoom('!zUSLZOXAyGnmzVpaVM:agent.dev-durable.tchap.gouv.fr').then(room => {
-            //     logger.notice("peek unknown")
-            //     logger.notice(room)
-            // }).catch(_reason => {})
-            // this.client.peekInRoom(GMCD_INFRA_ROOM_ID).then(room => {
-            //     logger.notice("peek GMCD_INFRA_ROOM_ID")
-            //     logger.notice(room)
-            // }).catch(_reason => {})
             if (member.membership === "invite" && member.userId === this.client.getUserId() &&
                 member.roomId !== '!zUSLZOXAyGnmzVpaVM:agent.dev-durable.tchap.gouv.fr') {
                 this.client.joinRoom(member.roomId).then(() => {
@@ -199,7 +191,7 @@ export class Bot {
             logger.debug("Public Rooms: %s", JSON.stringify(data));
         }).catch(e => logger.error(e))
 
-        const start = ['Bonjour à tous', 'Bonjour', 'Salut', 'Hello'];
+        const start = ['Hallo', 'Bonjour', 'Salut', 'Hello', 'Hej', 'Hola', 'Buongiorno', 'God morgon', 'Dzień dobry', 'Dobrý den', 'Hyvää huomenta'];
         const startLength = start.length
         const end = ['.', ' !', ', me revoilà.', '. Je viens de redémarrer ¯\\_(ツ)_/¯', ', encore =)'];
         const endLength = end.length
