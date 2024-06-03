@@ -81,6 +81,12 @@ export async function postMessage(req: Request, res: Response) {
     await webhookService.findOne({where: {webhook_id: webhookId}}).then((value) => {
         webhook = value
         logger.debug("Webhook :", webhook)
+    }).catch(_ => {
+        res.status(StatusCodes.UNAUTHORIZED).send({
+            message:
+                "Unauthenticated (Wrong webhook)."
+        })
+        return
     })
 
     if (!webhook) {

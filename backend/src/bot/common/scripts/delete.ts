@@ -1,12 +1,12 @@
 import {MatrixClient} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
-import {getPowerLevel, sendMessage} from "../../common/helper.js";
+import {getPowerLevel, sendMessage} from "../helper.js";
 import botService from "../../../services/bot.service.js";
 
 /**
  * @help
- * command : oust
- * return : je quitte le canal
+ * command : delete room !roomId
+ * return : je supprime le canal
  * isAnswer : true
  */
 export function deleteRoomIfAsked(client: MatrixClient, roomId: string, userId: string, body: string) {
@@ -21,7 +21,7 @@ export function deleteRoomIfAsked(client: MatrixClient, roomId: string, userId: 
 
                 logger.warning(userId + " deleted room : " + roomId)
                 sendMessage(client, roomId, "This is 'The End of the ******* World' ! 😭")
-                botService.deleteRoom(client, roomId).catch(reason => sendMessage(client, roomId, reason)).catch(reason => {
+                botService.deleteRoom(roomId, {client: client}).catch(reason => sendMessage(client, roomId, reason)).catch(reason => {
                     logger.error("Error deleting room (" + roomId + ")", reason)
                     sendMessage(client, roomId, "Désolé, une erreur est survenue ! 🤷")
                 })

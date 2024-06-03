@@ -20,6 +20,8 @@ const botRouter = express.Router();
  *                   type: string
  *                 room_name:
  *                   type: string
+ *                 is_private:
+ *                   type: boolean
  *                 users_list:
  *                   type: array
  *                   items:
@@ -31,6 +33,15 @@ const botRouter = express.Router();
  *     responses:
  *       200:
  *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 room_id:
+ *                   type: string
  */
 botRouter.post("/api/migrate/room", verifyTimeBasedToken, migrateRoom)
 
@@ -50,12 +61,23 @@ botRouter.post("/api/migrate/room", verifyTimeBasedToken, migrateRoom)
  *                   type: string
  *                 room_name:
  *                   type: string
+ *                 is_private:
+ *                   type: boolean
  *               required:
  *                 - token
  *                 - room_name
  *     responses:
  *       200:
  *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 room_id:
+ *                   type: string
  */
 botRouter.post("/api/room/create", verifyTimeBasedToken, createRoom)
 
@@ -86,6 +108,13 @@ botRouter.post("/api/room/create", verifyTimeBasedToken, createRoom)
  *     responses:
  *       200:
  *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 botRouter.post("/api/room/invite", verifyTimeBasedToken, inviteUsers)
 
@@ -111,6 +140,15 @@ botRouter.post("/api/room/invite", verifyTimeBasedToken, inviteUsers)
  *     responses:
  *       200:
  *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 room_name:
+ *                   type: string
  */
 botRouter.post("/api/room/name", verifyTimeBasedToken, getRoomName)
 
@@ -136,6 +174,13 @@ botRouter.post("/api/room/name", verifyTimeBasedToken, getRoomName)
  *     responses:
  *       200:
  *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 botRouter.delete("/api/room/delete", verifyTimeBasedToken, deleteRoom)
 
@@ -163,6 +208,13 @@ botRouter.delete("/api/room/delete", verifyTimeBasedToken, deleteRoom)
  *     responses:
  *       200:
  *         description:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 botRouter.post("/api/room/member", verifyTimeBasedToken, getRoomName)
 

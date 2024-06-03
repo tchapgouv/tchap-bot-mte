@@ -5,6 +5,7 @@ import fs from "fs";
 import showdown from "showdown";
 import path from "path";
 import {fileURLToPath} from "url";
+import {ADMINS} from "./config.js";
 
 const converter = new showdown.Converter()
 
@@ -231,4 +232,10 @@ export function answerHelp(body: string, event: MatrixEvent, client: MatrixClien
     }
 
     return false
+}
+
+export function isSupport(userId: string) {
+    return ADMINS.some(admin => {
+        return userId.includes(admin)
+    })
 }
