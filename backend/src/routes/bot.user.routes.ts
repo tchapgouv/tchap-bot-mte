@@ -41,8 +41,8 @@ botRouter.delete("/api/user/kick", verifyTimeBasedToken, kickUser)
 
 /**
  * @openapi
- * /api/user/search:
- *   delete:
+ * /api/user/search/mail:
+ *   post:
  *     description: Renvoie un utilisateur à partir de son mail
  *     requestBody:
  *         required: true
@@ -78,7 +78,7 @@ botRouter.post("/api/user/search/mail", verifyTimeBasedToken, searchUserFromMail
 /**
  * @openapi
  * /api/user/search:
- *   delete:
+ *   post:
  *     description: Renvoie un utilisateur à partir d'un terme
  *     requestBody:
  *         required: true
