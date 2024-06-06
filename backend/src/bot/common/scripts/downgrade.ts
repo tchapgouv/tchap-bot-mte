@@ -32,8 +32,9 @@ export function downgradeIfAsked(client: MatrixClient, event: MatrixEvent, body:
 
                     getPowerLevel(client, roomId, botId).then(powerLevel => {
 
-                        client.setPowerLevel(roomId, botId, powerLevel === 100 ? 50 : 0).catch(e => logger.error(e));
-                        sendMessage(client, roomId, "C'est fait !")
+                        client.setPowerLevel(roomId, botId, powerLevel === 100 ? 50 : 0).then(_ => {
+                            sendMessage(client, roomId, "C'est fait !")
+                        }).catch(e => logger.error(e));
                     })
 
                 } else {
