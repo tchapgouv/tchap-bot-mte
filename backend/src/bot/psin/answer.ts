@@ -7,6 +7,7 @@ import {promoteUserIfAsked} from "../common/scripts/promote.js";
 import {sendMessage} from "../common/helper.js";
 import {helpIfAsked} from "./scripts/help.js";
 import {deleteRoomIfAsked} from "../common/scripts/delete.js";
+import {downgradeIfAsked} from "../common/scripts/downgrade.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent): void {
 
@@ -33,6 +34,7 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent): vo
     if (!actionTaken) actionTaken = createWebhookIfAsked(client, event, message)
     if (!actionTaken) actionTaken = promoteUserIfAsked(client, event, message)
     if (!actionTaken) actionTaken = helpIfAsked(client, event, message)
+    if (!actionTaken) actionTaken = downgradeIfAsked(client, event, message)
     if (!actionTaken) actionTaken = deleteRoomIfAsked(client, roomId, event.sender.userId, message)
     if (!actionTaken) sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }

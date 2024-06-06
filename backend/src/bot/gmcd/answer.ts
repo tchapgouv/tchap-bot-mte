@@ -33,8 +33,8 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent):voi
     logger.debug("room_id =", roomId)
 
     if (!actionTaken) actionTaken = leaveRoomIfAsked(client, roomId, event.sender.userId, message)
-    if (!actionTaken) actionTaken = promoteUserIfAsked(client, event, message)
     if (!actionTaken) actionTaken = createWebhookIfAsked(client, event, message)
+    if (!actionTaken) actionTaken = promoteUserIfAsked(client, event, message)
     if (!actionTaken) actionTaken = helpIfAsked(client, event, message)
     if (!actionTaken) actionTaken = downgradeIfAsked(client, event, message)
     if (!actionTaken) actionTaken = deleteRoomIfAsked(client, roomId, event.sender.userId, message)

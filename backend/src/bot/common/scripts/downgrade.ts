@@ -38,7 +38,7 @@ export function downgradeIfAsked(client: MatrixClient, event: MatrixEvent, body:
                     })
 
                 } else {
-                    sendMessage(client, roomId, "Désolé, seul un administrateur rétrograder ! 🤷")
+                    sendMessage(client, roomId, "Désolé, seul un administrateur peut me rétrograder ! 🤷")
                 }
             })
 

@@ -166,7 +166,7 @@ export async function isSomeoneAdmin(client: MatrixClient, roomId: string): Prom
 
 export function redactHelp(commandes: { command: string | undefined; return: string; isAnswer: boolean }[]): string {
 
-    let help = "Voici une liste non exhaustive des commandes auxquelles je sais répondre :\n"
+    let help = "Voici une liste non exhaustive des commandes auxquelles je sais répondre (Si les droits du salon me le permettent) :\n"
     for (const commande of commandes) {
         help += " - "
         if (commande.command) {
