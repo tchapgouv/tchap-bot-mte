@@ -115,7 +115,7 @@ export default {
                     message += "Enfin, vous pouvez me renvoyer : `@bot-gmcd oust !`. 🪦\n"
                     roomId = data.room_id
 
-                    // gmcdBot.client.sendStateEvent(roomId, "im.vector.room.access_rules", {rule: "unrestricted"})
+                    this.setRoomNotificationPowerLevel(roomId, 0)
 
                 })
                 .catch(reason => {
@@ -133,6 +133,14 @@ export default {
         }
 
         return {roomId, message}
+    },
+
+    setRoomNotificationPowerLevel(roomId: string, powerLevel: number) {
+
+        logger.notice("Setting room notification power level requirement to " + powerLevel)
+        gmcdBot.client.sendStateEvent(roomId, "m.room.power_levels", {notifications: {room: powerLevel}}).catch(reason => {
+            logger.error("Error setting room notification power level requirement :", reason)
+        })
     },
 
     async deleteRoom(roomId: string, opts: { kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷", client?: MatrixClient, }) {
