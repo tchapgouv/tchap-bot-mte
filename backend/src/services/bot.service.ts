@@ -191,9 +191,18 @@ export default {
         let user: { user_id: string, display_name?: string, avatar_url?: string } | undefined
 
         await gmcdBot.client.searchUserDirectory({term: searchTerm, limit: 5}).then(value => {
-            if (value.results.length !== 1) throw 'Invalid number of matches. Found ' + value.results.length + ', expected 1.'
-            user = value.results.at(0)
+            if (value.results.length > 1) throw 'Invalid number of matches (Limit 5). Found ' + value.results.length + ', expected 1.'
+            if (value.results.at(0)) user = value.results.at(0)
         })
+
+        if (!user) {
+            const matchingKnownUsers = gmcdBot.client.getUsers().filter(value => {
+                return value.userId.toLowerCase().includes(searchTerm) || value.displayName?.toLowerCase().includes(searchTerm)
+            })
+            if (matchingKnownUsers.length > 1) throw 'Invalid number of matches (Limit 5). Found ' + matchingKnownUsers.length + ', expected 1.'
+            const matchingKnownUser = matchingKnownUsers.at(0)
+            if (matchingKnownUser) user = {user_id: matchingKnownUser.userId, display_name: matchingKnownUser.displayName, avatar_url: matchingKnownUser.avatarUrl}
+        }
 
         if (!user) throw 'User not found.'
 
