@@ -106,10 +106,11 @@ export default {
                 name: roomName,
                 room_alias_name: roomName,
                 visibility: isPrivate ? Visibility.Private : Visibility.Public,
-                // preset: isPrivate ? Preset.PrivateChat : Preset.PublicChat,
-                // power_level_content_override: {
-                // users_default: 50
-                // },
+                power_level_content_override: {
+                    notifications: {
+                        room: 0
+                    }
+                },
             })
                 .then((data) => {
                     logger.notice("Room created : ", data)
