@@ -106,11 +106,6 @@ export default {
                 name: roomName,
                 room_alias_name: roomName,
                 visibility: isPrivate ? Visibility.Private : Visibility.Public,
-                // power_level_content_override: {
-                //     notifications: {
-                //         room: 0
-                //     }
-                // },
             })
                 .then((data) => {
                     logger.notice("Room created : ", data)
@@ -119,6 +114,9 @@ export default {
                     message += "Vous pouvez vous promouvoir administrateur simplement en me le demandant : `@bot-gmcd promote me`. 🍄\n"
                     message += "Enfin, vous pouvez me renvoyer : `@bot-gmcd oust !`. 🪦\n"
                     roomId = data.room_id
+
+                    // gmcdBot.client.sendStateEvent(roomId, "im.vector.room.access_rules", {rule: "unrestricted"})
+
                 })
                 .catch(reason => {
                     logger.error("Error creating room " + roomName + ". ", reason)
