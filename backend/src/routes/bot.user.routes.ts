@@ -89,7 +89,7 @@ botRouter.post("/api/user/search/mail", verifyTimeBasedToken, searchUserFromMail
  *               properties:
  *                 token:
  *                   type: string
- *                 user_mail:
+ *                 term:
  *                   type: string
  *               required:
  *                 - token

@@ -175,7 +175,9 @@ export default {
     async searchUserFromMail(userMail: string) {
 
         userMail = "@" + userMail.replace("@", "-")
-        return this.searchUser(userMail)
+        return this.searchUser(userMail).catch(reason => {
+            throw reason
+        })
     },
 
     async searchUser(searchTerm: string) {
