@@ -138,7 +138,18 @@ export default {
     setRoomNotificationPowerLevel(roomId: string, powerLevel: number) {
 
         logger.notice("Setting room notification power level requirement to " + powerLevel)
-        gmcdBot.client.sendStateEvent(roomId, "m.room.power_levels", {notifications: {room: powerLevel}}).catch(reason => {
+
+        gmcdBot.client.roomState(roomId).then(value => {
+            value
+        })
+
+        gmcdBot.client.getStateEvent(roomId, "m.room.power_levels", "notifications").then(value => {
+            logger.notice(value)
+        }).catch(reason => {
+            logger.error("Error getting room notification power level requirement :", reason)
+        })
+
+        gmcdBot.client.sendStateEvent(roomId, "m.room.power_levels", {"notifications": {"room": powerLevel}}).catch(reason => {
             logger.error("Error setting room notification power level requirement :", reason)
         })
     },
