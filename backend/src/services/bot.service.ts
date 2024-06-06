@@ -172,6 +172,26 @@ export default {
         return adminList
     },
 
+    async searchUserFromMail(userMail: string) {
+
+        userMail = "@" + userMail.replace("@", "-")
+        return this.searchUser(userMail)
+    },
+
+    async searchUser(searchTerm: string) {
+
+        let user: { user_id: string, display_name?: string, avatar_url?: string } | undefined
+
+        await gmcdBot.client.searchUserDirectory({term: searchTerm, limit: 5}).then(value => {
+            if (value.results.length !== 1) throw 'Invalid number of matches. Found ' + value.results.length + ', expected 1.'
+            user = value.results.at(0)
+        })
+
+        if (!user) throw 'User not found.'
+
+        return user
+    },
+
     async kickUser(roomId: string, userId: string, kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
 
         let message = ""

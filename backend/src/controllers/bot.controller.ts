@@ -87,6 +87,34 @@ export async function kickUser(req: Request, res: Response) {
     })
 }
 
+export async function searchUserFromMail(req: Request, res: Response) {
+
+    if (!req.body.user_mail) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing user mail !'});
+
+    await botService.searchUserFromMail(req.body.user_mail).then(user => {
+
+        res.status(StatusCodes.OK).json(user)
+
+    }).catch(reason => {
+        logger.error("Error getting user", reason)
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
+    })
+}
+
+export async function searchUser(req: Request, res: Response) {
+
+    if (!req.body.term) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing search term !'});
+
+    await botService.searchUser(req.body.term).then(user => {
+
+        res.status(StatusCodes.OK).json(user)
+
+    }).catch(reason => {
+        logger.error("Error getting user", reason)
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
+    })
+}
+
 export async function inviteUsers(req: Request, res: Response) {
 
     if (!req.body.users_list) res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing users UIDs list !'});
