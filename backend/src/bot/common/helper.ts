@@ -134,9 +134,12 @@ export async function getPowerLevel(client: MatrixClient, roomId: string, userId
     let userPowerLevel = 0
     await client.getStateEvent(roomId, "m.room.power_levels", "").then(record => {
 
-        logger.debug(record)
+        logger.debug("getPowerLevel record : ", record)
 
-        userPowerLevel = record.users[userId]
+        userPowerLevel = record.users ? record.users[userId] : 0
+    }).catch(reason => {
+        logger.error("getPowerLevel record : ", reason)
+        userPowerLevel = 0
     })
 
     return userPowerLevel

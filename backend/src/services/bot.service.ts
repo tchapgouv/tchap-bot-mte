@@ -135,6 +135,11 @@ export default {
         return {roomId, message}
     },
 
+    upload(roomId: string, file:any) {
+
+        gmcdBot.client.uploadContent()
+    },
+
     setRoomNotificationPowerLevel(roomId: string, powerLevel: number) {
 
         logger.notice("Setting room notification power level requirement to " + powerLevel)
