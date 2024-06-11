@@ -1,5 +1,5 @@
 <template>
-  <h1>Tester un Webhooks</h1>
+  <h1>Tester un Webhook</h1>
   <dsfr-input v-model="webhook_id"
               :label="'Webhook ID :'"
               :type="'text'"
