@@ -135,8 +135,8 @@ export default {
         return {roomId, message}
     },
 
-    upload(roomId: string, file:any) {
-
+    upload(_roomId: string, _file:any) {
+        // TODO
         gmcdBot.client.uploadContent()
     },
 
