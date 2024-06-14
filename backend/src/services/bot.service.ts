@@ -137,7 +137,7 @@ export default {
 
     upload(_roomId: string, _file:any) {
         // TODO
-        gmcdBot.client.uploadContent()
+        // gmcdBot.client.uploadContent()
     },
 
     setRoomNotificationPowerLevel(roomId: string, powerLevel: number) {
