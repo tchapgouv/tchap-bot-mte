@@ -106,6 +106,8 @@ export default {
                 name: roomName,
                 room_alias_name: roomName,
                 visibility: isPrivate ? Visibility.Private : Visibility.Public,
+                power_level_content_override: {
+                }
             })
                 .then((data) => {
                     logger.notice("Room created : ", data)
