@@ -1,6 +1,6 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
-import {getUserPowerLevel, isSomeoneAdmin, isSupport, sendMessage} from "../helper.js";
+import {getPowerLevel, getUserPowerLevel, isSomeoneAdmin, isSupport, sendMessage} from "../helper.js";
 
 
 /**
@@ -37,9 +37,17 @@ export function promoteUserIfAsked(client: MatrixClient, event: MatrixEvent, bod
 
                             } else {
 
-                                logger.debug("Promoting " + user.username + ".")
-                                client.setPowerLevel(roomId, userId, 100);
-                                sendMessage(client, roomId, "Je viens de promouvoir " + user.username + ". Félicitation ! 🎆")
+                                getPowerLevel(client, roomId).then(powerLevel => {
+
+                                    if (powerLevel === 100) {
+                                        logger.debug("Promoting " + user.username + ".")
+                                        client.setPowerLevel(roomId, userId, 100);
+                                        sendMessage(client, roomId, "Je viens de promouvoir " + user.username + ". Félicitation ! 🎆")
+                                    }
+                                    else {
+                                        sendMessage(client, roomId, "Je n'ai pas les droits suffisants pour promouvoir une personne 🤷")
+                                    }
+                                })
 
                             }
                         })

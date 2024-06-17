@@ -129,7 +129,7 @@ export async function getUserPowerLevel(client: MatrixClient, event: MatrixEvent
     return user
 }
 
-export async function getPowerLevel(client: MatrixClient, roomId: string, userId: string): Promise<number> {
+export async function getPowerLevel(client: MatrixClient, roomId: string, userId: string = client.getUserId() + ""): Promise<number> {
 
     let userPowerLevel = 0
     await client.getStateEvent(roomId, "m.room.power_levels", "").then(record => {
