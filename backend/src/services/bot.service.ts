@@ -146,10 +146,6 @@ export default {
 
         logger.notice("Setting room notification power level requirement to " + powerLevel)
 
-        gmcdBot.client.roomState(roomId).then(value => {
-            logger.notice(value)
-        })
-
         gmcdBot.client.getStateEvent(roomId, "m.room.power_levels", "").then(value => {
             logger.notice(value)
         }).catch(reason => {
@@ -227,29 +223,41 @@ export default {
         return user
     },
 
-    async kickUser(roomId: string, userId: string, kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
+    async kickUser(roomId: string, userTerm: string, kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
+
+        logger.debug("kickUser : ", roomId, userTerm, kickReason)
 
         let message = ""
         let isAdmin = false
         let hasError = false
         let members: RoomMember[] | undefined = gmcdBot.client.getRoom(roomId)?.getMembers();
 
-        if (!members) return {message: "No room members found !", isAdmin: false, hasError: true}
+        if (!members || !members.length) return {message: "No room members found !", isAdmin: false, hasError: true}
+
+        let powerLevel
+        await getPowerLevel(gmcdBot.client, roomId).then(value => {
+            powerLevel = value
+        })
+        if (powerLevel !== 100) return {message: "Rights insufficient to kick !", isAdmin: false, hasError: true}
 
         for (const roomMember of members) {
 
-            if (!roomMember.userId.toLowerCase().includes(userId.toLowerCase())) continue
+            logger.debug("roomMember", roomMember)
+            logger.debug(roomMember.userId + " power level  = " + roomMember.powerLevel)
+            const isMatch = roomMember.userId.toLowerCase().includes(userTerm.toLowerCase())
+            logger.debug(roomMember.userId.toLowerCase() + " vs " + userTerm.toLowerCase() + ". isMatch ? " + isMatch)
+
+            if (!isMatch) continue
+
             if (roomMember.userId === gmcdBot.client.getUserId()) {
                 message += "Did you really thought i would kick myself ?!\n"
                 continue
             }
 
-            logger.debug("roomMember", roomMember)
-            logger.debug(roomMember.userId + " power level  = " + roomMember.powerLevel)
-
             if (!roomMember.powerLevel || roomMember.powerLevel < 100) {
 
                 logger.debug("Kicking " + roomMember.userId)
+
                 await gmcdBot.client.kick(roomId, roomMember.userId, kickReason)
                     .then(() => {
                         message += roomMember.name + " kicked.\n"
