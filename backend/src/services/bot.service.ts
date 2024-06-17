@@ -147,7 +147,7 @@ export default {
         logger.notice("Setting room notification power level requirement to " + powerLevel)
 
         gmcdBot.client.roomState(roomId).then(value => {
-            value
+            logger.notice(value)
         })
 
         gmcdBot.client.getStateEvent(roomId, "m.room.power_levels", "").then(value => {
@@ -156,9 +156,9 @@ export default {
             logger.error("Error getting room notification power level requirement :", reason)
         })
 
-        gmcdBot.client.sendStateEvent(roomId, "m.room.power_levels", {"notifications": {"room": powerLevel}}).catch(reason => {
-            logger.error("Error setting room notification power level requirement :", reason)
-        })
+        // gmcdBot.client.sendStateEvent(roomId, "m.room.power_levels", {"notifications": {"room": powerLevel}}).catch(reason => {
+        //     logger.error("Error setting room notification power level requirement :", reason)
+        // })
     },
 
     async deleteRoom(roomId: string, opts: { kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷", client?: MatrixClient, }) {
