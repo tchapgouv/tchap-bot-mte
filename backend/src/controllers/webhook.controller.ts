@@ -216,6 +216,10 @@ export async function uploadFile(req: Request, res: Response) {
         return
     }
 
+    logger.debug(req)
+    logger.debug(req.headers)
+    logger.debug(req.body)
+
     const fileName: string = req.body.name
 
     let data: any[] = [];
@@ -236,7 +240,6 @@ export async function uploadFile(req: Request, res: Response) {
                     else
                         res.status(StatusCodes.BAD_REQUEST).json(value)
                 })
-
         }
         // Save to file exemple :
         // fs.writeFile(
