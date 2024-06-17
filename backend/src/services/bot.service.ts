@@ -2,7 +2,7 @@ import gmcdBot from "../bot/gmcd/bot.js";
 import gmcdBotConfig from "../bot/gmcd/config.js";
 import psinBot from "../bot/psin/bot.js";
 import vm from "vm"
-import {MatrixClient, Visibility} from "matrix-js-sdk";
+import {MatrixClient, Preset, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import ldapService from "./ldap.service.js";
 import {getPowerLevel, sendHtmlMessage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
@@ -105,9 +105,9 @@ export default {
             await gmcdBot.client.createRoom({
                 name: roomName,
                 room_alias_name: roomName,
+                preset: isPrivate ? Preset.PrivateChat : Preset.PublicChat,
                 visibility: isPrivate ? Visibility.Private : Visibility.Public,
-                power_level_content_override: {
-                }
+                power_level_content_override: {}
             })
                 .then((data) => {
                     logger.notice("Room created : ", data)
@@ -137,7 +137,7 @@ export default {
         return {roomId, message}
     },
 
-    upload(_roomId: string, _file:any) {
+    upload(_roomId: string, _file: any) {
         // TODO
         // gmcdBot.client.uploadContent()
     },
