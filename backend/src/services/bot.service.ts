@@ -137,9 +137,25 @@ export default {
         return {roomId, message}
     },
 
-    upload(_roomId: string, _file: any) {
-        // TODO
-        // gmcdBot.client.uploadContent()
+    async upload(roomId: string, file: Buffer, opts: {
+        name?: string,
+        type?: string,
+        includeFilename?: boolean
+    }) {
+
+        let message = ""
+        let uri = ""
+
+        await gmcdBot.client.uploadContent(file, opts).then(value => {
+            sendMarkdownMessage(gmcdBot.client, roomId, "💡 **Nouveau fichier téléversé !**\n ==> [" + (opts.name ? opts.name : "Fichier") + "](" + value.content_uri + ") <==")
+            message = "File uploaded"
+            uri = value.content_uri
+        }).catch(reason => {
+            logger.error("Error uploading file :", reason)
+            message = "Error uploading file !"
+        })
+
+        return {message: message, uri: uri}
     },
 
     setRoomNotificationPowerLevel(roomId: string, powerLevel: number) {

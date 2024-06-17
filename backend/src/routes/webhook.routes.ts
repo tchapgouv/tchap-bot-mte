@@ -1,5 +1,5 @@
 import express from 'express';
-import {destroy, findAll, findOneWithWebhook, postMessage, update} from "../controllers/webhook.controller.js";
+import {destroy, findAll, findOneWithWebhook, postMessage, update, uploadFile} from "../controllers/webhook.controller.js";
 import {create} from "../controllers/webhook.controller.js";
 import {verifyToken} from "../controllers/auth.controller.js";
 
@@ -52,5 +52,7 @@ webhookRouter.put("/api/webhook/update", verifyToken, update);
  *         description:
  */
 webhookRouter.post("/api/webhook/post/:webhook?", postMessage)
+
+webhookRouter.post("/api/webhook/upload/:webhook?", uploadFile)
 
 export default webhookRouter

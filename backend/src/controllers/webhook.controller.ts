@@ -189,3 +189,67 @@ export async function create(req: Request, res: Response) {
         });
 
 }
+
+export async function uploadFile(req: Request, res: Response) {
+
+    logger.debug("Webhook upload request received.")
+
+    const webhookId: string = req.params.webhook || req.body.webhook
+    let webhook: Webhook | null | undefined
+
+    await webhookService.findOne({where: {webhook_id: webhookId}}).then((value) => {
+        webhook = value
+        logger.debug("Webhook :", webhook)
+    }).catch(_ => {
+        res.status(StatusCodes.UNAUTHORIZED).send({
+            message:
+                "Unauthenticated (Wrong webhook)."
+        })
+        return
+    })
+
+    if (!webhook) {
+        res.status(StatusCodes.UNAUTHORIZED).send({
+            message:
+                "Unauthenticated (Wrong webhook)."
+        })
+        return
+    }
+
+    const fileName: string = req.body.name
+
+    let data: any[] = [];
+    req.on("data", (chunk) => {
+        data.push(chunk);
+    });
+
+    req.on("end", () => {
+        let fileData = Buffer.concat(data);
+
+        const contentType = req.headers["content-type"]
+
+        if (webhook) {
+            botService.upload(webhook.dataValues.room_id, fileData, {type: contentType, name: fileName, includeFilename: !!fileData})
+                .then(value => {
+                    if (value.uri !== "")
+                        res.status(StatusCodes.OK).json(value)
+                    else
+                        res.status(StatusCodes.BAD_REQUEST).json(value)
+                })
+
+        }
+        // Save to file exemple :
+        // fs.writeFile(
+        //     path.join(__dirname, "example.pdf"),
+        //     fileData,
+        //     "base64",
+        //     (err) => {
+        //         if (err) {
+        //             res.statusCode = 500;
+        //         }
+        //     }
+        // );
+    });
+
+
+}
