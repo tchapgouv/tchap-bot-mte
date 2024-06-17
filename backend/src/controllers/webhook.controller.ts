@@ -194,6 +194,10 @@ export async function uploadFile(req: Request, res: Response) {
 
     logger.debug("Webhook upload request received.")
 
+    if (!req.files || !req.files.file) {
+        return res.status(422).send('No files were uploaded');
+    }
+
     const webhookId: string = req.params.webhook || req.body.webhook
     let webhook: Webhook | null | undefined
 
@@ -219,39 +223,34 @@ export async function uploadFile(req: Request, res: Response) {
     logger.debug(req.headers)
     logger.debug(req.headers["content-disposition"])
 
-    const fileName: string = req.body.name
+    const fileArray = req.files[0]
+    let uploadedFile = Array.isArray(fileArray) ? fileArray[0] : fileArray;
 
-    let data: any[] = [];
-    req.on("data", (chunk) => {
-        data.push(chunk);
-    });
+    logger.debug(`File Name: ${uploadedFile.name}`);
+    logger.debug(`File Size: ${uploadedFile.size}`);
+    logger.debug(`File MD5 Hash: ${uploadedFile.md5}`);
+    logger.debug(`File Mime Type: ${uploadedFile.mimetype}`);
 
-    req.on("end", () => {
-        let fileData = Buffer.concat(data);
-
-        const contentType = req.headers["content-type"]
-
-        if (webhook) {
-            botService.upload(webhook.dataValues.room_id, fileData, {type: contentType, name: fileName, includeFilename: !!fileData})
-                .then(value => {
-                    if (value.uri !== "")
-                        res.status(StatusCodes.OK).json(value)
-                    else
-                        res.status(StatusCodes.BAD_REQUEST).json(value)
-                })
-        }
-        // Save to file exemple :
-        // fs.writeFile(
-        //     path.join(__dirname, "example.pdf"),
-        //     fileData,
-        //     "base64",
-        //     (err) => {
-        //         if (err) {
-        //             res.statusCode = 500;
-        //         }
-        //     }
-        // );
-    });
+    if (webhook) {
+        botService.upload(webhook.dataValues.room_id, uploadedFile.data, {type: uploadedFile.mimetype, name: uploadedFile.name})
+            .then(value => {
+                if (value.uri !== "")
+                    res.status(StatusCodes.OK).json(value)
+                else
+                    res.status(StatusCodes.BAD_REQUEST).json(value)
+            })
+    }
+    // Save to file exemple :
+    // fs.writeFile(
+    //     path.join(__dirname, "example.pdf"),
+    //     fileData,
+    //     "base64",
+    //     (err) => {
+    //         if (err) {
+    //             res.statusCode = 500;
+    //         }
+    //     }
+    // );
 
 
 }

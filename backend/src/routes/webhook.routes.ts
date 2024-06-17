@@ -1,6 +1,6 @@
 import express from 'express';
-import {destroy, findAll, findOneWithWebhook, postMessage, update, uploadFile} from "../controllers/webhook.controller.js";
-import {create} from "../controllers/webhook.controller.js";
+import {create, destroy, findAll, findOneWithWebhook, postMessage, update, uploadFile} from "../controllers/webhook.controller.js";
+import fileUpload from 'express-fileupload'
 import {verifyToken} from "../controllers/auth.controller.js";
 
 const webhookRouter = express.Router();
@@ -53,6 +53,14 @@ webhookRouter.put("/api/webhook/update", verifyToken, update);
  */
 webhookRouter.post("/api/webhook/post/:webhook?", postMessage)
 
+webhookRouter.use(fileUpload({
+    // Configure file uploads with maximum file size 10MB
+    limits: {
+        fileSize: 10 * 1024 * 1024
+    }
+}))
+
 webhookRouter.post("/api/webhook/upload/:webhook?", uploadFile)
+
 
 export default webhookRouter
