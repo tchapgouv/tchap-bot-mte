@@ -149,7 +149,7 @@ export default {
         await gmcdBot.client.uploadContent(file, opts).then(value => {
             sendHtmlMessage(gmcdBot.client, roomId,
                 "",
-                "💡 **Nouveau fichier téléversé !**<br/>==> <a href='" + value.content_uri + "'>" + (opts.name ? opts.name : "Fichier") + "</a> <==")
+                "💡 <b>Nouveau fichier téléversé !</b><br/>==> <a target='_blank' href='" + value.content_uri + "'>" + (opts.name ? opts.name : "Fichier") + "</a> <== </br>" + value.content_uri)
             message = "File uploaded"
             uri = value.content_uri
         }).catch(reason => {

@@ -216,9 +216,8 @@ export async function uploadFile(req: Request, res: Response) {
         return
     }
 
-    logger.debug(req)
     logger.debug(req.headers)
-    logger.debug(req.body)
+    logger.debug(req.headers["content-disposition"])
 
     const fileName: string = req.body.name
 
