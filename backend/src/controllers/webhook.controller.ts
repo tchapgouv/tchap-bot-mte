@@ -194,7 +194,7 @@ export async function uploadFile(req: Request, res: Response) {
 
     logger.debug("Webhook upload request received.", req.files)
 
-    if (!req.files || !req.files.file) {
+    if (!req.files || !req.files.myFile) {
         res.status(400).send('No file were uploaded');
         return;
     }
@@ -224,7 +224,7 @@ export async function uploadFile(req: Request, res: Response) {
     logger.debug(req.headers)
     logger.debug(req.headers["content-disposition"])
 
-    let uploadedFile = req.files.file;
+    let uploadedFile = req.files.myFile;
     if (Array.isArray(uploadedFile)) {
         uploadedFile = uploadedFile[0];
     }
