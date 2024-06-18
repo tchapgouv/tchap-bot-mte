@@ -150,8 +150,8 @@ export default {
 
             const httpUrl = value.content_uri.replace('mxc://', 'https://matrix.agent.dev-durable.tchap.gouv.fr/_matrix/media/v3/download/')
             sendHtmlMessage(gmcdBot.client, roomId,
-                "",
-                "💡 <b>Nouveau fichier téléversé !</b><br/>==> <a target='_blank' href='" + httpUrl + "'>" + (opts.name ? opts.name : "Fichier") + "</a> <== </br>" + value.content_uri)
+                "Nouveau fichier téléversé !\n" + httpUrl,
+                "💡 <b>Nouveau fichier téléversé !</b><br/>==> <a target='_blank' href='" + httpUrl + "'>" + (opts.name ? opts.name : "Fichier") + "</a> <==")
             message = "File uploaded"
             uri = value.content_uri
         }).catch(reason => {
