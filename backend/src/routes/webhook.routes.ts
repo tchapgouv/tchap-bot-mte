@@ -53,6 +53,6 @@ webhookRouter.put("/api/webhook/update", verifyToken, update);
  */
 webhookRouter.post("/api/webhook/post/:webhook?", postMessage)
 
-webhookRouter.put("/api/webhook/upload/:webhook?", fileUpload({limits: {fileSize: 10 * 1024 * 1024}}), uploadFile)
+webhookRouter.post("/api/webhook/upload/:webhook?", fileUpload({limits: {fileSize: 10 * 1024 * 1024}}), uploadFile)
 
 export default webhookRouter
