@@ -147,9 +147,11 @@ export default {
         let uri = ""
 
         await gmcdBot.client.uploadContent(file, opts).then(value => {
+
+            const httpUrl = value.content_uri.replace('mxc://', 'https://matrix.agent.dev-durable.tchap.gouv.fr/_matrix/media/v3/download/')
             sendHtmlMessage(gmcdBot.client, roomId,
                 "",
-                "💡 <b>Nouveau fichier téléversé !</b><br/>==> <a target='_blank' href='" + value.content_uri + "'>" + (opts.name ? opts.name : "Fichier") + "</a> <== </br>" + value.content_uri)
+                "💡 <b>Nouveau fichier téléversé !</b><br/>==> <a target='_blank' href='" + httpUrl + "'>" + (opts.name ? opts.name : "Fichier") + "</a> <== </br>" + value.content_uri)
             message = "File uploaded"
             uri = value.content_uri
         }).catch(reason => {
