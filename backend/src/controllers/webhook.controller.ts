@@ -192,7 +192,7 @@ export async function create(req: Request, res: Response) {
 
 export async function uploadFile(req: Request, res: Response) {
 
-    logger.debug("Webhook upload request received.")
+    logger.debug("Webhook upload request received.", req.files)
 
     if (!req.files || !req.files.file) {
         return res.status(422).send('No files were uploaded');
