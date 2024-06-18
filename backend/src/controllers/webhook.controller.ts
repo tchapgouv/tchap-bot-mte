@@ -221,9 +221,6 @@ export async function uploadFile(req: Request, res: Response) {
         return
     }
 
-    logger.debug(req.headers)
-    logger.debug(req.headers["content-disposition"])
-
     let uploadedFile = Object.values(req.files)[0];
     if (Array.isArray(uploadedFile)) {
         uploadedFile = uploadedFile[0];
@@ -234,7 +231,7 @@ export async function uploadFile(req: Request, res: Response) {
     logger.debug(`File MD5 Hash: ${uploadedFile.md5}`);
     logger.debug(`File Mime Type: ${uploadedFile.mimetype}`);
 
-    uploadedFile.mv("/tchap-bot-workdir/data/upload")
+    uploadedFile.mv("/tchap-bot-workdir/data/upload/" + uploadedFile.name)
         .then(_ => {
             logger.notice("File moved.")
         })
