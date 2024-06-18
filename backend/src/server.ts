@@ -16,6 +16,7 @@ import {syntaxErrorHandler} from "./requestHandlers/syntaxError.handler.js";
 import swaggerUi from "swagger-ui-express"
 import {specs} from "./swagger.config.js";
 import crypto from "crypto";
+import fileUpload from "express-fileupload";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -39,6 +40,19 @@ app.use(express.json({limit: '1mb'}));
 app.use(express.urlencoded({extended: true}));
 
 app.use(express.static(vuePath));
+
+app.use(fileUpload({
+    abortOnLimit: true,
+    limits: {
+        fileSize: 10 * 1024 * 1024
+    },
+    debug: true,
+    logger: {
+        log: (msg) => {
+            logger.debug(msg)
+        }
+    }
+}))
 
 app.use(webhookRouter);
 app.use(userRouter);

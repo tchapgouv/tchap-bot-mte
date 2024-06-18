@@ -1,6 +1,5 @@
 import express from 'express';
 import {create, destroy, findAll, findOneWithWebhook, postMessage, update, uploadFile} from "../controllers/webhook.controller.js";
-import fileUpload from 'express-fileupload'
 import {verifyToken} from "../controllers/auth.controller.js";
 
 const webhookRouter = express.Router();
@@ -53,6 +52,6 @@ webhookRouter.put("/api/webhook/update", verifyToken, update);
  */
 webhookRouter.post("/api/webhook/post/:webhook?", postMessage)
 
-webhookRouter.post("/api/webhook/upload/:webhook?", fileUpload(), uploadFile)
+webhookRouter.post("/api/webhook/upload/:webhook?", uploadFile)
 
 export default webhookRouter
