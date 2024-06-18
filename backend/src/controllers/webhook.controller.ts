@@ -195,7 +195,8 @@ export async function uploadFile(req: Request, res: Response) {
     logger.debug("Webhook upload request received.", req.files)
 
     if (!req.files || !req.files.file) {
-        return res.status(422).send('No files were uploaded');
+        res.status(400).send('No file were uploaded');
+        return;
     }
 
     const webhookId: string = req.params.webhook || req.body.webhook
@@ -223,8 +224,10 @@ export async function uploadFile(req: Request, res: Response) {
     logger.debug(req.headers)
     logger.debug(req.headers["content-disposition"])
 
-    const fileArray = req.files[0]
-    let uploadedFile = Array.isArray(fileArray) ? fileArray[0] : fileArray;
+    let uploadedFile = req.files.file;
+    if (Array.isArray(uploadedFile)) {
+        uploadedFile = uploadedFile[0];
+    }
 
     logger.debug(`File Name: ${uploadedFile.name}`);
     logger.debug(`File Size: ${uploadedFile.size}`);
