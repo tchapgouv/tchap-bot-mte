@@ -60,7 +60,7 @@ webhookRouter.use(fileUpload({
     }
 }))
 
-webhookRouter.post("/api/webhook/upload/:webhook?", uploadFile)
+webhookRouter.put("/api/webhook/upload/:webhook?", uploadFile)
 
 
 export default webhookRouter
