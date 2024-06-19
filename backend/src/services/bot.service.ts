@@ -151,14 +151,22 @@ export default {
         await gmcdBot.client.uploadContent(file, {name: opts.fileName, type: opts.mimeType, includeFilename: opts.includeFilename}).then(value => {
 
             if (opts.mimeType.includes("image"))
-                sendImage(gmcdBot.client, roomId, {
-                    mimeType: opts.mimeType,
-                    width: opts.width ? opts.width : 800,
-                    height: opts.height ? opts.height : 600,
-                    size: file.byteLength
-                }, value.content_uri)
+                sendImage(
+                    gmcdBot.client,
+                    roomId,
+                    opts.fileName,
+                    {
+                        mimeType: opts.mimeType,
+                        width: opts.width ? opts.width : 800,
+                        height: opts.height ? opts.height : 600,
+                        size: file.byteLength
+                    },
+                    value.content_uri)
             else
                 sendFile(gmcdBot.client, roomId, opts.fileName, value.content_uri)
+
+            message = "File " + opts.fileName + " uploaded"
+            uri = value.content_uri
 
         }).catch(reason => {
             logger.error("Error uploading file :", reason)
