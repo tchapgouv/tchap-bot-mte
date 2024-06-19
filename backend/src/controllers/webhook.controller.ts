@@ -231,13 +231,13 @@ export async function uploadFile(req: Request, res: Response) {
     logger.debug(`File MD5 Hash: ${uploadedFile.md5}`);
     logger.debug(`File Mime Type: ${uploadedFile.mimetype}`);
 
-    uploadedFile.mv("/tchap-bot-workdir/data/upload/" + uploadedFile.name)
-        .then(_ => {
-            logger.notice("File moved.")
-        })
-        .catch(reason => {
-            logger.error("Cannot copy file to temporary directory :", reason)
-        })
+    // uploadedFile.mv("/tchap-bot-workdir/data/upload/" + uploadedFile.name)
+    //     .then(_ => {
+    //         logger.notice("File moved.")
+    //     })
+    //     .catch(reason => {
+    //         logger.error("Cannot copy file to temporary directory :", reason)
+    //     })
 
     if (webhook) {
         botService.upload(
