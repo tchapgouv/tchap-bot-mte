@@ -102,28 +102,14 @@ export async function sendFile(client: MatrixClient, room: string, fileName: str
     });
 }
 
-export async function sendImage(client: MatrixClient, room: string, fileName: string, image: { mimeType: string, height: number, width: number, size: number }, url: string) {
+export async function sendImage(client: MatrixClient, room: string, fileName: string, url: string, height: number = 100) {
 
-    logger.debug("Sending image : ", room, image, url)
+    logger.debug("Sending image : ", room, url)
 
-    const content = {
-        "body": fileName,  // string	Required: A textual representation of the image. This could be the alt text of the image, the filename of the image, or some kind of content description for accessibility e.g. ‘image attachment’.
-        // "file":,                  // EncryptedFile	Required if the file is encrypted. Information on the encrypted file, as specified in End-to-end encryption.
-        "info": {
-            "h": image.height,            // integer	The intended display height of the image in pixels. This may differ from the intrinsic dimensions of the image file.
-            "mimetype": image.mimeType,   // string	The mimetype of the image, e.g. image/jpeg.
-            "size": image.size,	          // integer	Size of the image in bytes.
-            "w": image.width,	          // integer	The intended display width of the image in pixels. This may differ from the intrinsic dimensions of the image file.
-            "xyz.amorgan.blurhash": "L6PZfSi_.AyE_3t7t7R**0o#DgR4"
-        },                           // ImageInfo	Metadata about the image referred to in url.
-        "msgtype": MsgType.Image,    // string	Required: One of: [m.image].
-        "url": url,                  // string	Required if the file is unencrypted. The URL (typically mxc:// URI) to the image.
-    };
-    await client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
-        logger.debug(res);
-    }).catch(reason => {
-        logger.error(reason)
-    });
+    const rawMessage = "(Image attachement)";
+    const message = "<img src='" + url + "' height='" + height + "' alt='alt' title='" + fileName + "'/>";
+
+    sendHtmlMessage(client, room, rawMessage, message)
 }
 
 export async function sendHtmlMessage(client: MatrixClient, room: string, rawMessage: string, htmlMessage: string): Promise<void> {

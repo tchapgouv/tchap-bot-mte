@@ -141,7 +141,6 @@ export default {
         fileName: string,
         mimeType: string,
         includeFilename?: boolean,
-        width?: number,
         height?: number
     }) {
 
@@ -155,13 +154,9 @@ export default {
                     gmcdBot.client,
                     roomId,
                     opts.fileName,
-                    {
-                        mimeType: opts.mimeType,
-                        width: opts.width ? opts.width : 800,
-                        height: opts.height ? opts.height : 600,
-                        size: file.byteLength
-                    },
-                    value.content_uri)
+                    value.content_uri,
+                    opts.height ? opts.height : 100,
+                )
             else
                 sendFile(gmcdBot.client, roomId, opts.fileName, value.content_uri)
 
