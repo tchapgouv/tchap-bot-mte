@@ -240,7 +240,15 @@ export async function uploadFile(req: Request, res: Response) {
         })
 
     if (webhook) {
-        botService.upload(webhook.dataValues.room_id, uploadedFile.data, {mimeType: uploadedFile.mimetype, fileName: uploadedFile.name})
+        botService.upload(
+            webhook.dataValues.room_id,
+            uploadedFile.data,
+            {
+                mimeType: uploadedFile.mimetype,
+                fileName: uploadedFile.name,
+                height: req.query.height && typeof req.query.height === 'string' ? Number.parseInt(req.query.height) : undefined,
+                width: req.query.width && typeof req.query.width === 'string' ? Number.parseInt(req.query.width) : undefined
+            })
             .then(value => {
                 if (value.uri !== "")
                     res.status(StatusCodes.OK).json(value)
