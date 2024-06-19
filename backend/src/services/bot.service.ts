@@ -139,20 +139,20 @@ export default {
 
     async upload(roomId: string, file: Buffer, opts: {
         fileName: string,
-        mimetype: string,
-        type: string,
+        mimeType: string,
         includeFilename?: boolean
     }) {
 
         let message = ""
         let uri = ""
 
-        await gmcdBot.client.uploadContent(file, opts).then(value => {
+        await gmcdBot.client.uploadContent(file, {name: opts.fileName, type: opts.mimeType, includeFilename: opts.includeFilename}).then(value => {
 
-            if (opts.mimetype.includes("image"))
-                sendImage(gmcdBot.client, roomId, opts.mimetype, value.content_uri)
+            if (opts.mimeType.includes("image"))
+                sendImage(gmcdBot.client, roomId, opts.mimeType, value.content_uri)
             else
                 sendFile(gmcdBot.client, roomId, opts.fileName, value.content_uri)
+
         }).catch(reason => {
             logger.error("Error uploading file :", reason)
             message = "Error uploading file !"
