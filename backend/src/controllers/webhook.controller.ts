@@ -246,7 +246,8 @@ export async function uploadFile(req: Request, res: Response) {
             {
                 mimeType: uploadedFile.mimetype,
                 fileName: uploadedFile.name,
-                height: req.query.height && typeof req.query.height === 'string' ? Number.parseInt(req.query.height) : undefined
+                height: req.query.height && typeof req.query.height === 'string' ? Number.parseInt(req.query.height) : undefined,
+                width: req.query.width && typeof req.query.width === 'string' ? Number.parseInt(req.query.width) : undefined
             })
             .then(value => {
                 if (value.uri !== "")
