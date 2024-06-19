@@ -5,7 +5,7 @@ import vm from "vm"
 import {MatrixClient, Preset, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import ldapService from "./ldap.service.js";
-import {getPowerLevel, sendFile, sendHtmlMessage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
+import {getPowerLevel, sendFile, sendHtmlMessage, sendImage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
 import {Bot} from "../bot/common/Bot.js";
 import {splitEvery} from "../utils/utils.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
@@ -138,8 +138,9 @@ export default {
     },
 
     async upload(roomId: string, file: Buffer, opts: {
-        name?: string,
-        type?: string,
+        fileName: string,
+        mimetype: string,
+        type: string,
         includeFilename?: boolean
     }) {
 
@@ -148,13 +149,10 @@ export default {
 
         await gmcdBot.client.uploadContent(file, opts).then(value => {
 
-            // const httpUrl = value.content_uri.replace('mxc://', 'https://matrix.agent.dev-durable.tchap.gouv.fr/_matrix/media/v3/download/')
-            sendFile(gmcdBot.client, roomId, opts.name + "", value.content_uri)
-            // sendHtmlMessage(gmcdBot.client, roomId,
-            //     "Nouveau fichier téléversé !\n" + httpUrl,
-            //     "💡 <b>Nouveau fichier téléversé !</b><br/>==> <a target='_blank' href='" + httpUrl + "'>" + (opts.name ? opts.name : "Fichier") + "</a> <==")
-            // message = "File uploaded"
-            // uri = value.content_uri
+            if (opts.mimetype.includes("image"))
+                sendImage(gmcdBot.client, roomId, opts.mimetype, value.content_uri)
+            else
+                sendFile(gmcdBot.client, roomId, opts.fileName, value.content_uri)
         }).catch(reason => {
             logger.error("Error uploading file :", reason)
             message = "Error uploading file !"
@@ -163,6 +161,9 @@ export default {
         return {message: message, uri: uri}
     },
 
+    /**
+     * @deprecated will be removed
+     */
     setRoomNotificationPowerLevel(roomId: string, powerLevel: number) {
 
         logger.notice("Setting room notification power level requirement to " + powerLevel)
@@ -172,10 +173,6 @@ export default {
         }).catch(reason => {
             logger.error("Error getting room notification power level requirement :", reason)
         })
-
-        // gmcdBot.client.sendStateEvent(roomId, "m.room.power_levels", {"notifications": {"room": powerLevel}}).catch(reason => {
-        //     logger.error("Error setting room notification power level requirement :", reason)
-        // })
     },
 
     async deleteRoom(roomId: string, opts: { kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷", client?: MatrixClient, }) {

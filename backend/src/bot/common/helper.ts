@@ -91,9 +91,30 @@ export async function sendFile(client: MatrixClient, room: string, fileName: str
         "body": fileName,        //	string	Required: A human-readable description of the file. This is recommended to be the filename of the original upload.
         // "file":,              //	EncryptedFile	Required if the file is encrypted. Information on the encrypted file, as specified in End-to-end encryption.
         "filename": fileName,    //	string	The original filename of the uploaded file.
-        "info": "New file",      //	FileInfo	Information about the file referred to in url.
+        "info": "File attachment",      //	FileInfo	Information about the file referred to in url.
         "msgtype": MsgType.File, //	string	Required:  One of: [m.file].
         "url": url               //	string	Required if the file is unencrypted. The URL (typically mxc:// URI) to the file.
+    };
+    await client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
+        logger.debug(res);
+    }).catch(reason => {
+        logger.error(reason)
+    });
+}
+
+export async function sendImage(client: MatrixClient, room: string, mimeType: string, url: string) {
+
+    logger.debug("Sending image : ", room, mimeType, url)
+
+    const content = {
+        "body": "Image attachment",  // string	Required: A textual representation of the image. This could be the alt text of the image, the filename of the image, or some kind of content description for accessibility e.g. ‘image attachment’.
+        // "file":,                  // EncryptedFile	Required if the file is encrypted. Information on the encrypted file, as specified in End-to-end encryption.
+        "info": {
+            "h": 200,                // integer	The intended display height of the image in pixels. This may differ from the intrinsic dimensions of the image file.
+            "mimetype": mimeType,    // string	The mimetype of the image, e.g. image/jpeg.
+        },                           // ImageInfo	Metadata about the image referred to in url.
+        "msgtype": MsgType.Image,    // string	Required: One of: [m.image].
+        "url": url,                      // string	Required if the file is unencrypted. The URL (typically mxc:// URI) to the image.
     };
     await client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
         logger.debug(res);

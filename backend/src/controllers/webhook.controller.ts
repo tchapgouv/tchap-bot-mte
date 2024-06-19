@@ -240,7 +240,7 @@ export async function uploadFile(req: Request, res: Response) {
         })
 
     if (webhook) {
-        botService.upload(webhook.dataValues.room_id, uploadedFile.data, {type: uploadedFile.mimetype, name: uploadedFile.name})
+        botService.upload(webhook.dataValues.room_id, uploadedFile.data, {fileName: uploadedFile.name, type: uploadedFile.mimetype, mimetype: uploadedFile.name})
             .then(value => {
                 if (value.uri !== "")
                     res.status(StatusCodes.OK).json(value)
@@ -248,17 +248,4 @@ export async function uploadFile(req: Request, res: Response) {
                     res.status(StatusCodes.BAD_REQUEST).json(value)
             })
     }
-    // Save to file exemple :
-    // fs.writeFile(
-    //     path.join(__dirname, "example.pdf"),
-    //     fileData,
-    //     "base64",
-    //     (err) => {
-    //         if (err) {
-    //             res.statusCode = 500;
-    //         }
-    //     }
-    // );
-
-
 }
