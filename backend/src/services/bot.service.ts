@@ -5,7 +5,7 @@ import vm from "vm"
 import {MatrixClient, Preset, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import ldapService from "./ldap.service.js";
-import {getPowerLevel, sendFile, sendHtmlMessage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
+import {getPowerLevel, sendFile, sendHtmlMessage, sendImage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
 import {Bot} from "../bot/common/Bot.js";
 import {splitEvery} from "../utils/utils.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
@@ -150,19 +150,20 @@ export default {
 
         await gmcdBot.client.uploadContent(file, {name: opts.fileName, type: opts.mimeType, includeFilename: opts.includeFilename}).then(value => {
 
-            // if (opts.mimeType.includes("image"))
-            //     sendImage(
-            //         gmcdBot.client,
-            //         roomId,
-            //         opts.fileName,
-            //         {
-            //             mimeType: opts.mimeType,
-            //             width: opts.width ? opts.width : 800,
-            //             height: opts.height ? opts.height : 600,
-            //             size: file.byteLength
-            //         },
-            //         value.content_uri)
-            // else
+            if (opts.mimeType.includes("image")) {
+                sendImage(
+                    gmcdBot.client,
+                    roomId,
+                    opts.fileName,
+                    {
+                        mimeType: opts.mimeType,
+                        width: opts.width ? opts.width : 800,
+                        height: opts.height ? opts.height : 600,
+                        size: file.byteLength
+                    },
+                    value.content_uri)
+            }
+
             sendFile(gmcdBot.client,
                 roomId,
                 {
