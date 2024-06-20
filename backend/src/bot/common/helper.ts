@@ -83,6 +83,9 @@ export function extractHelpFromComments(commandes: { command: string | undefined
     return commandes
 }
 
+/**
+ * https://spec.matrix.org/v1.10/client-server-api/#mfile
+ */
 export async function sendFile(client: MatrixClient, room: string, file: { fileName: string, mimeType: string, url: string, size: number }) {
 
     logger.debug("Sending file : ", room, file)
@@ -106,6 +109,9 @@ export async function sendFile(client: MatrixClient, room: string, file: { fileN
     });
 }
 
+/**
+ * https://spec.matrix.org/v1.10/client-server-api/#mimage
+ */
 export async function sendImage(client: MatrixClient, room: string, fileName: string, image: { mimeType: string, height: number, width: number, size: number }, url: string) {
 
     logger.debug("Sending image : ", room, image, url)

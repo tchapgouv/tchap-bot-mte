@@ -162,16 +162,16 @@ export default {
                         size: file.byteLength
                     },
                     value.content_uri)
+            } else {
+                sendFile(gmcdBot.client,
+                    roomId,
+                    {
+                        fileName: opts.fileName,
+                        mimeType: opts.mimeType,
+                        size: file.byteLength,
+                        url: value.content_uri
+                    })
             }
-
-            sendFile(gmcdBot.client,
-                roomId,
-                {
-                    fileName: opts.fileName,
-                    mimeType: opts.mimeType,
-                    size: file.byteLength,
-                    url: value.content_uri
-                })
 
             message = "File " + opts.fileName + " uploaded"
             uri = value.content_uri
