@@ -83,17 +83,21 @@ export function extractHelpFromComments(commandes: { command: string | undefined
     return commandes
 }
 
-export async function sendFile(client: MatrixClient, room: string, fileName: string, url: string) {
+export async function sendFile(client: MatrixClient, room: string, file: { fileName: string, mimeType: string, url: string, size: number }) {
 
-    logger.debug("Sending file : ", room, fileName, url)
+    logger.debug("Sending file : ", room, file)
 
     const content = {
-        "body": fileName,        //	string	Required: A human-readable description of the file. This is recommended to be the filename of the original upload.
-        // "file":,              //	EncryptedFile	Required if the file is encrypted. Information on the encrypted file, as specified in End-to-end encryption.
-        "filename": fileName,    //	string	The original filename of the uploaded file.
-        "info": "File attachment",      //	FileInfo	Information about the file referred to in url.
-        "msgtype": MsgType.File, //	string	Required:  One of: [m.file].
-        "url": url               //	string	Required if the file is unencrypted. The URL (typically mxc:// URI) to the file.
+        "body": file.fileName,        //	string	Required: A human-readable description of the file. This is recommended to be the filename of the original upload.
+        // "file":,                   //	EncryptedFile	Required if the file is encrypted. Information on the encrypted file, as specified in End-to-end encryption.
+        "filename": file.fileName,    //	string	The original filename of the uploaded file.
+        "info":                       //	FileInfo	Information about the file referred to in url.
+            {
+                "mimetype": file.mimeType,         // string	The mimetype of the file e.g. application/msword.
+                "size": file.size,                 // integer	The size of the file in bytes.
+            },
+        "msgtype": MsgType.File,      //	string	Required:  One of: [m.file].
+        "url": file.url               //	string	Required if the file is unencrypted. The URL (typically mxc:// URI) to the file.
     };
     await client.sendEvent(room, EventType.RoomMessage, content).then((res) => {
         logger.debug(res);
