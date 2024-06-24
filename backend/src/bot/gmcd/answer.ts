@@ -4,7 +4,7 @@ import {sendMessage} from "../common/helper.js";
 import {norrisIfAsked} from "./scripts/norris.js";
 import {promoteUserIfAsked} from "../common/scripts/promote.js";
 import {helpIfAsked} from "./scripts/help.js";
-import {sayGoodbyeIfNecessary} from "../common/scripts/gallantry.js";
+import {bePoliteIfNecessary} from "../common/scripts/gallantry.js";
 import {leaveRoomIfAsked} from "../common/scripts/leave.js";
 import {createWebhookIfAsked} from "../common/scripts/webhoook.js";
 import {deleteRoomIfAsked} from "../common/scripts/delete.js";
@@ -17,7 +17,7 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent):void {
 
     if (!roomId || !message || !event.sender) return
 
-    sayGoodbyeIfNecessary(client, event, message)
+    bePoliteIfNecessary(client, event, message)
     norrisIfAsked(client, roomId, message)
 }
 
