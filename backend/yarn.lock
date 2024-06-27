@@ -3249,6 +3249,7 @@ __metadata:
     swagger-ui-express: "npm:^5.0.0"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.3.3"
+    undici: "npm:^6.19.2"
   languageName: unknown
   linkType: soft
 
@@ -3347,6 +3348,13 @@ __metadata:
   version: 5.26.5
   resolution: "undici-types@npm:5.26.5"
   checksum: 10c0/bb673d7876c2d411b6eb6c560e0c571eef4a01c1c19925175d16e3a30c4c428181fb8d7ae802a261f283e4166a0ac435e2f505743aa9e45d893f9a3df017b501
+  languageName: node
+  linkType: hard
+
+"undici@npm:^6.19.2":
+  version: 6.19.2
+  resolution: "undici@npm:6.19.2"
+  checksum: 10c0/3b7b9238c0c84fd90742422fb12844a29e33e922d2c5f722f626090ca1f1ec93596ccec9be1814bb0e923e28682d2080a17d17a4afe373897b9770ef25a64d97
   languageName: node
   linkType: hard
 

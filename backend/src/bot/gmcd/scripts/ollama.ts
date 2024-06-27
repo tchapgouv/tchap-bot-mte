@@ -17,10 +17,10 @@ export function ollama(client: MatrixClient, roomId: string, sender: any, body: 
 
         client.sendTyping(roomId, true, 30 * 1000)
 
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
         fetchWithError('https://Ollama.gmcd-runner01.eco4.cloud.e2.rie.gouv.fr/api/generate',
             {
-                proxify: false,
-                rejectUnauthorizedSsl: false,
+                proxify: true,
                 requestInit: {
                     method: "POST", // *GET, POST, PUT, DELETE, etc.
                     headers: {
@@ -44,7 +44,9 @@ export function ollama(client: MatrixClient, roomId: string, sender: any, body: 
                 logger.error("Ollama error : ", reason)
                 client.sendTyping(roomId, false, 30 * 1000)
                 sendMessage(client, roomId, `Je crois avoir un problème d'accès à mes neurones 😶‍🌫️.`)
-            });
+            }).finally(() => {
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1'
+        });
 
         return true
     }
