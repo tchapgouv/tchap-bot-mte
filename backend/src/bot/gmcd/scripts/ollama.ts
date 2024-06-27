@@ -15,7 +15,7 @@ export function ollama(client: MatrixClient, roomId: string, sender: any, body: 
         fetchWithError('https://Ollama.gmcd-runner01.eco4.cloud.e2.rie.gouv.fr/api/generate',
             {
                 proxify: true,
-                disableSslCheck: true,
+                rejectUnauthorizedSsl: false,
                 requestInit: {
                     method: "POST", // *GET, POST, PUT, DELETE, etc.
                     headers: {
