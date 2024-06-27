@@ -5,13 +5,14 @@ import logger from "./logger.js";
 
 export default function (url: string, opts: { requestInit?: RequestInit, timeout?: number, proxify?: boolean, proxy?: string, rejectUnauthorizedSsl?: boolean } = {}): Promise<any> {
 
-    if (!opts.requestInit) opts.requestInit = {method: "GET"}
-    if (!opts.timeout) opts.timeout = 7000
-    if (!opts.proxify) opts.proxify = false
-    if (!opts.rejectUnauthorizedSsl) opts.rejectUnauthorizedSsl = true
+    if (opts.requestInit === undefined) opts.requestInit = {method: "GET"}
+    if (opts.timeout === undefined) opts.timeout = 7000
+    if (opts.proxify === undefined) opts.proxify = false
+    if (opts.rejectUnauthorizedSsl === undefined) opts.rejectUnauthorizedSsl = true
 
     if (opts.proxify) {
         const proxy = opts.proxy ? opts.proxy : process.env.PROXY_URL
+        logger.debug("proxy = " + proxy)
         opts.requestInit.agent = proxy ? new HttpsProxyAgent(proxy, {rejectUnauthorized: opts.rejectUnauthorizedSsl}) : undefined
     } else if (!opts.rejectUnauthorizedSsl) {
         opts.requestInit.agent = new https.Agent({
