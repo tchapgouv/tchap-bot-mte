@@ -10,7 +10,7 @@ export function bePoliteIfNecessary(client: MatrixClient, event: MatrixEvent, bo
 
     const regexGoodbye: RegExp = /.*(bonne soirée|[aà] demain|bon we|bonsoir|tcho|tchao|ciao).*/i
 
-    if (regexGoodbye.test(body) && body.length < 40) {
+    if (regexGoodbye.test(body) && body.length < 35) {
         logger.debug("Saying goodbye.")
         addEmoji(client, event, "👋");
     }
