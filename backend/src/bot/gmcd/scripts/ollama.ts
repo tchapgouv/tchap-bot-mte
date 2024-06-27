@@ -36,7 +36,8 @@ export function ollama(client: MatrixClient, roomId: string, sender: any, body: 
             })
             .catch(reason => {
                 logger.error("Ollama error : ", reason)
-                sendMessage(client, roomId, JSON.stringify(`Je crois avoir un problème d'accès à mes neurones 😶‍🌫️.`))
+                client.sendTyping(roomId, false, 30 * 1000)
+                sendMessage(client, roomId, `Je crois avoir un problème d'accès à mes neurones 😶‍🌫️.`)
             });
 
         return true
