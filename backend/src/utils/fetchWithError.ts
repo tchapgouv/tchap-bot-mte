@@ -11,10 +11,10 @@ export default function (url: string, opts: { requestInit?: RequestInit, timeout
 
     if (opts.proxify) {
         const proxy = opts.proxy ? opts.proxy : process.env.PROXY_URL
-        opts.requestInit.agent = proxy ? new HttpsProxyAgent(proxy, {rejectUnauthorized: !opts.rejectUnauthorizedSsl}) : undefined
-    } else if (opts.rejectUnauthorizedSsl) {
+        opts.requestInit.agent = proxy ? new HttpsProxyAgent(proxy, {rejectUnauthorized: opts.rejectUnauthorizedSsl}) : undefined
+    } else if (!opts.rejectUnauthorizedSsl) {
         opts.requestInit.agent = new https.Agent({
-            rejectUnauthorized: true,
+            rejectUnauthorized: false,
         })
     }
     opts.requestInit.method = opts.requestInit.method ? opts.requestInit.method : "GET"
