@@ -1,7 +1,7 @@
 import fetch, {RequestInit} from 'node-fetch';
 import {HttpsProxyAgent} from 'https-proxy-agent';
-import https from "https";
 import logger from "./logger.js";
+import https from "https";
 
 export default function (url: string, opts: { requestInit?: RequestInit, timeout?: number, proxify?: boolean, proxy?: string, rejectUnauthorizedSsl?: boolean } = {}): Promise<any> {
 
@@ -19,9 +19,10 @@ export default function (url: string, opts: { requestInit?: RequestInit, timeout
             rejectUnauthorized: false,
         })
     }
+
     opts.requestInit.method = opts.requestInit.method ? opts.requestInit.method : "GET"
 
-    logger.debug("fetchWithError : ", url, opts.requestInit)
+    logger.debug("fetchWithError : ", url, opts.requestInit, opts.requestInit.agent)
 
     return Promise.race([
         fetch(url, opts.requestInit),
