@@ -9,6 +9,7 @@ import {leaveRoomIfAsked} from "../common/scripts/leave.js";
 import {createWebhookIfAsked} from "../common/scripts/webhoook.js";
 import {deleteRoomIfAsked} from "../common/scripts/delete.js";
 import {downgradeIfAsked} from "../common/scripts/downgrade.js";
+import {ollama} from "./scripts/ollama.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent):void {
 
@@ -38,5 +39,6 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent):voi
     if (!actionTaken) actionTaken = helpIfAsked(client, event, message)
     if (!actionTaken) actionTaken = downgradeIfAsked(client, event, message)
     if (!actionTaken) actionTaken = deleteRoomIfAsked(client, roomId, event.sender.userId, message)
+    if (!actionTaken) actionTaken = ollama(client, roomId, event.sender, message)
     if (!actionTaken) sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }

@@ -10,17 +10,17 @@ export function bePoliteIfNecessary(client: MatrixClient, event: MatrixEvent, bo
 
     const regexGoodbye: RegExp = /.*(bonne soirée|[aà] demain|bon we|bonsoir|tcho|tchao|ciao).*/i
 
-    if (regexGoodbye.test(body)) {
+    if (regexGoodbye.test(body) && body.length < 40) {
         logger.debug("Saying goodbye.")
         addEmoji(client, event, "👋");
     }
 
-    const regexHello: RegExp = /.*(bonjour|hello|salut|holà).*/i
+    const regexHello: RegExp = /^ *(bonjour|hello|salut|holà).*/i
     const emojiHello: string[] = ["☕", "🍵", "🥐", "👋", "🤗"]
 
     const hour = (new Date()).getHours()
 
-    if (regexHello.test(body) && hour <= 10) {
+    if (regexHello.test(body) && hour < 8) {
         logger.debug("Saying goodbye.")
         addEmoji(client, event, emojiHello[Math.floor(Math.random() * emojiHello.length)]);
     }
