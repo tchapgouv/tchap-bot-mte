@@ -12,9 +12,10 @@ const getLogLevel = function () {
     return 5
 }
 
-const getIsoDate = function ():string {
+const getIsoDate = function (): string {
     return "[" + new Date().toISOString() + "]"
 }
+
 class Logger {
 
     emergency = function (...data: any[]) {
@@ -40,6 +41,29 @@ class Logger {
     }
     debug = function debug(...data: any[]) {
         if (getLogLevel() >= 8) console.log(getIsoDate() + " DEBUG:     ", data)
+    }
+}
+
+export function autopsy(data: any, offset: string = "", varName?: string) {
+    const type = typeof data
+    const isArray = Array.isArray(data)
+    console.log(getIsoDate() + " AUTOPSY:    " + offset + "\"" + (varName ? varName : "ROOT") + "\":" + type + (isArray ? "[]" : ""))
+
+    if (isArray) {
+        for (let d of data) {
+            autopsy(d, offset + "   ")
+        }
+    } else {
+        switch (type) {
+            case "object":
+                for (const property of Object.getOwnPropertyNames(data)) {
+                    autopsy(data[property], offset + "   ", property)
+                }
+                break
+            default:
+                console.log(getIsoDate() + " AUTOPSY:    " + offset + "   ↪ " + data)
+                break
+        }
     }
 }
 
