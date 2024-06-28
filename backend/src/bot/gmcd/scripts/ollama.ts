@@ -5,7 +5,7 @@ import logger from "../../../utils/logger.js";
 
 /**
  * Initialisation du contexte de réponse. Récupérer body.context :
- * curl http://ollama:11434/api/generate -d '{ "model": "llama3", "prompt": "Bonjour. Répond toujours en français. Ton nom est bot-GMCD. Lis la documentation suivante en suivant les liens de manière récursive tant qu''ils commencent par la même racine : https://fabrique-numerique.gitbook.io/bnum puis répond à mes questions en se basant sur cette documentation. Ne précise pas que tu lis la documentation dans tes réponses. Donne un lien vers la page de la documentation à la fin de ta réponse.", "stream": false }'
+ * curl http://ollama:11434/api/generate -d '{ "model": "llama3", "prompt": "Bonjour. Répond toujours en français. Ton nom est Bot-GMCD. Lis la documentation suivante en suivant les liens de manière récursive tant qu''ils commencent par la même racine : https://fabrique-numerique.gitbook.io/bnum puis répond à mes questions en se basant sur cette documentation. Ne précise pas que tu lis la documentation dans tes réponses. Si tu fais référence à la documentation dans ta réponse, donne un lien vers la page utile à la fin de ta réponse.", "stream": false }'
  */
 
 
@@ -21,6 +21,7 @@ export function ollama(client: MatrixClient, roomId: string, sender: any, body: 
         fetchWithError('https://Ollama.gmcd-runner01.eco4.cloud.e2.rie.gouv.fr/api/generate',
             {
                 proxify: true,
+                timeout: 30 * 1000,
                 requestInit: {
                     method: "POST", // *GET, POST, PUT, DELETE, etc.
                     headers: {
