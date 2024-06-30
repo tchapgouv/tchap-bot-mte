@@ -20,8 +20,8 @@ export function bePoliteIfNecessary(client: MatrixClient, event: MatrixEvent, bo
 
     const hour = (new Date()).getHours()
 
-    if (regexHello.test(body) && hour < 8) {
-        logger.debug("Saying goodbye.")
+    if (regexHello.test(body) && hour < 10) {
+        logger.debug("Saying Hi.")
         addEmoji(client, event, emojiHello[Math.floor(Math.random() * emojiHello.length)]);
     }
 }
