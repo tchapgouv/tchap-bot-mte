@@ -20,7 +20,7 @@ export function leaveRoomIfAsked(client: MatrixClient, roomId: string, userId: s
 
                 logger.warning("Someone dismissed me :(")
                 sendMessage(client, roomId, "Au revoir ! 😭")
-                client.leave(roomId).catch(e => logger.error(e));
+                client.leave(roomId).catch(e => logger.error(e))
 
             } else {
                 sendMessage(client, roomId, "Désolé, seul un administrateur peut me renvoyer ! 🤷")

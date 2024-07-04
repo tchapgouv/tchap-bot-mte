@@ -30,8 +30,8 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent):voi
 
     if (!roomId || !message || !event.sender) return
 
-    logger.debug("body =", message)
-    logger.debug("room_id =", roomId)
+    logger.debug("parseMessageToSelf: body =", message)
+    logger.debug("parseMessageToSelf: room_id =", roomId)
 
     if (!actionTaken) actionTaken = leaveRoomIfAsked(client, roomId, event.sender.userId, message)
     if (!actionTaken) actionTaken = createWebhookIfAsked(client, event, message)
