@@ -1,6 +1,7 @@
-import gmcdBot from "../bot/gmcd/bot.js";
+import botGmcd from "../bot/gmcd/bot.js";
 import gmcdBotConfig from "../bot/gmcd/config.js";
-import psinBot from "../bot/psin/bot.js";
+import botPsin from "../bot/psin/bot.js";
+import bot777 from "../bot/777/bot.js";
 import vm from "vm"
 import {MatrixClient, Preset, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
@@ -11,8 +12,9 @@ import {splitEvery} from "../utils/utils.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
 
 const bots: Bot[] = [
-    gmcdBot,
-    psinBot
+    botGmcd,
+    botPsin,
+    bot777
 ]
 
 const rateLimit = 10
@@ -43,7 +45,7 @@ export default {
         let invited = false
 
         const uid = userMail.toLowerCase().replace(/@.*/, "")
-        const alreadyInvited = gmcdBot.client.getRoom(roomId)?.getMembers().some(roomMember => {
+        const alreadyInvited = botGmcd.client.getRoom(roomId)?.getMembers().some(roomMember => {
             logger.debug(roomMember.userId.toLowerCase(), "vs", uid)
             return roomMember.userId.toLowerCase().includes(uid)
         })
@@ -58,7 +60,7 @@ export default {
 
         let tries = 0
         while (!invited && tries <= opts.retries) {
-            await gmcdBot.client.inviteByEmail(roomId, userMail)
+            await botGmcd.client.inviteByEmail(roomId, userMail)
                 .then(() => {
                     logger.notice(userMail + " successfully invited.")
                     invited = true
@@ -96,13 +98,13 @@ export default {
         let message: string = ""
         let roomId: any
 
-        await gmcdBot.client.getRoomIdForAlias("#" + roomName + ":" + process.env.TCHAP_SERVER_NAME).then((data) => {
+        await botGmcd.client.getRoomIdForAlias("#" + roomName + ":" + process.env.TCHAP_SERVER_NAME).then((data) => {
             roomId = data.room_id
             message += roomName + " existait déjà et n'a pas été créé.\n"
         }).catch(reason => logger.notice("Room not found", reason))
 
         if (!roomId) {
-            await gmcdBot.client.createRoom({
+            await botGmcd.client.createRoom({
                 name: roomName,
                 room_alias_name: roomName,
                 preset: isPrivate ? Preset.PrivateChat : Preset.PublicChat,
@@ -131,7 +133,7 @@ export default {
         message += "Bonne journée !\n"
 
         if (roomId != null) {
-            sendMessage(gmcdBot.client, roomId, message)
+            sendMessage(botGmcd.client, roomId, message)
         }
 
         return {roomId, message}
@@ -148,11 +150,11 @@ export default {
         let message = ""
         let uri = ""
 
-        await gmcdBot.client.uploadContent(file, {name: opts.fileName, type: opts.mimeType, includeFilename: opts.includeFilename}).then(value => {
+        await botGmcd.client.uploadContent(file, {name: opts.fileName, type: opts.mimeType, includeFilename: opts.includeFilename}).then(value => {
 
             if (opts.mimeType.includes("image")) {
                 sendImage(
-                    gmcdBot.client,
+                    botGmcd.client,
                     roomId,
                     opts.fileName,
                     {
@@ -163,7 +165,7 @@ export default {
                     },
                     value.content_uri)
             } else {
-                sendFile(gmcdBot.client,
+                sendFile(botGmcd.client,
                     roomId,
                     {
                         fileName: opts.fileName,
@@ -191,7 +193,7 @@ export default {
 
         logger.notice("Setting room notification power level requirement to " + powerLevel)
 
-        gmcdBot.client.getStateEvent(roomId, "m.room.power_levels", "").then(value => {
+        botGmcd.client.getStateEvent(roomId, "m.room.power_levels", "").then(value => {
             logger.notice(value)
         }).catch(reason => {
             logger.error("Error getting room notification power level requirement :", reason)
@@ -202,7 +204,7 @@ export default {
 
         logger.debug("deleteRoom", roomId)
 
-        if (!opts.client) opts.client = gmcdBot.client
+        if (!opts.client) opts.client = botGmcd.client
         const client = opts.client
         const botId = client.getUserId()
 
@@ -216,7 +218,7 @@ export default {
 
         let adminList: { name: string, userId: string }[] = []
 
-        let members: RoomMember[] | undefined = gmcdBot.client.getRoom(roomId)?.getMembers();
+        let members: RoomMember[] | undefined = botGmcd.client.getRoom(roomId)?.getMembers();
 
         if (members) {
             for (const roomMember of members) {
@@ -245,13 +247,13 @@ export default {
 
         let user: { user_id: string, display_name?: string, avatar_url?: string } | undefined
 
-        await gmcdBot.client.searchUserDirectory({term: searchTerm, limit: 5}).then(value => {
+        await botGmcd.client.searchUserDirectory({term: searchTerm, limit: 5}).then(value => {
             if (value.results.length > 1) throw 'Invalid number of matches (Limit 5). Found ' + value.results.length + ', expected 1.'
             if (value.results.at(0)) user = value.results.at(0)
         })
 
         if (!user) {
-            const matchingKnownUsers = gmcdBot.client.getUsers().filter(value => {
+            const matchingKnownUsers = botGmcd.client.getUsers().filter(value => {
                 return value.userId.toLowerCase().includes(searchTerm) || value.displayName?.toLowerCase().includes(searchTerm)
             })
             if (matchingKnownUsers.length > 1) throw 'Invalid number of matches (Limit 5). Found ' + matchingKnownUsers.length + ', expected 1.'
@@ -271,12 +273,12 @@ export default {
         let message = ""
         let isAdmin = false
         let hasError = false
-        let members: RoomMember[] | undefined = gmcdBot.client.getRoom(roomId)?.getMembers();
+        let members: RoomMember[] | undefined = botGmcd.client.getRoom(roomId)?.getMembers();
 
         if (!members || !members.length) return {message: "No room members found !", isAdmin: false, hasError: true}
 
         let powerLevel
-        await getPowerLevel(gmcdBot.client, roomId).then(value => {
+        await getPowerLevel(botGmcd.client, roomId).then(value => {
             powerLevel = value
         })
         if (powerLevel !== 100) return {message: "Rights insufficient to kick !", isAdmin: false, hasError: true}
@@ -290,7 +292,7 @@ export default {
 
             if (!isMatch) continue
 
-            if (roomMember.userId === gmcdBot.client.getUserId()) {
+            if (roomMember.userId === botGmcd.client.getUserId()) {
                 message += "Did you really thought i would kick myself ?!\n"
                 continue
             }
@@ -299,7 +301,7 @@ export default {
 
                 logger.debug("Kicking " + roomMember.userId)
 
-                await gmcdBot.client.kick(roomId, roomMember.userId, kickReason)
+                await botGmcd.client.kick(roomId, roomMember.userId, kickReason)
                     .then(() => {
                         message += roomMember.name + " kicked.\n"
                     })
@@ -324,7 +326,7 @@ export default {
 
         logger.debug("getRoomName", roomId)
 
-        const roomName = gmcdBot.client.getRoom(roomId)?.name
+        const roomName = botGmcd.client.getRoom(roomId)?.name
 
         if (!roomName) throw "Cannot find room name for Id : " + roomId + ". Do I know this room ?"
 
@@ -339,7 +341,7 @@ export default {
 
         if (!isMemberOfRoom) throw "I am not able to invite has i am not a member of the room !"
 
-        if (!gmcdBot.client.getRoom(roomId)?.canInvite(gmcdBotConfig.userId)) throw "I am do not have permissions to invite in this room !"
+        if (!botGmcd.client.getRoom(roomId)?.canInvite(gmcdBotConfig.userId)) throw "I am do not have permissions to invite in this room !"
 
         let message: string = "Rapport d'invitations : \n"
 
@@ -369,7 +371,7 @@ export default {
 
         if (hasExternal) {
             logger.notice("Setting guest access to room " + roomId)
-            await gmcdBot.client.sendStateEvent(roomId, "im.vector.room.access_rules", {rule: "unrestricted"})
+            await botGmcd.client.sendStateEvent(roomId, "im.vector.room.access_rules", {rule: "unrestricted"})
                 .then(() => {
                     logger.notice("Guest access set for room " + roomId)
                 }).catch(_ => {
@@ -378,7 +380,7 @@ export default {
         }
 
         // Maj du token préventivement afin d’éviter de multiples appels en parallèle
-        await gmcdBot.getIdentityServerToken()
+        await botGmcd.getIdentityServerToken()
 
         // On invite par groupes de 10 et on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit de l’endpoint en lui-même = 1k/s).
         let tasks: Promise<{ message: string, hasError: boolean, mail: string }>[] = [];
@@ -404,7 +406,7 @@ export default {
             count++
         }
 
-        sendMessage(gmcdBot.client, roomId, message)
+        sendMessage(botGmcd.client, roomId, message)
 
         logger.debug("Awaiting " + tasks.length + " inviting tasks.")
 
@@ -420,13 +422,13 @@ export default {
                 logger.error("Promise.all(inviteByEmail) : ", reason)
                 throw (reason)
             })
-            sendMessage(gmcdBot.client, roomId, inviteResultMessage)
+            sendMessage(botGmcd.client, roomId, inviteResultMessage)
         })
 
         logger.debug("Inviting tasks completed")
 
         if (mailInErrorList.length > 0 && retry <= 2) {
-            sendMessage(gmcdBot.client, roomId, " ❗️ Certaines invitations semblent en erreur et seront retentées dans 30 minutes.\n")
+            sendMessage(botGmcd.client, roomId, " ❗️ Certaines invitations semblent en erreur et seront retentées dans 30 minutes.\n")
             setTimeout(() => {
                 retry++
                 this.inviteUsersInRoom(mailInErrorList, roomId, retry, false).catch(reason => {
@@ -447,7 +449,7 @@ export default {
             if (bot.client.getUserId() === botId) client = bot.client
         }
 
-        if (!client) client = gmcdBot.client
+        if (!client) client = botGmcd.client
 
         logger.info("Posting message")
 
@@ -477,7 +479,7 @@ export default {
 
         let isMember = false
 
-        await gmcdBot.client.getJoinedRoomMembers(roomId)
+        await botGmcd.client.getJoinedRoomMembers(roomId)
             .then(value => {
                 isMember = !!value.joined[userId ? userId : "" + process.env.BOT_USER_ID]
             })

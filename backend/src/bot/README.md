@@ -20,4 +20,6 @@
 
 ### 5. Dupliquer le code d'un bot et changer le fichier `config.ts`
 
-### 6. Enlever / Ajouter des scripts qui lui sont propres dans le dossier `scripts`
+### 6. Ajouter le bot à la liste dans `bot.service.ts`
+
+### 7. Enlever / Ajouter des scripts qui lui sont propres dans le dossier `scripts`
