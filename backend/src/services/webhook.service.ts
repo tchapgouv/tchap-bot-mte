@@ -74,6 +74,7 @@ export default {
     async update(webhookId: string, newWebhook: {
         webhook_label: string,
         room_id: string,
+        bot_id: string,
         script: string,
     }) {
 

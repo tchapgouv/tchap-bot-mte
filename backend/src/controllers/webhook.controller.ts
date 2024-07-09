@@ -141,6 +141,7 @@ export async function update(req: Request, res: Response) {
     const webhook = {
         webhook_label: req.body.webhook.webhook_label,
         room_id: req.body.webhook.room_id,
+        bot_id: req.body.webhook.bot_id,
         script: req.body.webhook.script,
     }
 
