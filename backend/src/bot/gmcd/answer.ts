@@ -11,7 +11,7 @@ import {deleteRoomIfAsked} from "../common/scripts/delete.js";
 import {downgradeIfAsked} from "../common/scripts/downgrade.js";
 import {ollama} from "./scripts/ollama.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent):void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -19,10 +19,11 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent):void {
     if (!roomId || !message || !event.sender) return
 
     bePoliteIfNecessary(client, event, message)
+    // Actions propres au Bot
     norrisIfAsked(client, roomId, message)
 }
 
-export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent):void {
+export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -39,6 +40,8 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent):voi
     if (!actionTaken) actionTaken = helpIfAsked(client, event, message)
     if (!actionTaken) actionTaken = downgradeIfAsked(client, event, message)
     if (!actionTaken) actionTaken = deleteRoomIfAsked(client, roomId, event.sender.userId, message)
+    // Actions propres au Bot
     if (!actionTaken) actionTaken = ollama(client, roomId, event.sender, message)
+    // Default
     if (!actionTaken) sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }

@@ -7,6 +7,7 @@ import {promoteUserIfAsked} from "../common/scripts/promote.js";
 import {helpIfAsked} from "./scripts/help.js";
 import {deleteRoomIfAsked} from "../common/scripts/delete.js";
 import {downgradeIfAsked} from "../common/scripts/downgrade.js";
+import {listIncidentsIfAsked} from "./scripts/incidents.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent): void {
 
@@ -16,6 +17,7 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent): void {
     if (!roomId || !message || !event.sender) return
 
     bePoliteIfNecessary(client, event, message)
+    // Actions propres au Bot
 }
 
 export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent): void {
@@ -35,5 +37,8 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent): vo
     if (!actionTaken) actionTaken = helpIfAsked(client, event, message)
     if (!actionTaken) actionTaken = downgradeIfAsked(client, event, message)
     if (!actionTaken) actionTaken = deleteRoomIfAsked(client, roomId, event.sender.userId, message)
+    // Actions propres au Bot
+    if (!actionTaken) actionTaken = listIncidentsIfAsked(client, event, message)
+    // Default
     if (!actionTaken) logger.debug("parseMessageToSelf : No action taken") // sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }
