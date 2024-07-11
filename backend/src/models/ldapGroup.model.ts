@@ -6,11 +6,11 @@ export class LdapGroup extends Model<InferAttributes<LdapGroup>, InferCreationAt
 
     @Unique
     @Column(DataType.TEXT)
-    room_id!: string;
+    declare room_id: string;
     @Column(DataType.TEXT)
-    base_dn!: string;
+    declare base_dn: string;
     @Column(DataType.BOOLEAN)
-    recursively!: boolean;
+    declare recursively: boolean;
     @Column(DataType.TEXT)
-    filter!: string;
+    declare filter: string;
 }
