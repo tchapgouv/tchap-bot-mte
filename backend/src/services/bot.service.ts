@@ -10,12 +10,17 @@ import {getPowerLevel, sendFile, sendHtmlMessage, sendImage, sendMarkdownMessage
 import {Bot} from "../bot/common/Bot.js";
 import {splitEvery} from "../utils/utils.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
+import sequelize from "../models/index.js";
+import {LdapGroup} from "../models/ldapGroup.model.js";
+import ldap from "ldapjs";
 
 const bots: Bot[] = [
     botGmcd,
     botPsin,
     bot777
 ]
+
+const ldapGroupRepository = sequelize.getRepository(LdapGroup)
 
 const rateLimit = 10
 const rateLimitDelay = 60 / rateLimit * 1000
@@ -489,5 +494,23 @@ export default {
             })
 
         return isMember
+    },
+
+    async updateRoomMemberList(roomId: string) {
+
+        if (!roomId) throw "updateRoomMemberList : roomId cannot be empty"
+
+        const ldapGroup = await ldapGroupRepository.findOne({where: {room_id: roomId}})
+
+        if (!ldapGroup) {
+            throw ({message: "No defined ldap group found for given room."})
+        }
+
+        const client = ldap.createClient({url: process.env.LDAP_URI || ''});
+
+        ldapService.getUsersWithLdapRequest(client, ldapGroup.getDataValue("base_dn"), ldapGroup.getDataValue("recursively"), ldapGroup.getDataValue("filter"))
+            .then(
+                // TODO
+            )
     }
 }
