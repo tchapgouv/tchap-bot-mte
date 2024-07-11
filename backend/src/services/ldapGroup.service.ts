@@ -1,6 +1,7 @@
 import sequelize from "../models/index.js";
 import {LdapGroup} from "../models/ldapGroup.model.js";
 import {Attributes} from "sequelize/lib/model";
+import logger from "../utils/logger.js";
 
 const ldapGroupRepository = sequelize.getRepository(LdapGroup)
 
@@ -16,6 +17,16 @@ export default {
             ldapGroup.set({room_id, base_dn, recursively, filter})
             return await ldapGroup.save()
         }
+    },
+
+    async findAll(): Promise<LdapGroup[]> {
+
+        return await ldapGroupRepository.findAll()
+            .catch(err => {
+                logger.error(err)
+                throw ({message: err.message || "Some error occurred while retrieving users."});
+            });
+
     },
 
     async create(room_id: string, base_dn: string, recursively: boolean = false, filter: string = "(&(objectClass=mineqPerson)"): Promise<any> {

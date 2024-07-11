@@ -17,6 +17,10 @@ import swaggerUi from "swagger-ui-express"
 import {specs} from "./swagger.config.js";
 import crypto from "crypto";
 import fileUpload from "express-fileupload";
+import cron from "node-cron";
+import ldapGroupService from "./services/ldapGroup.service.js";
+import botService from "./services/bot.service.js";
+import botGmcd from "./bot/gmcd/bot.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -113,3 +117,11 @@ logger.info("Current Time Based Token : ",
     "Based on : ",
     new Date().toLocaleDateString("fr-FR") + "-JWT_KEY")
 
+cron.schedule('0 0 * * *', () => {
+    logger.notice('running midnight tasks');
+    ldapGroupService.findAll().then(ldapGroups => {
+        for (const ldapGroup of ldapGroups) {
+            botService.updateRoomMemberList(botGmcd.client, ldapGroup.getDataValue("room_id"))
+        }
+    })
+});

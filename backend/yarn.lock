@@ -446,6 +446,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node-cron@npm:^3":
+  version: 3.0.11
+  resolution: "@types/node-cron@npm:3.0.11"
+  checksum: 10c0/21cd0255988da2935bc8bf010da8b31624911ec10ef5d9a96a59c57193f60b27c1749b2e27c2a292a697d00195da5b8848a707345bb276abc39c96287ee82005
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*":
   version: 20.11.0
   resolution: "@types/node@npm:20.11.0"
@@ -2362,6 +2369,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-cron@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "node-cron@npm:3.0.3"
+  dependencies:
+    uuid: "npm:8.3.2"
+  checksum: 10c0/e6e817c5bf28cca69f256ecc1a2cb737cf895cb0fe22f8ec58ce614cb74dcc22e93f495984a26ece51322473238ccc0ef53b4f373035697017b8c28bddacb9b9
+  languageName: node
+  linkType: hard
+
 "node-domexception@npm:^1.0.0":
   version: 1.0.0
   resolution: "node-domexception@npm:1.0.0"
@@ -3223,6 +3239,7 @@ __metadata:
     "@types/ldapjs": "npm:^3.0.6"
     "@types/mime": "npm:^4.0.0"
     "@types/node": "npm:^20.11.19"
+    "@types/node-cron": "npm:^3"
     "@types/showdown": "npm:^2"
     "@types/swagger-jsdoc": "npm:^6.0.4"
     "@types/swagger-ui-express": "npm:^4.1.6"
@@ -3237,6 +3254,7 @@ __metadata:
     jsonwebtoken: "npm:^9.0.2"
     ldapjs: "npm:^3.0.7"
     matrix-js-sdk: "npm:^30.3.0"
+    node-cron: "npm:^3.0.3"
     node-fetch: "npm:^3.3.2"
     node-localstorage: "npm:^3.0.5"
     olm: "https://packages.matrix.org/npm/olm/olm-3.1.4.tgz"
@@ -3249,7 +3267,6 @@ __metadata:
     swagger-ui-express: "npm:^5.0.0"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.3.3"
-    undici: "npm:^6.19.2"
   languageName: unknown
   linkType: soft
 
@@ -3351,13 +3368,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:^6.19.2":
-  version: 6.19.2
-  resolution: "undici@npm:6.19.2"
-  checksum: 10c0/3b7b9238c0c84fd90742422fb12844a29e33e922d2c5f722f626090ca1f1ec93596ccec9be1814bb0e923e28682d2080a17d17a4afe373897b9770ef25a64d97
-  languageName: node
-  linkType: hard
-
 "unhomoglyph@npm:^1.0.6":
   version: 1.0.6
   resolution: "unhomoglyph@npm:1.0.6"
@@ -3422,21 +3432,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uuid@npm:8.3.2, uuid@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "uuid@npm:8.3.2"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 10c0/bcbb807a917d374a49f475fae2e87fdca7da5e5530820ef53f65ba1d12131bd81a92ecf259cc7ce317cbe0f289e7d79fdfebcef9bfa3087c8c8a2fa304c9be54
+  languageName: node
+  linkType: hard
+
 "uuid@npm:9":
   version: 9.0.1
   resolution: "uuid@npm:9.0.1"
   bin:
     uuid: dist/bin/uuid
   checksum: 10c0/1607dd32ac7fc22f2d8f77051e6a64845c9bce5cd3dd8aa0070c074ec73e666a1f63c7b4e0f4bf2bc8b9d59dc85a15e17807446d9d2b17c8485fbc2147b27f9b
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^8.3.2":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 10c0/bcbb807a917d374a49f475fae2e87fdca7da5e5530820ef53f65ba1d12131bd81a92ecf259cc7ce317cbe0f289e7d79fdfebcef9bfa3087c8c8a2fa304c9be54
   languageName: node
   linkType: hard
 
