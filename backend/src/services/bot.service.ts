@@ -271,7 +271,7 @@ export default {
         return user
     },
 
-    async kickUser(roomId: string, userTerm: string, kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
+    async kickUser(roomId: string, userTerm: string, kickReason: string = "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
 
         logger.debug("kickUser : ", roomId, userTerm, kickReason)
 
@@ -496,7 +496,7 @@ export default {
         return isMember
     },
 
-    async updateRoomMemberList(roomId: string) {
+    async updateRoomMemberList(client: MatrixClient, roomId: string) {
 
         if (!roomId) throw "updateRoomMemberList : roomId cannot be empty"
 
@@ -506,11 +506,29 @@ export default {
             throw ({message: "No defined ldap group found for given room."})
         }
 
-        const client = ldap.createClient({url: process.env.LDAP_URI || ''});
+        const ldapClient = ldap.createClient({url: process.env.LDAP_URI || ''});
 
-        ldapService.getUsersWithLdapRequest(client, ldapGroup.getDataValue("base_dn"), ldapGroup.getDataValue("recursively"), ldapGroup.getDataValue("filter"))
-            .then(
-                // TODO
-            )
+        const roomMembers: RoomMember[] = client.getRoom(roomId)?.getMembers() || [];
+        const ldapQueryPerson = await ldapService.getUsersWithLdapRequest(ldapClient, ldapGroup.getDataValue("base_dn"), ldapGroup.getDataValue("recursively"), ldapGroup.getDataValue("filter"))
+
+        for (const roomMember of roomMembers) {
+            if (!ldapQueryPerson.some(ldapPerson => roomMember.userId.includes(ldapPerson.uid[0].toLowerCase()))) {
+                this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus à la requête définissant les membre de ce salon.").then(value => {
+                    sendMessage(client, roomId, value.message)
+                })
+            }
+        }
+
+        for (const ldapPerson of ldapQueryPerson) {
+
+            const mailPR = ldapPerson.mailPR[0].toLowerCase()
+            // const uid = ldapPerson.uid[0].toLowerCase()
+
+            if (!roomMembers.some(roomMember => roomMember.userId.includes(ldapPerson.uid[0].toLowerCase()))) {
+                this.inviteUserInRoom(mailPR, roomId).then(value => {
+                    sendMessage(client, roomId, value.message)
+                })
+            }
+        }
     }
 }

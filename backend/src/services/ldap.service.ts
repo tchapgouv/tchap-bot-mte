@@ -50,7 +50,7 @@ export default {
     },
 
     // await ldapService.getUsersWithBaseDn(ldap.createClient({url: process.env.LDAP_URI || ''}), "ou=GMCD,ou=DETN,ou=UNI,ou=DNUM,ou=SG,ou=AC,ou=melanie,ou=organisation,dc=equipement,dc=gouv,dc=fr", true).then(value => console.log("value"))
-    async getUsersWithLdapRequest(client: ldap.Client, baseDn: string, recursively = false, filter: string = "(&(objectClass=mineqPerson))") {
+    async getUsersWithLdapRequest(client: ldap.Client, baseDn: string, recursively = false, filter: string = "(&(objectClass=mineqPerson))"):Promise<any[]> {
 
         logger.debug("getUsersWithBaseDn", baseDn)
 
