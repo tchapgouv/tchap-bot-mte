@@ -5,11 +5,11 @@ import botService from "../../../services/bot.service.js";
 
 /**
  * --help
- * command : create ldap group base_dn:BASE_DN filter:FILTER recursive:true
+ * command : create ldap group basedn:BASE_DN filter:FILTER recursive:true
  * return : je gère les utilisateurs de ce salon en me basant sur une requête ldap <sup>*</sup>
  * isAnswer : true
  */
-// create ldap group base_dn:ou=PIAP,ou=GMCD,ou=DETN,ou=UNI,ou=DNUM,ou=SG,ou=AC,ou=melanie,ou=organisation,dc=equipement,dc=gouv,dc=fr
+// create ldap group basedn:ou=PIAP,ou=GMCD,ou=DETN,ou=UNI,ou=DNUM,ou=SG,ou=AC,ou=melanie,ou=organisation,dc=equipement,dc=gouv,dc=fr
 export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
     const regex: RegExp = /.*create ldap group.*/i
@@ -27,12 +27,12 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
 
                 if (powerLevel === 100) {
 
-                    const base_dn = body.match(/.* base_dn:(.*?)[ $].*/i)?.at(1)
+                    const base_dn = body.match(/.* basedn:(.*?)[ $].*/i)?.at(1)
                     const filter = body.match(/.* filter:(.*?)[ $].*/i)?.at(1)
                     const recursive = body.includes("recursive:true")
 
                     if (!base_dn) {
-                        sendMessage(client, roomId, "Désolé, il semblerait que vous n'ayez pas fourni de base_dn")
+                        sendMessage(client, roomId, "Désolé, il semblerait que vous n'ayez pas fourni de basedn")
                         return true
                     }
 
