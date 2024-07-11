@@ -1,16 +1,16 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import {getPowerLevel, sendMessage} from "../helper.js";
-import ldapGroupService from "../../../services/ldapGroup.service.js";
+import botService from "../../../services/bot.service.js";
 
 /**
  * @help
- * command : delete ldap group
- * return : Je supprime la requête ldap gérant les membres de ce salon <sup>*</sup>
+ * command : update members
+ * return : je met à jours les utilisateurs de ce salon <sup>*</sup>
  * isAnswer : true
  */
-export function deleteRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
+export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /.*delete ldap group.*/i
+    const regex: RegExp = /.*update members.*/i
 
     if (regex.test(body)) {
 
@@ -25,9 +25,7 @@ export function deleteRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
 
                 if (powerLevel === 100) {
 
-                    ldapGroupService.destroy(roomId).then(_value => {
-                        sendMessage(client, roomId, "Groupe supprimé.")
-                    })
+                    botService.updateRoomMemberList(client, roomId)
 
                 } else {
                     sendMessage(client, roomId, "Désolé, seul un administrateur me demander cela ! 🤷")

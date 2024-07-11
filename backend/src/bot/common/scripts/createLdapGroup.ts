@@ -5,13 +5,13 @@ import botService from "../../../services/bot.service.js";
 
 /**
  * @help
- * command : ldap group base_dn:BASE_DN filter:FILTER recursive:true
+ * command : create ldap group base_dn:BASE_DN filter:FILTER recursive:true
  * return : je gère les utilisateurs de ce salon en me basant sur une requête ldap <sup>*</sup>
  * isAnswer : true
  */
 export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /.*ldap group.*/i
+    const regex: RegExp = /.*create ldap group.*/i
 
     if (regex.test(body)) {
 
