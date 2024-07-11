@@ -3,7 +3,7 @@ import {getPowerLevel, sendMessage} from "../helper.js";
 import ldapGroupService from "../../../services/ldapGroup.service.js";
 
 /**
- * @help
+ * --help
  * command : delete ldap group
  * return : Je supprime la requête ldap gérant les membres de ce salon <sup>*</sup>
  * isAnswer : true

@@ -3,7 +3,7 @@ import {getPowerLevel, sendMessage} from "../helper.js";
 import botService from "../../../services/bot.service.js";
 
 /**
- * @help
+ * --help
  * command : update members
  * return : je met à jours les utilisateurs de ce salon <sup>*</sup>
  * isAnswer : true
