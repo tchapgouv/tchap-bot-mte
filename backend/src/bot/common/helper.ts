@@ -7,7 +7,7 @@ import path from "path";
 import {fileURLToPath} from "url";
 import {ADMINS} from "./config.js";
 
-const converter = new showdown.Converter()
+const converter = new showdown.Converter({simpleLineBreaks: true})
 
 export function addEmoji(client: MatrixClient, event: MatrixEvent, emoji: string) {
     logger.debug("Sending emoji : ", emoji)
