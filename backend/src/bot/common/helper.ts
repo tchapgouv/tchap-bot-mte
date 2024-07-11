@@ -241,7 +241,7 @@ export function redactHelp(commonCommandes: { command: string | undefined; retur
                 help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
                 help += "`" + commande.command + "`, "
             }
-            help += commande.return + "  \n"
+            help += commande.return + "  \n\n"
         }
     }
     help += "_<sup>*</sup> = Administrateur uniquement)_"
