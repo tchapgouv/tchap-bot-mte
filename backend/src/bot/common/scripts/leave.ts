@@ -5,7 +5,7 @@ import {getPowerLevel, sendMessage} from "../helper.js";
 /**
  * @help
  * command : oust
- * return : je quitte le canal
+ * return : je quitte le canal <sup>*</sup>
  * isAnswer : true
  */
 export function leaveRoomIfAsked(client: MatrixClient, roomId: string, userId: string, body: string) {

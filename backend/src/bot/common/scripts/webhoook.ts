@@ -65,7 +65,7 @@ function createOrReturnWebhook(client: MatrixClient, roomId: string, user: User,
 /**
  * @help
  * command : create webhook|créer webhook
- * return : je créé un webhook (RIE) pour le canal afin d'y envoyer des messages (Administrateur uniquement !)
+ * return : je créé un webhook (RIE) pour le canal afin d'y envoyer des messages *
  * isAnswer : true
  */
 export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {

@@ -6,7 +6,7 @@ import {getPowerLevel, getUserPowerLevel, isSomeoneAdmin, isSupport, sendMessage
 /**
  * @help
  * command : promote me|promeut moi
- * return : je promeus administrateur un utilisateur (si je suis moi-même administrateur)
+ * return : je promeus administrateur un utilisateur (si je suis moi-même administrateur) <sup>*</sup>
  * isAnswer : true
  */
 export function promoteUserIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {

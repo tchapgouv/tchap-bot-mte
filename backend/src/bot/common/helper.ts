@@ -220,10 +220,12 @@ export async function isSomeoneAdmin(client: MatrixClient, roomId: string): Prom
 }
 
 
-export function redactHelp(commandes: { command: string | undefined; return: string; isAnswer: boolean }[]): string {
+export function redactHelp(commonCommandes: { command: string | undefined; return: string; isAnswer: boolean }[],
+                           specificCommands: { command: string | undefined; return: string; isAnswer: boolean }[]): string {
 
-    let help = "Voici une liste non exhaustive des commandes auxquelles je sais répondre (Si les droits du salon me le permettent) :\n"
-    for (const commande of commandes) {
+    let help = "Voici une liste non exhaustive des commandes auxquelles je sais répondre (Si les droits du salon me le permettent).\n"
+    help += specificCommands.length > 0 ? "Commandes générales à tous les Bots : \n" : ""
+    for (const commande of commonCommandes) {
         help += " - "
         if (commande.command) {
             help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
@@ -231,32 +233,36 @@ export function redactHelp(commandes: { command: string | undefined; return: str
         }
         help += commande.return + "\n"
     }
+    if (specificCommands.length > 0) {
+        help += "Commandes qui me sont propres : \n"
+        for (const commande of specificCommands) {
+            help += " - "
+            if (commande.command) {
+                help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
+                help += "`" + commande.command + "`, "
+            }
+            help += commande.return + "\n"
+        }
+    }
+    help += "_<sup>*</sup> = Administrateur uniquement)_"
     logger.notice(help)
     return help
 }
 
 export function generateHelp(dirname?: string): string {
 
-    let commands: { command: string | undefined; return: string; isAnswer: boolean }[] = []
+    let specificCommands: { command: string | undefined; return: string; isAnswer: boolean }[] = []
 
     let files
 
     if (dirname) {
         files = fs.readdirSync(dirname);
         for (const file of files) {
-            commands = extractHelpFromComments(commands, dirname, file);
+            specificCommands = extractHelpFromComments(specificCommands, dirname, file);
         }
     }
 
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.resolve(__filename, "../scripts");
-    files = fs.readdirSync(__dirname);
-
-    for (const file of files) {
-        commands = extractHelpFromComments(commands, __dirname, file);
-    }
-
-    commands.sort((a, b) => {
+    specificCommands.sort((a, b) => {
         if (a.command && !b.command) return 1
         if (!a.command && b.command) return -1
         if (a.isAnswer && !b.isAnswer) return 1
@@ -265,9 +271,28 @@ export function generateHelp(dirname?: string): string {
         return a.return < b.return ? 1 : -1
     }).reverse()
 
-    // logger.notice(commands);
+    let commonCommands: { command: string | undefined; return: string; isAnswer: boolean }[] = []
 
-    return redactHelp(commands)
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.resolve(__filename, "../scripts");
+    files = fs.readdirSync(__dirname);
+
+    for (const file of files) {
+        commonCommands = extractHelpFromComments(commonCommands, __dirname, file);
+    }
+
+    commonCommands.sort((a, b) => {
+        if (a.command && !b.command) return 1
+        if (!a.command && b.command) return -1
+        if (a.isAnswer && !b.isAnswer) return 1
+        if (!a.isAnswer && b.isAnswer) return -1
+        if (a.command && b.command) return a.command < b.command ? 1 : -1
+        return a.return < b.return ? 1 : -1
+    }).reverse()
+
+    // logger.notice(commonCommands);
+
+    return redactHelp(commonCommands, specificCommands)
 }
 
 export function answerHelp(body: string, event: MatrixEvent, client: MatrixClient, help: string) {
