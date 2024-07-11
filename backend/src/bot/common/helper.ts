@@ -244,7 +244,7 @@ export function redactHelp(commonCommandes: { command: string | undefined; retur
             help += commande.return + "  \n\n"
         }
     }
-    help += "_<sup>*</sup> = Administrateur uniquement)_"
+    help += "_<sup>*</sup> = Administrateur uniquement_"
     logger.notice(help)
     return help
 }
