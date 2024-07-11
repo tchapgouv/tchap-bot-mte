@@ -223,7 +223,7 @@ export async function isSomeoneAdmin(client: MatrixClient, roomId: string): Prom
 export function redactHelp(commonCommandes: { command: string | undefined; return: string; isAnswer: boolean }[],
                            specificCommands: { command: string | undefined; return: string; isAnswer: boolean }[]): string {
 
-    let help = "Voici une liste non exhaustive des commandes auxquelles je sais répondre (Si les droits du salon me le permettent).  \n"
+    let help = "Voici une liste non exhaustive des commandes auxquelles je sais répondre (Si les droits du salon me le permettent).  \n\n"
     help += specificCommands.length > 0 ? "Commandes générales à tous les Bots :  \n" : ""
     for (const commande of commonCommandes) {
         help += " - "
@@ -231,7 +231,7 @@ export function redactHelp(commonCommandes: { command: string | undefined; retur
             help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
             help += "`" + commande.command + "`, "
         }
-        help += commande.return + "  \n"
+        help += commande.return + "  \n\n"
     }
     if (specificCommands.length > 0) {
         help += "Commandes qui me sont propres :  \n"
