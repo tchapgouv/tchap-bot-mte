@@ -8,7 +8,7 @@ import botService from "../../../services/bot.service.js";
  * return : je met à jours les utilisateurs de ce salon <sup>*</sup>
  * isAnswer : true
  */
-export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
+export function updateRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
     const regex: RegExp = /.*update members.*/i
 
