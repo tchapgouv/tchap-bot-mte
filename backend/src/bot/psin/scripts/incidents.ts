@@ -25,8 +25,8 @@ export function listIncidentsIfAsked(client: MatrixClient, event: MatrixEvent, b
             const psinApiKey = process.env.PSIN_API_KEY || ""
 
             fetchWithError("http://psin.supervision.e2.rie.gouv.fr/centreon/ApiPsin.php?cle=" + psinApiKey + "&indic=incident", {proxify: true})
-                .then(value => {
-                    sendHtmlMessage(client, roomId, value, value)
+                .then((value: Response) => {
+                    value.text().then(decodedGzip => sendHtmlMessage(client, roomId, decodedGzip, decodedGzip))
                 })
 
             return true
