@@ -7,10 +7,10 @@ import logger from "../../../utils/logger.js";
 /**
  * @help
  * command : stats
- * return : je retourne la liste statistiques en cours
+ * return : je retourne les statistiques en cours
  * isAnswer : true
  */
-export function listIncidentsIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
+export function statsIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
     const regex: RegExp = /.*(stats).*/i
 
