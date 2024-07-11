@@ -10,12 +10,17 @@ import {getPowerLevel, sendFile, sendHtmlMessage, sendImage, sendMarkdownMessage
 import {Bot} from "../bot/common/Bot.js";
 import {splitEvery} from "../utils/utils.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
+import sequelize from "../models/index.js";
+import {LdapGroup} from "../models/ldapGroup.model.js";
+import ldap from "ldapjs";
 
 const bots: Bot[] = [
     botGmcd,
     botPsin,
     bot777
 ]
+
+const ldapGroupRepository = sequelize.getRepository(LdapGroup)
 
 const rateLimit = 10
 const rateLimitDelay = 60 / rateLimit * 1000
@@ -266,7 +271,7 @@ export default {
         return user
     },
 
-    async kickUser(roomId: string, userTerm: string, kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
+    async kickUser(roomId: string, userTerm: string, kickReason: string = "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
 
         logger.debug("kickUser : ", roomId, userTerm, kickReason)
 
@@ -489,5 +494,41 @@ export default {
             })
 
         return isMember
+    },
+
+    async updateRoomMemberList(client: MatrixClient, roomId: string) {
+
+        if (!roomId) throw "updateRoomMemberList : roomId cannot be empty"
+
+        const ldapGroup = await ldapGroupRepository.findOne({where: {room_id: roomId}})
+
+        if (!ldapGroup) {
+            throw ({message: "No defined ldap group found for given room."})
+        }
+
+        const ldapClient = ldap.createClient({url: process.env.LDAP_URI || ''});
+
+        const roomMembers: RoomMember[] = client.getRoom(roomId)?.getMembers() || [];
+        const ldapQueryPerson = await ldapService.getUsersWithLdapRequest(ldapClient, ldapGroup.getDataValue("base_dn"), ldapGroup.getDataValue("recursively"), ldapGroup.getDataValue("filter"))
+
+        for (const roomMember of roomMembers) {
+            if (!ldapQueryPerson.some(ldapPerson => roomMember.userId.includes(ldapPerson.uid[0].toLowerCase()))) {
+                this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus à la requête définissant les membre de ce salon.").then(value => {
+                    sendMessage(client, roomId, value.message)
+                })
+            }
+        }
+
+        for (const ldapPerson of ldapQueryPerson) {
+
+            const mailPR = ldapPerson.mailPR[0].toLowerCase()
+            // const uid = ldapPerson.uid[0].toLowerCase()
+
+            if (!roomMembers.some(roomMember => roomMember.userId.includes(ldapPerson.uid[0].toLowerCase()))) {
+                this.inviteUserInRoom(mailPR, roomId).then(value => {
+                    sendMessage(client, roomId, value.message)
+                })
+            }
+        }
     }
 }

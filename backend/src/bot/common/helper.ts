@@ -231,20 +231,20 @@ export function redactHelp(commonCommandes: { command: string | undefined; retur
             help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
             help += "`" + commande.command + "`, "
         }
-        help += commande.return + "  \n\n"
+        help += commande.return + "  \n"
     }
     if (specificCommands.length > 0) {
-        help += "Commandes qui me sont propres :  \n"
+        help += "\nCommandes qui me sont propres :  \n"
         for (const commande of specificCommands) {
             help += " - "
             if (commande.command) {
                 help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
                 help += "`" + commande.command + "`, "
             }
-            help += commande.return + "  \n\n"
+            help += commande.return + "  \n"
         }
     }
-    help += "_<sup>*</sup> = Administrateur uniquement)_"
+    help += "\n_<sup>*</sup> = Administrateur uniquement_"
     logger.notice(help)
     return help
 }
