@@ -6,13 +6,15 @@ import {RequestInit} from "node-fetch";
 import fetchWithError from "../../utils/fetchWithError.js";
 import {GMCD_INFRA_ROOM_ID} from "./config.js";
 import {Brain} from "./Brain.js";
+import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
+import configGmcd from "../gmcd/config.js";
 
 export class Bot {
 
     client: MatrixClient;
     brain: Brain = new Brain()
-    private readonly parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, brain: Brain) => void;
-    private readonly parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, brain: Brain) => void;
+    private readonly parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message:string, sender: RoomMember; botId: string; roomId: string }) => void;
+    private readonly parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message:string, sender: RoomMember; botId: string; roomId: string }) => void;
 
     ids_token: { token: string, valid_until: Date } | undefined
 
@@ -23,8 +25,8 @@ export class Bot {
                     deviceId: string,
                     idBaseUrl: string
                 },
-                parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, brain: Brain) => void,
-                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, brain: Brain) => void) {
+                parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message:string, sender: RoomMember; botId: string; roomId: string }) => void,
+                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message:string, sender: RoomMember; botId: string; roomId: string }) => void) {
 
         const getIST = () => {
             return this.getIdentityServerToken()
@@ -124,13 +126,21 @@ export class Bot {
 
                 if (isNewMessage) {
 
-                    if (isSelfMentioned) {
-                        logger.debug("Parsing Message To Self", this.client.getUserId())
-                        this.parseMessageToSelf(this.client, event, this.brain)
-                    } else {
+                    const message: string | undefined = event.event.content?.body.toLowerCase() || ""
+                    const roomId = event.event.room_id
 
-                        logger.debug("Parsing Message", this.client.getUserId())
-                        this.parseMessage(this.client, event, this.brain)
+                    if (roomId && message && event.sender && this.client.getUserId()) {
+
+                        const data: { message:string, sender: RoomMember; botId: string; roomId: string } = {message, sender: event.sender, roomId, botId: this.client.getUserId() || configGmcd.userId}
+
+                        if (isSelfMentioned) {
+                            logger.debug("Parsing Message To Self", this.client.getUserId())
+                            this.parseMessageToSelf(this.client, event, this.brain, data)
+                        } else {
+
+                            logger.debug("Parsing Message", this.client.getUserId())
+                            this.parseMessage(this.client, event, this.brain, data)
+                        }
                     }
                 }
             }

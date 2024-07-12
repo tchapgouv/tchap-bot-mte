@@ -28,15 +28,17 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
             brain.get("group_created").roomId === roomId) {
 
             if (/oui/i.test(body)) {
-
                 botService.updateRoomMemberList(client, roomId, false).catch(reason => {
                     logger.error("Error while executing : update room member list.", reason)
                 })
-                return true
-
             } else {
                 brain.set("group_created", undefined)
+                ldapGroupService.destroy(roomId).then(_value => {
+                    sendMessage(client, roomId, "Groupe supprimé.")
+                })
             }
+
+            return true
         }
 
         if (/.*create ldap group.*/i.test(body)) {
@@ -45,8 +47,8 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
 
                 if (powerLevel === 100) {
 
-                    const base_dn = body.match(/.* basedn:(.*?)[ $].*/i)?.at(1)
-                    const filter = body.match(/.* filter:(.*?)[ $].*/i)?.at(1)
+                    const base_dn = body.match(/.* basedn:(.*?)[ |$].*/i)?.at(1)
+                    const filter = body.match(/.* filter:(.*?)[ |$].*/i)?.at(1)
                     const recursive = body.includes("recursive:true")
 
                     if (!base_dn) {

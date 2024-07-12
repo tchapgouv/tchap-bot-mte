@@ -522,7 +522,7 @@ export default {
         for (const roomMember of roomMembers) {
             if (!ldapQueryPerson.some(ldapPerson => roomMember.userId.includes(ldapPerson.uid[0].toLowerCase()))) {
                 if (dryRun)
-                    dryRunMessage += " - " + roomMember + " sera renvoyé.\n"
+                    dryRunMessage += " - " + roomMember.name + " sera renvoyé.\n"
                 else
                     this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus à la requête définissant les membre de ce salon.").then(value => {
                         sendMessage(client, roomId, value.message)
@@ -545,7 +545,7 @@ export default {
         }
 
         if (dryRun) {
-            dryRunMessage += "\n<sup>*</sup> Sous réserve de droits suffisants"
+            dryRunMessage += "\n_<sup>*</sup> Sous réserve de droits suffisants._"
             sendMarkdownMessage(client, roomId, dryRunMessage)
         } else {
             if (userUidList.length > 0) {

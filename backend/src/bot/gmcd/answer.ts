@@ -14,44 +14,36 @@ import {createRoomUsersListIfAsked} from "../common/scripts/createLdapGroup.js";
 import {deleteRoomUsersListIfAsked} from "../common/scripts/deleteLdapGroup.js";
 import {updateRoomUsersListIfAsked} from "../common/scripts/updateLdapGroup.js";
 import {Brain} from "../common/Brain.js";
+import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain:Brain): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: { message:string, sender: RoomMember; botId: string; roomId: string }): void {
 
-    const message: string | undefined = event.event.content?.body.toLowerCase()
-    const roomId = event.event.room_id
-
-    if (!roomId || !message || !event.sender) return
-
-    bePoliteIfNecessary(client, event, message)
+    bePoliteIfNecessary(client, event, data.message)
     // Actions propres au Bot
-    norrisIfAsked(client, roomId, message)
+    norrisIfAsked(client, data.roomId, data.message)
 }
 
-export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain:Brain): void {
+export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain: Brain, data: { message:string, sender: RoomMember; botId: string; roomId: string }): void {
 
-    const message: string | undefined = event.event.content?.body.toLowerCase()
-    const roomId = event.event.room_id
     let actionTaken = false
 
-    if (!roomId || !message || !event.sender) return
+    logger.debug("parseMessageToSelf: body =", data.message)
+    logger.debug("parseMessageToSelf: room_id =", data.roomId)
 
-    logger.debug("parseMessageToSelf: body =", message)
-    logger.debug("parseMessageToSelf: room_id =", roomId)
+    if (!actionTaken) actionTaken = leaveRoomIfAsked(client, data.roomId, data.sender.userId, data.message)
+    if (!actionTaken) actionTaken = createWebhookIfAsked(client, event, data.message)
+    if (!actionTaken) actionTaken = promoteUserIfAsked(client, event, data.message)
+    if (!actionTaken) actionTaken = helpIfAsked(client, event, data.message)
+    if (!actionTaken) actionTaken = downgradeIfAsked(client, event, data.message)
+    if (!actionTaken) actionTaken = deleteRoomIfAsked(client, data.roomId, data.sender.userId, data.message)
 
-    if (!actionTaken) actionTaken = leaveRoomIfAsked(client, roomId, event.sender.userId, message)
-    if (!actionTaken) actionTaken = createWebhookIfAsked(client, event, message)
-    if (!actionTaken) actionTaken = promoteUserIfAsked(client, event, message)
-    if (!actionTaken) actionTaken = helpIfAsked(client, event, message)
-    if (!actionTaken) actionTaken = downgradeIfAsked(client, event, message)
-    if (!actionTaken) actionTaken = deleteRoomIfAsked(client, roomId, event.sender.userId, message)
-
-    if (!actionTaken) actionTaken = createRoomUsersListIfAsked(client, event, message, brain)
-    if (!actionTaken) actionTaken = deleteRoomUsersListIfAsked(client, event, message)
-    if (!actionTaken) actionTaken = updateRoomUsersListIfAsked(client, event, message)
+    if (!actionTaken) actionTaken = createRoomUsersListIfAsked(client, event, data.message, brain)
+    if (!actionTaken) actionTaken = deleteRoomUsersListIfAsked(client, event, data.message)
+    if (!actionTaken) actionTaken = updateRoomUsersListIfAsked(client, event, data.message)
 
     // Actions propres au Bot
-    if (!actionTaken) actionTaken = ollama(client, roomId, event.sender, message)
+    if (!actionTaken) actionTaken = ollama(client, data.roomId, data.sender, data.message)
 
     // Default
-    if (!actionTaken) sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
+    if (!actionTaken) sendMessage(client, data.roomId, "Bonjour " + data.sender.name + ", en quoi puis-je aider ?")
 }
