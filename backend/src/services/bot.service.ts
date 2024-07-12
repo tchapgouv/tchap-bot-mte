@@ -338,10 +338,10 @@ export default {
         return roomName
     },
 
-    async inviteUsersInRoom(botId:string, userUidList: string[], roomId: string, retry = 0, logAlreadyInvited = true): Promise<void> {
+    async inviteUsersInRoom(botId: string, userUidList: string[], roomId: string, retry = 0, logAlreadyInvited = true): Promise<void> {
 
         const bot = this.getBotById(botId)
-        const client: MatrixClient= bot.client
+        const client: MatrixClient = bot.client
 
         logger.debug("inviteUsersInRoom", userUidList.length, roomId, retry, logAlreadyInvited)
 
@@ -519,32 +519,46 @@ export default {
         const roomMembers: RoomMember[] = client.getRoom(roomId)?.getMembers() || [];
         const ldapQueryPerson = await ldapService.getUsersWithLdapRequest(ldapClient, ldapGroup.getDataValue("base_dn"), ldapGroup.getDataValue("recursively"), ldapGroup.getDataValue("filter"))
 
+        let foundSomeoneToKick = false
         for (const roomMember of roomMembers) {
             if (!ldapQueryPerson.some(ldapPerson => roomMember.userId.includes(ldapPerson.uid[0].toLowerCase()))) {
-                if (dryRun)
-                    dryRunMessage += " - " + roomMember.name + " sera renvoyé.\n"
-                else
-                    this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus à la requête définissant les membre de ce salon.").then(value => {
+                if (dryRun) {
+                    if (!foundSomeoneToKick) {
+                        foundSomeoneToKick = true
+                        dryRunMessage += "Seront renvoyés :\n\n"
+                    }
+                    dryRunMessage += " - " + roomMember.name + "\n"
+                } else {
+                    this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus à la requête LDAP définissant les membre de ce salon.").then(value => {
                         sendMessage(client, roomId, value.message)
                     })
+                }
             }
         }
 
         let userUidList: string[] = []
-
+        let foundSomeoneToInvite = false
         for (const ldapPerson of ldapQueryPerson) {
 
             const mailPR = ldapPerson.mailPR[0].toLowerCase()
 
             if (!roomMembers.some(roomMember => roomMember.userId.includes(ldapPerson.uid[0].toLowerCase()))) {
-                if (dryRun)
-                    dryRunMessage += " - " + mailPR + " sera invité.\n"
-                else
+                if (dryRun) {
+                    if (!foundSomeoneToInvite) {
+                        foundSomeoneToInvite = true
+                        dryRunMessage += "\nSeront invités :\n\n"
+                    }
+                    dryRunMessage += " - " + mailPR + "\n"
+                } else {
                     userUidList.push(ldapPerson.uid[0].toLowerCase())
+                }
             }
         }
 
         if (dryRun) {
+            if (!foundSomeoneToInvite && !foundSomeoneToKick) {
+                dryRunMessage += "Aucun.\n"
+            }
             dryRunMessage += "\n_<sup>*</sup> Sous réserve de droits suffisants._"
             sendMarkdownMessage(client, roomId, dryRunMessage)
         } else {
