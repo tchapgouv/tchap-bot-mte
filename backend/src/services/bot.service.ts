@@ -521,10 +521,7 @@ export default {
 
         let foundSomeoneToKick = false
         for (const roomMember of roomMembers) {
-            if (!ldapQueryPerson.some(ldapPerson => {
-                if (!ldapPerson.uid || !ldapPerson.uid[0]) return false
-                return roomMember.userId.includes(ldapPerson.uid[0].toLowerCase())
-            })) {
+            if (!ldapQueryPerson.some(ldapPerson => roomMember.userId.includes(ldapPerson.uid[0].toLowerCase()) )) {
                 if (roomMember.userId.toLowerCase().includes("bot-")) continue
                 if (dryRun) {
                     if (!foundSomeoneToKick) {
@@ -543,8 +540,6 @@ export default {
         let userUidList: string[] = []
         let foundSomeoneToInvite = false
         for (const ldapPerson of ldapQueryPerson) {
-
-            if (!ldapPerson.uid || !ldapPerson.uid[0] || !ldapPerson.mailPR || ldapPerson.mailPR[0]) continue
 
             const mailPR = ldapPerson.mailPR[0].toLowerCase()
 
