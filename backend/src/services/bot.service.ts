@@ -530,7 +530,7 @@ export default {
                     }
                     dryRunMessage += " - " + roomMember.name + "\n"
                 } else {
-                    this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus au groupe définissant les membres de ce salon.").then(value => {
+                    this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus au groupe configuré, définissant les membres de ce salon.").then(value => {
                         sendMessage(client, roomId, value.message)
                     })
                 }

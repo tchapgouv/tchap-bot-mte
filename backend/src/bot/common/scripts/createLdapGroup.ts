@@ -34,7 +34,7 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
             } else {
                 brain.set("group_created", undefined)
                 ldapGroupService.destroy(roomId).then(_value => {
-                    sendMessage(client, roomId, "Groupe supprimé.")
+                    sendMessage(client, roomId, "Configuration du groupe supprimée.")
                 })
             }
 
@@ -57,7 +57,7 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
                     }
 
                     ldapGroupService.createOrUpdate(botId, roomId, base_dn, recursive, filter).then(_value => {
-                        sendMessage(client, roomId, "Groupe créé.")
+                        sendMessage(client, roomId, "Configuration du groupe créée.")
                         brain.set("group_created", {userId, roomId})
                         botService.updateRoomMemberList(client, roomId, true).then(_ => {
                             sendMessage(client, roomId, "Souhaitez vous procéder ? oui/non")
