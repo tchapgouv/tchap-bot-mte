@@ -5,12 +5,14 @@ import {sendMessage} from "./helper.js";
 import {RequestInit} from "node-fetch";
 import fetchWithError from "../../utils/fetchWithError.js";
 import {GMCD_INFRA_ROOM_ID} from "./config.js";
+import {Brain} from "./Brain.js";
 
 export class Bot {
 
     client: MatrixClient;
-    private readonly parseMessage: (arg0: MatrixClient, arg1: MatrixEvent) => void;
-    private readonly parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent) => void;
+    brain: Brain = new Brain()
+    private readonly parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, brain: Brain) => void;
+    private readonly parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, brain: Brain) => void;
 
     ids_token: { token: string, valid_until: Date } | undefined
 
@@ -21,8 +23,8 @@ export class Bot {
                     deviceId: string,
                     idBaseUrl: string
                 },
-                parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent) => void,
-                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent) => void) {
+                parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, brain: Brain) => void,
+                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, brain: Brain) => void) {
 
         const getIST = () => {
             return this.getIdentityServerToken()
@@ -124,11 +126,11 @@ export class Bot {
 
                     if (isSelfMentioned) {
                         logger.debug("Parsing Message To Self", this.client.getUserId())
-                        this.parseMessageToSelf(this.client, event)
+                        this.parseMessageToSelf(this.client, event, this.brain)
                     } else {
 
                         logger.debug("Parsing Message", this.client.getUserId())
-                        this.parseMessage(this.client, event)
+                        this.parseMessage(this.client, event, this.brain)
                     }
                 }
             }

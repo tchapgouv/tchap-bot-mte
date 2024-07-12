@@ -338,9 +338,9 @@ export default {
         return roomName
     },
 
-    async inviteUsersInRoom(userList: string[], roomId: string, retry = 0, logAlreadyInvited = true): Promise<void> {
+    async inviteUsersInRoom(userUidList: string[], roomId: string, retry = 0, logAlreadyInvited = true): Promise<void> {
 
-        logger.debug("inviteUsersInRoom", userList.length, roomId, retry, logAlreadyInvited)
+        logger.debug("inviteUsersInRoom", userUidList.length, roomId, retry, logAlreadyInvited)
 
         const isMemberOfRoom = await this.isMemberOfRoom(roomId)
 
@@ -353,7 +353,7 @@ export default {
         let userMailList: string[] = []
         let hasExternal = false
 
-        await ldapService.getMailsForUIDs(userList)
+        await ldapService.getMailsForUIDs(userUidList)
             .then(data => {
                 userMailList = data.userMailList
                 for (const username of data.userNotFoundList) {
@@ -443,16 +443,21 @@ export default {
         }
     },
 
-    async postMessage(roomId: string,
-                      message: { formattedMessage: string; rawMessage: string | undefined },
-                      botId: string,
-                      opts: { messageFormat: string } = {messageFormat: "text"}): Promise<{ message: string } | void> {
-
+    getClientWithBotId(botId: string) {
         let client
 
         for (const bot of bots) {
             if (bot.client.getUserId() === botId) client = bot.client
         }
+        return client;
+    },
+
+    async postMessage(roomId: string,
+                      message: { formattedMessage: string; rawMessage: string | undefined },
+                      botId: string,
+                      opts: { messageFormat: string } = {messageFormat: "text"}): Promise<{ message: string } | void> {
+
+        let client = this.getClientWithBotId(botId);
 
         if (!client) client = botGmcd.client
 
@@ -496,7 +501,9 @@ export default {
         return isMember
     },
 
-    async updateRoomMemberList(client: MatrixClient, roomId: string) {
+    async updateRoomMemberList(client: MatrixClient, roomId: string, dryRun: boolean = true) {
+
+        let dryRunMessage: string = "Les changements suivants seront opérés <sup>*</sup> : \n\n"
 
         if (!roomId) throw "updateRoomMemberList : roomId cannot be empty"
 
@@ -513,20 +520,36 @@ export default {
 
         for (const roomMember of roomMembers) {
             if (!ldapQueryPerson.some(ldapPerson => roomMember.userId.includes(ldapPerson.uid[0].toLowerCase()))) {
-                this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus à la requête définissant les membre de ce salon.").then(value => {
-                    sendMessage(client, roomId, value.message)
-                })
+                if (dryRun)
+                    dryRunMessage += " - " + roomMember + " sera renvoyé.\n"
+                else
+                    this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus à la requête définissant les membre de ce salon.").then(value => {
+                        sendMessage(client, roomId, value.message)
+                    })
             }
         }
+
+        let userUidList: string[] = []
 
         for (const ldapPerson of ldapQueryPerson) {
 
             const mailPR = ldapPerson.mailPR[0].toLowerCase()
-            // const uid = ldapPerson.uid[0].toLowerCase()
 
             if (!roomMembers.some(roomMember => roomMember.userId.includes(ldapPerson.uid[0].toLowerCase()))) {
-                this.inviteUserInRoom(mailPR, roomId).then(value => {
-                    sendMessage(client, roomId, value.message)
+                if (dryRun)
+                    dryRunMessage += " - " + mailPR + " sera invité.\n"
+                else
+                    userUidList.push(ldapPerson.uid[0].toLowerCase())
+            }
+        }
+
+        if (dryRun) {
+            dryRunMessage += "\n<sup>*</sup> Sous réserve de droits suffisants"
+            sendMarkdownMessage(client, roomId, dryRunMessage)
+        } else {
+            if (userUidList.length > 0) {
+                this.inviteUsersInRoom(userUidList, roomId, 0, false).catch(reason => {
+                    logger.error("Error inviting users based on ldap", reason)
                 })
             }
         }

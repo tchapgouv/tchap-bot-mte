@@ -2,6 +2,7 @@ import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import {getPowerLevel, sendMessage} from "../helper.js";
 import ldapGroupService from "../../../services/ldapGroup.service.js";
 import botService from "../../../services/bot.service.js";
+import {Brain} from "../Brain.js";
 
 /**
  * --help
@@ -10,18 +11,31 @@ import botService from "../../../services/bot.service.js";
  * isAnswer : true
  */
 // create ldap group basedn:ou=PIAP,ou=GMCD,ou=DETN,ou=UNI,ou=DNUM,ou=SG,ou=AC,ou=melanie,ou=organisation,dc=equipement,dc=gouv,dc=fr
-export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
+export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string, brain: Brain) {
 
-    const regex: RegExp = /.*create ldap group.*/i
 
-    if (regex.test(body)) {
+    if (event?.sender?.name &&
+        event?.sender?.userId &&
+        event?.event?.room_id) {
 
-        if (event?.sender?.name &&
-            event?.sender?.userId &&
-            event?.event?.room_id) {
+        const roomId = event.event.room_id
+        const userId = event.sender.userId
 
-            const roomId = event.event.room_id
-            const userId = event.sender.userId
+        if (brain.get("group_created") &&
+            brain.get("group_created").userId === userId &&
+            brain.get("group_created").roomId === roomId) {
+
+            if (/oui/i.test(body)) {
+
+                botService.updateRoomMemberList(client, roomId, false)
+                return true
+
+            } else {
+                brain.set("group_created", undefined)
+            }
+        }
+
+        if (/.*create ldap group.*/i.test(body)) {
 
             getPowerLevel(client, roomId, userId).then(powerLevel => {
 
@@ -37,8 +51,10 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
                     }
 
                     ldapGroupService.createOrUpdate(roomId, base_dn, recursive, filter).then(_value => {
-                        sendMessage(client, roomId, "Groupe créé, je vais maintenant mettre à jours les membres")
-                        botService.updateRoomMemberList(client, roomId)
+                        sendMessage(client, roomId, "Groupe créé.")
+                        brain.set("group_created", {userId, roomId})
+                        botService.updateRoomMemberList(client, roomId, true)
+                        sendMessage(client, roomId, "Souhaitez vous procéder ? oui/non")
                     })
 
                 } else {

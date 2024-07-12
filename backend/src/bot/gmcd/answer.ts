@@ -13,8 +13,9 @@ import {ollama} from "./scripts/ollama.js";
 import {createRoomUsersListIfAsked} from "../common/scripts/createLdapGroup.js";
 import {deleteRoomUsersListIfAsked} from "../common/scripts/deleteLdapGroup.js";
 import {updateRoomUsersListIfAsked} from "../common/scripts/updateLdapGroup.js";
+import {Brain} from "../common/Brain.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, brain:Brain): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -26,7 +27,7 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent): void {
     norrisIfAsked(client, roomId, message)
 }
 
-export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent): void {
+export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain:Brain): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -43,11 +44,14 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent): vo
     if (!actionTaken) actionTaken = helpIfAsked(client, event, message)
     if (!actionTaken) actionTaken = downgradeIfAsked(client, event, message)
     if (!actionTaken) actionTaken = deleteRoomIfAsked(client, roomId, event.sender.userId, message)
-    if (!actionTaken) actionTaken = createRoomUsersListIfAsked(client, event, message)
+
+    if (!actionTaken) actionTaken = createRoomUsersListIfAsked(client, event, message, brain)
     if (!actionTaken) actionTaken = deleteRoomUsersListIfAsked(client, event, message)
     if (!actionTaken) actionTaken = updateRoomUsersListIfAsked(client, event, message)
+
     // Actions propres au Bot
     if (!actionTaken) actionTaken = ollama(client, roomId, event.sender, message)
+
     // Default
     if (!actionTaken) sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }

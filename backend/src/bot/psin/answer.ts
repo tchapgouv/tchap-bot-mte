@@ -9,8 +9,9 @@ import {deleteRoomIfAsked} from "../common/scripts/delete.js";
 import {downgradeIfAsked} from "../common/scripts/downgrade.js";
 import {listIncidentsIfAsked} from "./scripts/incidents.js";
 import {statsIfAsked} from "./scripts/stats.js";
+import {Brain} from "../common/Brain.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, brain:Brain): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -21,7 +22,7 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent): void {
     // Actions propres au Bot
 }
 
-export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent): void {
+export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain:Brain): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
