@@ -47,8 +47,8 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
 
                 if (powerLevel === 100) {
 
-                    const base_dn = body.match(/.* basedn:(.*?)(?: |$).*/i)?.at(1)
-                    const filter = body.match(/.* filter:(.*?)(?: |$).*/i)?.at(1)
+                    const base_dn = event.event.content?.body.match(/.* basedn:(.*?)(?: |$).*/i)?.at(1)
+                    const filter = event.event.content?.body.match(/.* filter:(.*?)(?: |$).*/i)?.at(1)
                     const recursive = body.includes("recursive:true")
 
                     if (!base_dn) {
