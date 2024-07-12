@@ -25,8 +25,13 @@ export function deleteRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
 
                 if (powerLevel === 100) {
 
-                    ldapGroupService.destroy(roomId).then(_value => {
-                        sendMessage(client, roomId, "Groupe supprimé.")
+                    ldapGroupService.destroy(roomId).then(numberOfDeletedRows => {
+                        if (numberOfDeletedRows > 0) {
+                            sendMessage(client, roomId, "Groupe supprimé.")
+                        }
+                        else {
+                            sendMessage(client, roomId, "Aucun groupe n'est défini pour ce salon.")
+                        }
                     })
 
                 } else {
