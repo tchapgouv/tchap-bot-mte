@@ -7,14 +7,14 @@ const ldapGroupRepository = sequelize.getRepository(LdapGroup)
 
 export default {
 
-    async createOrUpdate(room_id: string, base_dn: string, recursively: boolean = false, filter: string = "(&(objectClass=mineqPerson)"): Promise<any> {
+    async createOrUpdate(bot_id: string, room_id: string, base_dn: string, recursively: boolean = false, filter: string = "(&(objectClass=mineqPerson)"): Promise<any> {
 
         const ldapGroup = await ldapGroupRepository.findOne({where: {room_id: room_id}})
 
         if (!ldapGroup) {
-            return await this.create(room_id, base_dn, recursively, filter)
+            return await this.create(bot_id, room_id, base_dn, recursively, filter)
         } else {
-            ldapGroup.set({room_id, base_dn, recursively, filter})
+            ldapGroup.set({bot_id, room_id, base_dn, recursively, filter})
             return await ldapGroup.save()
         }
     },
@@ -29,10 +29,11 @@ export default {
 
     },
 
-    async create(room_id: string, base_dn: string, recursively: boolean = false, filter: string = "(&(objectClass=mineqPerson)"): Promise<any> {
+    async create(bot_id:string, room_id: string, base_dn: string, recursively: boolean = false, filter: string = "(&(objectClass=mineqPerson)"): Promise<any> {
 
         // Create a Webhook
         const ldapGroupPojo: Attributes<LdapGroup> = {
+            bot_id: bot_id,
             room_id: room_id,
             base_dn: base_dn,
             recursively: recursively,

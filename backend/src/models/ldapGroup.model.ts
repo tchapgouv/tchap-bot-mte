@@ -13,4 +13,6 @@ export class LdapGroup extends Model<InferAttributes<LdapGroup>, InferCreationAt
     declare recursively: boolean;
     @Column(DataType.TEXT)
     declare filter: string;
+    @Column(DataType.TEXT)
+    declare bot_id: string;
 }

@@ -11,7 +11,7 @@ import {listIncidentsIfAsked} from "./scripts/incidents.js";
 import {statsIfAsked} from "./scripts/stats.js";
 import {Brain} from "../common/Brain.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent, brain:Brain): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain:Brain): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -22,7 +22,7 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent, brain:Bra
     // Actions propres au Bot
 }
 
-export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain:Brain): void {
+export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, _brain:Brain): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id

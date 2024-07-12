@@ -3,6 +3,7 @@ import {getPowerLevel, sendMessage} from "../helper.js";
 import ldapGroupService from "../../../services/ldapGroup.service.js";
 import botService from "../../../services/bot.service.js";
 import {Brain} from "../Brain.js";
+import logger from "../../../utils/logger.js";
 
 /**
  * --help
@@ -18,6 +19,7 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
         event?.sender?.userId &&
         event?.event?.room_id) {
 
+        let botId = client.getUserId() + "";
         const roomId = event.event.room_id
         const userId = event.sender.userId
 
@@ -27,7 +29,9 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
 
             if (/oui/i.test(body)) {
 
-                botService.updateRoomMemberList(client, roomId, false)
+                botService.updateRoomMemberList(client, roomId, false).catch(reason => {
+                    logger.error("Error while executing : update room member list.", reason)
+                })
                 return true
 
             } else {
@@ -50,11 +54,14 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
                         return true
                     }
 
-                    ldapGroupService.createOrUpdate(roomId, base_dn, recursive, filter).then(_value => {
+                    ldapGroupService.createOrUpdate(botId, roomId, base_dn, recursive, filter).then(_value => {
                         sendMessage(client, roomId, "Groupe créé.")
                         brain.set("group_created", {userId, roomId})
-                        botService.updateRoomMemberList(client, roomId, true)
-                        sendMessage(client, roomId, "Souhaitez vous procéder ? oui/non")
+                        botService.updateRoomMemberList(client, roomId, true).then(_ => {
+                            sendMessage(client, roomId, "Souhaitez vous procéder ? oui/non")
+                        }).catch(reason => {
+                            logger.error("Error while executing dry : update room member list.", reason)
+                        })
                     })
 
                 } else {

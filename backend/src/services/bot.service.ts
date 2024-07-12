@@ -338,7 +338,10 @@ export default {
         return roomName
     },
 
-    async inviteUsersInRoom(userUidList: string[], roomId: string, retry = 0, logAlreadyInvited = true): Promise<void> {
+    async inviteUsersInRoom(botId:string, userUidList: string[], roomId: string, retry = 0, logAlreadyInvited = true): Promise<void> {
+
+        const bot = this.getBotById(botId)
+        const client: MatrixClient= bot.client
 
         logger.debug("inviteUsersInRoom", userUidList.length, roomId, retry, logAlreadyInvited)
 
@@ -346,7 +349,7 @@ export default {
 
         if (!isMemberOfRoom) throw "I am not able to invite has i am not a member of the room !"
 
-        if (!botGmcd.client.getRoom(roomId)?.canInvite(gmcdBotConfig.userId)) throw "I am do not have permissions to invite in this room !"
+        if (!client.getRoom(roomId)?.canInvite(gmcdBotConfig.userId)) throw "I am do not have permissions to invite in this room !"
 
         let message: string = "Rapport d'invitations : \n"
 
@@ -376,7 +379,7 @@ export default {
 
         if (hasExternal) {
             logger.notice("Setting guest access to room " + roomId)
-            await botGmcd.client.sendStateEvent(roomId, "im.vector.room.access_rules", {rule: "unrestricted"})
+            await client.sendStateEvent(roomId, "im.vector.room.access_rules", {rule: "unrestricted"})
                 .then(() => {
                     logger.notice("Guest access set for room " + roomId)
                 }).catch(_ => {
@@ -385,7 +388,7 @@ export default {
         }
 
         // Maj du token préventivement afin d’éviter de multiples appels en parallèle
-        await botGmcd.getIdentityServerToken()
+        await bot.getIdentityServerToken()
 
         // On invite par groupes de 10 et on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit de l’endpoint en lui-même = 1k/s).
         let tasks: Promise<{ message: string, hasError: boolean, mail: string }>[] = [];
@@ -411,7 +414,7 @@ export default {
             count++
         }
 
-        sendMessage(botGmcd.client, roomId, message)
+        sendMessage(client, roomId, message)
 
         logger.debug("Awaiting " + tasks.length + " inviting tasks.")
 
@@ -427,29 +430,29 @@ export default {
                 logger.error("Promise.all(inviteByEmail) : ", reason)
                 throw (reason)
             })
-            sendMessage(botGmcd.client, roomId, inviteResultMessage)
+            sendMessage(client, roomId, inviteResultMessage)
         })
 
         logger.debug("Inviting tasks completed")
 
         if (mailInErrorList.length > 0 && retry <= 2) {
-            sendMessage(botGmcd.client, roomId, " ❗️ Certaines invitations semblent en erreur et seront retentées dans 30 minutes.\n")
+            sendMessage(client, roomId, " ❗️ Certaines invitations semblent en erreur et seront retentées dans 30 minutes.\n")
             setTimeout(() => {
                 retry++
-                this.inviteUsersInRoom(mailInErrorList, roomId, retry, false).catch(reason => {
+                this.inviteUsersInRoom(botId, mailInErrorList, roomId, retry, false).catch(reason => {
                     throw reason
                 })
             }, 30 * 60 * 1000)
         }
     },
 
-    getClientWithBotId(botId: string) {
-        let client
+    getBotById(botId: string) {
 
         for (const bot of bots) {
-            if (bot.client.getUserId() === botId) client = bot.client
+            if (bot.client.getUserId() === botId) return bot
         }
-        return client;
+
+        return botGmcd;
     },
 
     async postMessage(roomId: string,
@@ -457,9 +460,7 @@ export default {
                       botId: string,
                       opts: { messageFormat: string } = {messageFormat: "text"}): Promise<{ message: string } | void> {
 
-        let client = this.getClientWithBotId(botId);
-
-        if (!client) client = botGmcd.client
+        let client = this.getBotById(botId).client;
 
         logger.info("Posting message")
 
@@ -548,7 +549,7 @@ export default {
             sendMarkdownMessage(client, roomId, dryRunMessage)
         } else {
             if (userUidList.length > 0) {
-                this.inviteUsersInRoom(userUidList, roomId, 0, false).catch(reason => {
+                this.inviteUsersInRoom(client.getUserId() + "", userUidList, roomId, 0, false).catch(reason => {
                     logger.error("Error inviting users based on ldap", reason)
                 })
             }

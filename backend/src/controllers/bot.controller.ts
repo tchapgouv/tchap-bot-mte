@@ -2,6 +2,7 @@ import {Request, Response} from "express";
 import botService from "../services/bot.service.js";
 import logger from "../utils/logger.js";
 import {StatusCodes} from "http-status-codes";
+import config from "../bot/gmcd/config.js";
 
 export async function migrateRoom(req: Request, res: Response) {
 
@@ -10,7 +11,7 @@ export async function migrateRoom(req: Request, res: Response) {
 
     if (req.body.room_id) {
 
-        await botService.inviteUsersInRoom(req.body.users_list, req.body.room_id).then(_value => {
+        await botService.inviteUsersInRoom(config.userId, req.body.users_list, req.body.room_id).then(_value => {
 
             logger.info("Users invited in ", req.body.room_id)
             res.status(StatusCodes.OK).json({message: "Users invited"})
@@ -31,7 +32,7 @@ export async function migrateRoom(req: Request, res: Response) {
         })
 
         if (roomId) {
-            await botService.inviteUsersInRoom(req.body.users_list, roomId).then(_value => {
+            await botService.inviteUsersInRoom(config.userId, req.body.users_list, roomId).then(_value => {
 
                 logger.info("Room " + req.body.room_name + " created and users invited")
                 res.status(StatusCodes.OK).json({message: "Room created and users invited", room_id: roomId})
@@ -120,7 +121,7 @@ export async function inviteUsers(req: Request, res: Response) {
     if (!req.body.users_list) return res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing users UIDs list !'})
     if (!req.body.room_id) return res.status(StatusCodes.BAD_REQUEST).json({message: 'Missing room id !'})
 
-    await botService.inviteUsersInRoom(req.body.users_list, req.body.room_id).then(_value => {
+    await botService.inviteUsersInRoom(config.userId, req.body.users_list, req.body.room_id).then(_value => {
 
         res.status(StatusCodes.OK).json({message: "Users invited"})
 

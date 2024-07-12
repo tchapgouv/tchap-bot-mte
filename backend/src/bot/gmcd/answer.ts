@@ -15,7 +15,7 @@ import {deleteRoomUsersListIfAsked} from "../common/scripts/deleteLdapGroup.js";
 import {updateRoomUsersListIfAsked} from "../common/scripts/updateLdapGroup.js";
 import {Brain} from "../common/Brain.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent, brain:Brain): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain:Brain): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
