@@ -522,6 +522,7 @@ export default {
         let foundSomeoneToKick = false
         for (const roomMember of roomMembers) {
             if (!ldapQueryPerson.some(ldapPerson => roomMember.userId.includes(ldapPerson.uid[0].toLowerCase()))) {
+                if (roomMember.userId.toLowerCase().includes("bot-")) continue
                 if (dryRun) {
                     if (!foundSomeoneToKick) {
                         foundSomeoneToKick = true
