@@ -11,7 +11,7 @@ import logger from "../../../utils/logger.js";
  * return : je gère les utilisateurs de ce salon en me basant sur une requête ldap <sup>*</sup>
  * isAnswer : true
  */
-// create ldap group basedn:ou=PIAP,ou=GMCD,ou=DETN,ou=UNI,ou=DNUM,ou=SG,ou=AC,ou=melanie,ou=organisation,dc=equipement,dc=gouv,dc=fr filter:(&(mailPr=*gouv.fr)(objectclass=mineqPerson))
+// create ldap group basedn:ou=PIAP,ou=GMCD,ou=DETN,ou=UNI,ou=DNUM,ou=SG,ou=AC,ou=melanie,ou=organisation,dc=equipement,dc=gouv,dc=fr filter:(&(|(mailPr=*gouv.fr)(mailPr=*carre.net))(objectclass=mineqPerson))
 export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string, brain: Brain) {
 
 
