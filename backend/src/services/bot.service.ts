@@ -533,7 +533,7 @@ export default {
                     }
                     dryRunMessage += " - " + roomMember.name + "\n"
                 } else {
-                    this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus à la requête LDAP définissant les membre de ce salon.").then(value => {
+                    this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus à la requête LDAP définissant les membres de ce salon.").then(value => {
                         sendMessage(client, roomId, value.message)
                     })
                 }
