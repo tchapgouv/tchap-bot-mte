@@ -506,8 +506,11 @@ export default {
 
         if (!roomId) throw "updateRoomMemberList : roomId cannot be empty"
 
-        const mailListGroup = await mailGroupService.findRoomGroup(roomId)
         const ldapListGroup = await ldapGroupService.findRoomGroup(roomId)
+        const mailListGroup = await mailGroupService.findRoomGroup(roomId)
+
+        logger.debug("ldapListGroup :", ldapListGroup)
+        logger.debug("mailListGroup :", mailListGroup)
 
         if (!ldapListGroup && !mailListGroup) {
             throw ({message: "No defined ldap group or mail group configuration found for given room."})
