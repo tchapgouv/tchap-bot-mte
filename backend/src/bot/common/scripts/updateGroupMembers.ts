@@ -5,12 +5,12 @@ import botService from "../../../services/bot.service.js";
 /**
  * --help
  * command : update members
- * return : je met à jours les utilisateurs de ce salon <sup>*</sup>
+ * return : je mets à jour les utilisateurs de ce salon <sup>*</sup>
  * isAnswer : true
  */
 export function updateRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /.*update members.*/i
+    const regex: RegExp = /(?=.*(?:update|maj))(?=.*list)(?=.*(?:member|membre)).*/i
 
     if (regex.test(body)) {
 

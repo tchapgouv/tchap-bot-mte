@@ -10,9 +10,9 @@ import {createWebhookIfAsked} from "../common/scripts/webhoook.js";
 import {deleteRoomIfAsked} from "../common/scripts/delete.js";
 import {downgradeIfAsked} from "../common/scripts/downgrade.js";
 import {ollama} from "./scripts/ollama.js";
-import {createRoomUsersListIfAsked} from "../common/scripts/createLdapGroup.js";
-import {deleteRoomUsersListIfAsked} from "../common/scripts/deleteLdapGroup.js";
-import {updateRoomUsersListIfAsked} from "../common/scripts/updateLdapGroup.js";
+import {createLdapUsersListIfAsked} from "../common/scripts/ldapGroup/createLdapGroup.js";
+import {deleteLdapUsersListIfAsked} from "../common/scripts/ldapGroup/deleteLdapGroup.js";
+import {updateRoomUsersListIfAsked} from "../common/scripts/updateGroupMembers.js";
 import {Brain} from "../common/Brain.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
 
@@ -37,8 +37,9 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, bra
     if (!actionTaken) actionTaken = downgradeIfAsked(client, event, data.message)
     if (!actionTaken) actionTaken = deleteRoomIfAsked(client, data.roomId, data.sender.userId, data.message)
 
-    if (!actionTaken) actionTaken = createRoomUsersListIfAsked(client, event, data.message, brain)
-    if (!actionTaken) actionTaken = deleteRoomUsersListIfAsked(client, event, data.message)
+    if (!actionTaken) actionTaken = createLdapUsersListIfAsked(client, event, data.message, brain)
+    if (!actionTaken) actionTaken = deleteLdapUsersListIfAsked(client, event, data.message)
+
     if (!actionTaken) actionTaken = updateRoomUsersListIfAsked(client, event, data.message)
 
     // Actions propres au Bot

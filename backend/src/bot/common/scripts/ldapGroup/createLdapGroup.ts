@@ -1,9 +1,9 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
-import {getPowerLevel, sendMessage} from "../helper.js";
-import ldapGroupService from "../../../services/ldapGroup.service.js";
-import botService from "../../../services/bot.service.js";
-import {Brain} from "../Brain.js";
-import logger from "../../../utils/logger.js";
+import {getPowerLevel, sendMessage} from "../../helper.js";
+import ldapGroupService from "../../../../services/ldapListGroup.service.js";
+import botService from "../../../../services/bot.service.js";
+import {Brain} from "../../Brain.js";
+import logger from "../../../../utils/logger.js";
 
 /**
  * --help
@@ -11,8 +11,8 @@ import logger from "../../../utils/logger.js";
  * return : je gère les utilisateurs de ce salon en me basant sur une requête ldap <sup>*</sup>
  * isAnswer : true
  */
-// create ldap group basedn:ou=PIAP,ou=GMCD,ou=DETN,ou=UNI,ou=DNUM,ou=SG,ou=AC,ou=melanie,ou=organisation,dc=equipement,dc=gouv,dc=fr filter:(&(|(mailPr=*gouv.fr)(mailPr=*carre.net))(objectclass=mineqPerson))
-export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string, brain: Brain) {
+// create ldap group basedn:ou=GMCD,ou=DETN,ou=UNI,ou=DNUM,ou=SG,ou=AC,ou=melanie,ou=organisation,dc=equipement,dc=gouv,dc=fr filter:(&(mailPr=*)(objectclass=mineqPerson)(objectclass=mineqMelBoite)) recursive:true
+export function createLdapUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string, brain: Brain) {
 
 
     if (event?.sender?.name &&
@@ -28,6 +28,7 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
             brain.get("group_created").roomId === roomId) {
 
             if (/oui/i.test(body)) {
+                ldapGroupService.activate(roomId)
                 botService.updateRoomMemberList(client, roomId, false).catch(reason => {
                     logger.error("Error while executing : update room member list.", reason)
                 })
@@ -56,7 +57,7 @@ export function createRoomUsersListIfAsked(client: MatrixClient, event: MatrixEv
                         return true
                     }
 
-                    ldapGroupService.createOrUpdate(botId, roomId, base_dn, recursive, filter).then(_value => {
+                    ldapGroupService.createOrUpdate(roomId, botId, base_dn, filter, recursive, false).then(_value => {
                         sendMessage(client, roomId, "Configuration du groupe créée.")
                         brain.set("group_created", {userId, roomId})
                         botService.updateRoomMemberList(client, roomId, true).then(_ => {

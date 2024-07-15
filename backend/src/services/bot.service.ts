@@ -5,22 +5,20 @@ import bot777 from "../bot/777/bot.js";
 import vm from "vm"
 import {MatrixClient, Preset, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
-import ldapService from "./ldap.service.js";
+import ldapService, {Agent} from "./ldap.service.js";
 import {getPowerLevel, sendFile, sendHtmlMessage, sendImage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
 import {Bot} from "../bot/common/Bot.js";
 import {splitEvery} from "../utils/utils.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
-import sequelize from "../models/index.js";
-import {LdapGroup} from "../models/ldapGroup.model.js";
 import ldap from "ldapjs";
+import ldapGroupService from "./ldapListGroup.service.js";
+import mailGroupService from "./mailListGroup.service.js";
 
 const bots: Bot[] = [
     botGmcd,
     botPsin,
     bot777
 ]
-
-const ldapGroupRepository = sequelize.getRepository(LdapGroup)
 
 const rateLimit = 10
 const rateLimitDelay = 60 / rateLimit * 1000
@@ -508,20 +506,29 @@ export default {
 
         if (!roomId) throw "updateRoomMemberList : roomId cannot be empty"
 
-        const ldapGroup = await ldapGroupRepository.findOne({where: {room_id: roomId}})
+        const mailListGroup = await mailGroupService.findRoomGroup(roomId)
+        const ldapListGroup = await ldapGroupService.findRoomGroup(roomId)
 
-        if (!ldapGroup) {
-            throw ({message: "No defined ldap group found for given room."})
+        if (!ldapListGroup && !mailListGroup) {
+            throw ({message: "No defined ldap group or mail group configuration found for given room."})
         }
+
+        let agentList: Agent[] = []
 
         const ldapClient = ldap.createClient({url: process.env.LDAP_URI || ''});
 
+        if (ldapListGroup) {
+            agentList = await ldapService.getUsersWithLdapRequest(ldapClient, ldapListGroup.getDataValue("base_dn"), ldapListGroup.getDataValue("recursively"), ldapListGroup.getDataValue("filter"))
+        }
+        if (mailListGroup) {
+            agentList = await ldapService.getUsersWithLdapMailingList(ldapClient, mailListGroup.getDataValue("mail"))
+        }
+
         const roomMembers: RoomMember[] = client.getRoom(roomId)?.getMembers() || [];
-        const ldapQueryPerson = await ldapService.getUsersWithLdapRequest(ldapClient, ldapGroup.getDataValue("base_dn"), ldapGroup.getDataValue("recursively"), ldapGroup.getDataValue("filter"))
 
         let foundSomeoneToKick = false
         for (const roomMember of roomMembers) {
-            if (!ldapQueryPerson.some(ldapPerson => roomMember.userId.includes(ldapPerson.mailPR[0].toLowerCase().replace("@", "-")))) {
+            if (!agentList.some(agent => roomMember.userId.includes(agent.mailPR.toLowerCase().replace("@", "-")))) {
                 if (roomMember.userId.toLowerCase().includes("bot-")) continue
                 if (dryRun) {
                     if (!foundSomeoneToKick) {
@@ -539,11 +546,11 @@ export default {
 
         let userUidList: string[] = []
         let foundSomeoneToInvite = false
-        for (const ldapPerson of ldapQueryPerson) {
+        for (const agent of agentList) {
 
-            const mailPR = ldapPerson.mailPR[0].toLowerCase()
+            const mailPR = agent.mailPR[0].toLowerCase()
 
-            if (!roomMembers.some(roomMember => roomMember.userId.includes(ldapPerson.mailPR[0].toLowerCase().replace("@", "-")))) {
+            if (!roomMembers.some(roomMember => roomMember.userId.includes(agent.mailPR.toLowerCase().replace("@", "-")))) {
                 if (dryRun) {
                     if (!foundSomeoneToInvite) {
                         foundSomeoneToInvite = true
@@ -551,7 +558,7 @@ export default {
                     }
                     dryRunMessage += " - " + mailPR + "\n"
                 } else {
-                    userUidList.push(ldapPerson.uid[0].toLowerCase())
+                    userUidList.push((agent.uid || "").toLowerCase())
                 }
             }
         }
