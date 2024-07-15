@@ -14,7 +14,7 @@ import logger from "../../../../utils/logger.js";
 // create list group Agents.GMCD.DETN.UNI.DNUM.SG@developpement-durable.gouv.fr
 export function createMailUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string, brain: Brain) {
 
-    const regex: RegExp = /(?=.*(?:create|créer))(?=.*liste?)(?=.*groupe?).* (\S.*@\S.*)/i
+    const regex: RegExp = /(?=.*(?:create|créer))(?=.*(?:mail|liste?))(?=.*groupe?).* (\S.*@\S.*)/i
 
     if (event?.sender?.name &&
         event?.sender?.userId &&
