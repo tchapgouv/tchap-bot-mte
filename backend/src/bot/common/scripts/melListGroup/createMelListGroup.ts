@@ -11,7 +11,7 @@ import logger from "../../../../utils/logger.js";
  * return : je gère les utilisateurs de ce salon en me basant sur une liste ldap <sup>*</sup>
  * isAnswer : true
  */
-// create ldap group basedn:ou=GMCD,ou=DETN,ou=UNI,ou=DNUM,ou=SG,ou=AC,ou=melanie,ou=organisation,dc=equipement,dc=gouv,dc=fr filter:(&(mailPr=*)(objectclass=mineqPerson)(objectclass=mineqMelBoite)) recursive:true
+// create list group Agents.GMCD.DETN.UNI.DNUM.SG@developpement-durable.gouv.fr
 export function createMailUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string, brain: Brain) {
 
     const regex: RegExp = /(?=.*(?:create|créer))(?=.*liste?)(?=.*groupe?).* (\S.*@\S.*)/i
@@ -49,10 +49,10 @@ export function createMailUsersListIfAsked(client: MatrixClient, event: MatrixEv
 
                 if (powerLevel === 100) {
 
-                    const mail = event.event.content?.body.match(/.* basedn:(.*?)(?: |$).*/i)?.at(1)
+                    const mail = event.event.content?.body.match(/.* (\S.*@\S.*)(?: |$).*/i)?.at(1)
 
                     if (!mail) {
-                        sendMessage(client, roomId, "Désolé, il semblerait que vous n'ayez pas fourni l'adresse mail de la liste.'")
+                        sendMessage(client, roomId, "Désolé, il semblerait que vous n'ayez pas fourni l'adresse mail de la liste.")
                         return true
                     }
 
