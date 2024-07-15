@@ -15,6 +15,8 @@ import {deleteLdapUsersListIfAsked} from "../common/scripts/ldapGroup/deleteLdap
 import {updateRoomUsersListIfAsked} from "../common/scripts/updateGroupMembers.js";
 import {Brain} from "../common/Brain.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
+import {createMailUsersListIfAsked} from "../common/scripts/melListGroup/createMelListGroup.js";
+import {deleteMailUsersListIfAsked} from "../common/scripts/melListGroup/deleteMelListGroup.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: { message:string, sender: RoomMember; botId: string; roomId: string }): void {
 
@@ -39,6 +41,9 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, bra
 
     if (!actionTaken) actionTaken = createLdapUsersListIfAsked(client, event, data.message, brain)
     if (!actionTaken) actionTaken = deleteLdapUsersListIfAsked(client, event, data.message)
+
+    if (!actionTaken) actionTaken = createMailUsersListIfAsked(client, event, data.message, brain)
+    if (!actionTaken) actionTaken = deleteMailUsersListIfAsked(client, event, data.message)
 
     if (!actionTaken) actionTaken = updateRoomUsersListIfAsked(client, event, data.message)
 
