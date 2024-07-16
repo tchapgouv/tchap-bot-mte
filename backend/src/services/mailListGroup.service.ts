@@ -7,14 +7,14 @@ const mailListGroupRepository = sequelize.getRepository(MailListGroup)
 
 export default {
 
-    async createOrUpdate(room_id: string, bot_id: string, mail: string, activated: boolean = false): Promise<any> {
+    async createOrUpdate({room_id, bot_id, mail, activated = false}: { room_id: string, bot_id: string, mail: string, activated?: boolean }): Promise<any> {
 
         const mailListGroup = await mailListGroupRepository.findOne({where: {room_id: room_id}})
 
         if (!mailListGroup) {
             return await this.create(room_id, bot_id, mail, activated)
         } else {
-            mailListGroup.set({room_id, bot_id, mail, activated})
+            mailListGroup.set({room_id: room_id, bot_id: bot_id, mail: mail, activated: activated})
             return await mailListGroup.save()
         }
     },

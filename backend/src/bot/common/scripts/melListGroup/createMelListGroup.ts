@@ -56,7 +56,7 @@ export function createMailUsersListIfAsked(client: MatrixClient, event: MatrixEv
                         return true
                     }
 
-                    mailGroupService.createOrUpdate(botId, roomId, mail).then(_value => {
+                    mailGroupService.createOrUpdate({room_id: roomId, bot_id: botId, mail}).then(_value => {
                         sendMessage(client, roomId, "Configuration du groupe créée.")
                         brain.set("list_group_created", {userId, roomId})
                         botService.updateRoomMemberList(client, roomId, true).then(_ => {

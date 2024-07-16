@@ -7,12 +7,19 @@ const ldapListGroupRepository = sequelize.getRepository(LdapListGroup)
 
 export default {
 
-    async createOrUpdate(room_id: string, bot_id: string, base_dn: string, filter: string = "(&(objectClass=mineqPerson)", recursively: boolean = true, activated: boolean = false): Promise<any> {
+    async createOrUpdate({room_id, bot_id, base_dn, filter = "(&(objectClass=mineqPerson)", recursively = true, activated = false}: {
+        room_id: string,
+        bot_id: string,
+        base_dn: string,
+        filter?: string,
+        recursively?: boolean,
+        activated?: boolean
+    }): Promise<any> {
 
         const ldapListGroup = await ldapListGroupRepository.findOne({where: {room_id: room_id}})
 
         if (!ldapListGroup) {
-            return await this.create(room_id, bot_id, base_dn, filter, recursively, activated)
+            return await this.create({room_id, bot_id, base_dn, filter, recursively, activated})
         } else {
             ldapListGroup.set({room_id, bot_id, base_dn, filter, recursively, activated})
             return await ldapListGroup.save()
@@ -29,7 +36,14 @@ export default {
 
     },
 
-    async create(room_id: string, bot_id: string, base_dn: string, filter: string = "(&(objectClass=mineqPerson)", recursively: boolean = true, activated: boolean = false): Promise<any> {
+    async create({room_id, bot_id, base_dn, filter = "(&(objectClass=mineqPerson)", recursively = true, activated = false}: {
+        room_id: string,
+        bot_id: string,
+        base_dn: string,
+        filter: string,
+        recursively: boolean,
+        activated: boolean
+    }): Promise<any> {
 
         // Create a Webhook
         const ldapListGroupPojo: Attributes<LdapListGroup> = {

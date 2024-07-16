@@ -57,7 +57,7 @@ export function createLdapUsersListIfAsked(client: MatrixClient, event: MatrixEv
                         return true
                     }
 
-                    ldapGroupService.createOrUpdate(roomId, botId, base_dn, filter, recursive, false).then(_value => {
+                    ldapGroupService.createOrUpdate({room_id:roomId, bot_id:botId, base_dn, filter, recursively:recursive}).then(_value => {
                         sendMessage(client, roomId, "Configuration du groupe créée.")
                         brain.set("group_created", {userId, roomId})
                         botService.updateRoomMemberList(client, roomId, true).then(_ => {
