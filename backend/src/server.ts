@@ -18,6 +18,8 @@ import {specs} from "./swagger.config.js";
 import crypto from "crypto";
 import fileUpload from "express-fileupload";
 import Crontab from "./Crontab.js";
+import ldapService from "./services/ldap.service.js";
+import ldap from "ldapjs";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory

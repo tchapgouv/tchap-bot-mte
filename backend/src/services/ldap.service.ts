@@ -240,11 +240,7 @@ export default {
                         })
                         .catch(_reason => reject("Error while searching for users with ldap mailing list."))
 
-                    await Promise.all(nestedSearch).then(value => {
-                        for (const valueElement of value) {
-                            realAgents = realAgents.concat(valueElement)
-                        }
-                    })
+                    await Promise.all(nestedSearch)
 
                     resolve(realAgents)
                 }
