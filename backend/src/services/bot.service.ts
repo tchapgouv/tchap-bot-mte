@@ -11,8 +11,12 @@ import {Bot} from "../bot/common/Bot.js";
 import {splitEvery} from "../utils/utils.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
 import ldap from "ldapjs";
-import ldapGroupService from "./ldapListGroup.service.js";
-import mailGroupService from "./mailListGroup.service.js";
+import sequelize from "../models/index.js";
+import {LdapListGroup} from "../models/ldapListGroup.model.js";
+import {MailListGroup} from "../models/mailListGroup.model.js";
+
+const ldapListGroupRepository = sequelize.getRepository(LdapListGroup)
+const mailListGroupRepository = sequelize.getRepository(MailListGroup)
 
 const bots: Bot[] = [
     botGmcd,
@@ -506,8 +510,10 @@ export default {
 
         if (!roomId) throw "updateRoomMemberList : roomId cannot be empty"
 
-        const ldapListGroup = await ldapGroupService.findRoomGroup(roomId)
-        const mailListGroup = await mailGroupService.findRoomGroup(roomId)
+        // const ldapListGroup = await ldapGroupService.findRoomGroup(roomId)
+        const ldapListGroup = await ldapListGroupRepository.findOne({where: {room_id: roomId}})
+        // const mailListGroup = await mailGroupService.findRoomGroup(roomId)
+        const mailListGroup = await mailListGroupRepository.findOne({where: {room_id: roomId}})
 
         logger.debug("ldapListGroup :", ldapListGroup)
         logger.debug("mailListGroup :", mailListGroup)
