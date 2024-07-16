@@ -551,7 +551,7 @@ export default {
         let foundSomeoneToInvite = false
         for (const agent of agentList) {
 
-            const mailPR = agent.mailPR[0].toLowerCase()
+            const mailPR = agent.mailPR.toLowerCase()
 
             if (!roomMembers.some(roomMember => roomMember.userId.includes(agent.mailPR.toLowerCase().replace("@", "-")))) {
                 if (dryRun) {

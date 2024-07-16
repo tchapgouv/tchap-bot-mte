@@ -39,8 +39,8 @@ export default {
         let mailPR: string | undefined
 
         await this.getUserForUID(client, username).then((user: any) => {
-            logger.debug("Main mail for user " + username + " = " + user.mailPR[0].toLowerCase())
-            mailPR = (user.mailPR[0].toLowerCase())
+            logger.debug("Main mail for user " + username + " = " + user.mailPR.toLowerCase())
+            mailPR = (user.mailPR.toLowerCase())
         }).catch(reason => {
             logger.error("Could not get mail for uid " + username + " : ", reason)
             throw (reason)
@@ -104,7 +104,7 @@ export default {
         })
     },
 
-    async getUserForUID(client: ldap.Client, username: string) {
+    async getUserForUID(client: ldap.Client, username: string): Promise<Agent | null> {
 
         logger.debug("getUserForUID", username)
 
