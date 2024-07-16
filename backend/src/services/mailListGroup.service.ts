@@ -29,9 +29,9 @@ export default {
 
     },
 
-    async findRoomGroup(room_id: string): Promise<MailListGroup | null> {
+    async findRoomGroup(roomId: string): Promise<MailListGroup | null> {
 
-        return await mailListGroupRepository.findOne({where: {room_id: room_id}})
+        return await mailListGroupRepository.findOne({where: {room_id: roomId}})
     },
 
     async create(room_id: string, bot_id: string, mail: string, activated: boolean = false): Promise<any> {
