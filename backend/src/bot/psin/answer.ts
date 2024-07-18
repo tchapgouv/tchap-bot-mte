@@ -11,8 +11,11 @@ import {listIncidentsIfAsked} from "./scripts/incidents.js";
 import {statsIfAsked} from "./scripts/stats.js";
 import {Brain} from "../common/Brain.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
+import {sendMarkdownMessage} from "../common/helper.js";
+import {contactsIfAsked} from "./scripts/contacts.js";
+import {statutIfAsked} from "./scripts/statut.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain:Brain, _data: { message:string, sender: RoomMember; botId: string; roomId: string }): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, _data: { message: string, sender: RoomMember; botId: string; roomId: string }): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -23,7 +26,7 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain:Br
     // Actions propres au Bot
 }
 
-export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, _brain:Brain, _data: { message:string, sender: RoomMember; botId: string; roomId: string }): void {
+export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, _brain: Brain, _data: { message: string, sender: RoomMember; botId: string; roomId: string }): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -43,6 +46,8 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, _br
     // Actions propres au Bot
     if (!actionTaken) actionTaken = listIncidentsIfAsked(client, event, message)
     if (!actionTaken) actionTaken = statsIfAsked(client, event, message)
+    if (!actionTaken) actionTaken = contactsIfAsked(client, event, message)
+    if (!actionTaken) actionTaken = statutIfAsked(client, event, message)
     // Default
-    if (!actionTaken) logger.debug("parseMessageToSelf : No action taken") // sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
+    if (!actionTaken) sendMarkdownMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?\nVous pouvez me demander la liste des commandes accessibles ainsi :\n `@bot-psin aide moi !!` 😊.")
 }

@@ -1,6 +1,6 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import fetchWithError from "../../../utils/fetchWithError.js";
-import {sendHtmlMessage} from "../../common/helper.js";
+import {sendHtmlMessage, sendMessage} from "../../common/helper.js";
 import logger from "../../../utils/logger.js";
 
 
@@ -12,7 +12,7 @@ import logger from "../../../utils/logger.js";
  */
 export function listIncidentsIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /.*(list.*incident).*/i
+    const regex: RegExp = /.*(incidents?|alertes?|coupures?).*/i
 
 
     if (regex.test(body)) {
@@ -30,6 +30,7 @@ export function listIncidentsIfAsked(client: MatrixClient, event: MatrixEvent, b
                 .then((value: Response) => {
                     value.text().then(decodedGzip => sendHtmlMessage(client, roomId, decodedGzip, decodedGzip))
                 }).catch(reason => {
+                sendMessage(client, roomId, "❗ Il semblerait que j'ai un problème pour contacter la supervision !")
                 logger.error("Error listing incidents :", reason)
             }).finally(() => {
                 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1'

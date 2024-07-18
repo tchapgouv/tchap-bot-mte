@@ -10,9 +10,9 @@ import logger from "../../../utils/logger.js";
  * return : je retourne les statistiques en cours
  * isAnswer : true
  */
-export function statsIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
+export function contactsIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /.*(stats?).*/i
+    const regex: RegExp = /.*(contacts?).*/i
 
 
     if (regex.test(body)) {
@@ -26,12 +26,12 @@ export function statsIfAsked(client: MatrixClient, event: MatrixEvent, body: str
             const psinApiKey = process.env.PSIN_API_KEY || ""
 
             process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-            fetchWithError("https://psin.supervision.e2.rie.gouv.fr/centreon/ApiPsin.php?cle=" + psinApiKey + "&indic=stats", {proxify: true})
+            fetchWithError("https://psin.supervision.e2.rie.gouv.fr/centreon/ApiPsin.php?cle=" + psinApiKey + "&indic=contact", {proxify: true})
                 .then((value: Response) => {
                     value.text().then(decodedGzip => sendHtmlMessage(client, roomId, decodedGzip, decodedGzip))
                 }).catch(reason => {
-                sendMessage(client, roomId, "❗ Il semblerait que j'ai un problème pour contacter la supervision !")
-                logger.error("Error listing stats :", reason)
+                    sendMessage(client, roomId, "❗ Il semblerait que j'ai un problème pour contacter la supervision !")
+                logger.error("Error listing contacts :", reason)
             }).finally(() => {
                 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1'
             })
