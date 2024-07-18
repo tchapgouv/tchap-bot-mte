@@ -6,8 +6,8 @@ import logger from "../../../utils/logger.js";
 
 /**
  * @help
- * command : stats
- * return : je retourne les statistiques en cours
+ * command : contact
+ * return : je retourne les canaux de contact du PSIN
  * isAnswer : true
  */
 export function contactsIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {

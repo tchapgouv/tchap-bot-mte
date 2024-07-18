@@ -6,8 +6,8 @@ import logger from "../../../utils/logger.js";
 
 /**
  * @help
- * command : stats
- * return : je retourne les statistiques en cours
+ * command : statut [ressource]
+ * return : je retourne l’état d’une ressource
  * isAnswer : true
  */
 export function statutIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {

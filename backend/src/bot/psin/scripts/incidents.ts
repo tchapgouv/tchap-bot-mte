@@ -6,8 +6,8 @@ import logger from "../../../utils/logger.js";
 
 /**
  * @help
- * command : liste incidents
- * return : je retourne la liste des incidents en cours
+ * command : incidents|alertes|coupures
+ * return : je retourne la liste des incidents/alertes/coupures en cours
  * isAnswer : true
  */
 export function listIncidentsIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
