@@ -45,9 +45,9 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, _br
     if (!actionTaken) actionTaken = deleteRoomIfAsked(client, roomId, event.sender.userId, message)
     // Actions propres au Bot
     if (!actionTaken) actionTaken = listIncidentsIfAsked(client, event, message)
+    if (!actionTaken) actionTaken = statutIfAsked(client, event, message)
     if (!actionTaken) actionTaken = statsIfAsked(client, event, message)
     if (!actionTaken) actionTaken = contactsIfAsked(client, event, message)
-    if (!actionTaken) actionTaken = statutIfAsked(client, event, message)
     // Default
     if (!actionTaken) sendMarkdownMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?\nVous pouvez me demander la liste des commandes accessibles ainsi :\n `@bot-psin aide moi !!` 😊.")
 }
