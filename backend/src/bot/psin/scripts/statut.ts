@@ -4,7 +4,7 @@ import {sendHtmlMessage, sendMarkdownMessage} from "../../common/helper.js";
 import logger from "../../../utils/logger.js";
 
 
-/**
+/***
  * @help
  * command : statut [ressource]
  * return : je retourne l’état d’une ressource
