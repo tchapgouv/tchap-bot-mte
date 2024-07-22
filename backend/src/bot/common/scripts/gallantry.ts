@@ -8,7 +8,7 @@ import {addEmoji} from "../helper.js";
  */
 export function bePoliteIfNecessary(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regexGoodbye: RegExp = /.*(bonne soirée|[aà] demain|bon we|bonsoir|tcho|tchao|ciao).*/i
+    const regexGoodbye: RegExp = /.*(bonne soirée|[aà] demain|bon we|bonsoir|tcho|tchao|ciao|au revoir).*/i
 
     if (regexGoodbye.test(body)) {
         logger.debug("Saying goodbye.")
