@@ -7,7 +7,7 @@ import logger from "../../../utils/logger.js";
 /***
  * @help
  * command : statut [ressource]
- * return : je retourne l’état d’une ressource
+ * return : je retourne l’état d’une ressource (Messagerie, vpn, PFAI, nom d’un serveur, nom d’un routeur, application (Ex AMEDEE))
  * isAnswer : true
  */
 export function statutIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
