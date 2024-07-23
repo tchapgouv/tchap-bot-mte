@@ -99,7 +99,7 @@ export default {
         logger.debug("createRoom", roomName, isPrivate)
 
         let message: string = ""
-        let roomId: any
+        let roomId: string|undefined
 
         await botGmcd.client.getRoomIdForAlias("#" + roomName + ":" + process.env.TCHAP_SERVER_NAME).then((data) => {
             roomId = data.room_id

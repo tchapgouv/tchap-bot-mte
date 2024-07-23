@@ -1,7 +1,7 @@
 import jwt, {JwtPayload} from 'jsonwebtoken';
 import ldap from "ldapjs"
 import logger from "../utils/logger.js";
-import ldapService from "./ldap.service.js";
+import ldapService, {Agent} from "./ldap.service.js";
 import userService from "./user.service.js";
 
 function decodeToken(token: string) {
@@ -59,9 +59,9 @@ export default {
         return user
     },
 
-    ldapAuth(username: string, password: string):Promise<{}> {
+    ldapAuth(username: string, password: string): Promise<Agent> {
 
-        return new Promise((resolve, reject) => {
+        return new Promise<Agent>((resolve, reject) => {
             (async () => {
 
                 logger.debug(process.env.LDAP_URI)
@@ -73,30 +73,29 @@ export default {
                     // baseDN: process.env.BASE_DN || ''
                 });
 
-                let user: any = {}
-                await ldapService.getUserForUID(client, username).then(value => user = value)
+                let user = await ldapService.getUserForUID(client, username)
 
-                if (!user.dn) reject({message: "User not found !"})
+                if (!user) {
+                    reject({message: "User not found !"})
+                } else {
+                    client.bind(user.dn, password, (error, _response) => {
 
-                client.bind(user.dn, password, (error, _response) => {
+                        // logger.debug(response)
+                        if (error) {
 
-                    // logger.debug(response)
+                            client.unbind(() => {
+                                logger.debug('Disconnecting.');
+                            });
+                            logger.alert("LDAP binding failed.")
+                            reject({message: error.message})
 
-                    if (error) {
+                        } else {
 
-                        client.unbind(() => {
-                            logger.debug('Disconnecting.');
-                        });
-                        logger.alert("LDAP binding failed.")
-                        reject({message: error.message})
-
-                    } else {
-
-                        logger.notice(username + " : Logged in")
-                        resolve(user)
-                    }
-                })
-
+                            logger.notice(username + " : Logged in")
+                            if (user) resolve(user)
+                        }
+                    })
+                }
             })()
         })
     }

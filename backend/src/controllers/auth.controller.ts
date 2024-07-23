@@ -5,6 +5,7 @@ import {Request, RequestHandler, Response} from "express";
 import * as crypto from "crypto";
 import jwt from "jsonwebtoken";
 import {StatusCodes} from "http-status-codes";
+import {Agent} from "../services/ldap.service.js";
 
 function isFromIntranet(req: Request) {
 
@@ -98,9 +99,9 @@ export function authenticate(req: Request, res: Response) {
 
                 } else {
 
-                    authService.ldapAuth(username, password).then((user: any) => {
+                    authService.ldapAuth(username, password).then((user: Agent) => {
 
-                        const token = jwt.sign(user, process.env.JWT_KEY || '');
+                        const token = jwt.sign(JSON.stringify(user), process.env.JWT_KEY || '');
 
                         // set the cookie
                         res.setHeader('Set-Cookie', `user_token=${token}; HttpOnly;`);
@@ -118,7 +119,7 @@ export function authenticate(req: Request, res: Response) {
     })
 }
 
-export function logout(req: Request, res: Response)     {
+export function logout(req: Request, res: Response) {
 
     res.setHeader('Set-Cookie', `user_token=; HttpOnly;`);
     res.json({success: 'OK'});
