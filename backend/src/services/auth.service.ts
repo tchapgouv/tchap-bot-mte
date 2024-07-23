@@ -34,7 +34,7 @@ export default {
         let user
         // find the user
         await userService.findAllUsernames().then((users) => {
-            user = users?.find(u => u.username === decoded.uid[0]);
+            user = users?.find(u => u.username === decoded.uid);
         })
 
         logger.notice("User found : ", user)
