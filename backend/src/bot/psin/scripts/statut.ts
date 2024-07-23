@@ -23,7 +23,7 @@ export function statutIfAsked(client: MatrixClient, event: MatrixEvent, body: st
 
             const roomId = event.event.room_id
 
-            const regexRessource: RegExp = /.*statut.([^ $]+)(?: |$)/i
+            const regexRessource: RegExp = /.*statu[ts].([^ $]+)(?: |$)/i
             const matchRessource = body.match(regexRessource)?.at(1)
 
             if (!matchRessource) {
