@@ -12,7 +12,7 @@ import logger from "../../../utils/logger.js";
  */
 export function statutIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /.*(statut.).*/i
+    const regex: RegExp = /.*(statu[ts].).*/i
 
 
     if (regex.test(body)) {
