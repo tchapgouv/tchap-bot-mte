@@ -20,21 +20,23 @@ function decodeToken(token: string) {
     return payload;
 }
 
+
 export default {
 
     async verifyJwt(token: string) {
 
         logger.debug(">>>> verifyJwt")
 
-        // decode cookie and get user id
-        const decoded = decodeToken(token)
+        // decode user_token
+        const decoded_agent = decodeToken(token) as Agent
+        if (!decoded_agent.uid) return null
 
-        logger.debug("Decoded token : ", decoded)
+        logger.debug("Decoded token : ", decoded_agent)
 
         let user
         // find the user
         await userService.findAllUsernames().then((users) => {
-            user = users?.find(u => u.username === decoded.uid);
+            user = users?.find(u => u.username === decoded_agent.uid);
         })
 
         logger.notice("User found : ", user)
