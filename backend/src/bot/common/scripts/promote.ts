@@ -5,13 +5,13 @@ import {getPowerLevel, getUserPowerLevel, isSomeoneAdmin, isSupport, sendMessage
 
 /**
  * @help
- * command : promote me|promeut moi
+ * command : promote me|promeus moi
  * return : je promeus administrateur un utilisateur (si je suis moi-même administrateur) <sup>*</sup>
  * isAnswer : true
  */
 export function promoteUserIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /.*(promote me|promeut moi).*/i
+    const regex: RegExp = /.*(promote me|promeus moi).*/i
 
 
     if (regex.test(body)) {
