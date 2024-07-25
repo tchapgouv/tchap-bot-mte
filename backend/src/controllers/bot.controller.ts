@@ -32,14 +32,15 @@ export async function migrateRoom(req: Request, res: Response) {
         })
 
         if (roomId) {
-            await botService.inviteUsersInRoom(config.userId, req.body.users_list, roomId).then(_value => {
+
+            res.status(StatusCodes.OK).json({message: "Room created", room_id: roomId})
+
+            botService.inviteUsersInRoom(config.userId, req.body.users_list, roomId).then(_value => {
 
                 logger.info("Room " + req.body.room_name + " created and users invited")
-                res.status(StatusCodes.OK).json({message: "Room created and users invited", room_id: roomId})
 
             }).catch(reason => {
                 logger.error("Error inviting users (" + req.body.room_name + ")", reason)
-                res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
             })
         }
     }
