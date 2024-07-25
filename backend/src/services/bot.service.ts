@@ -36,6 +36,8 @@ export default {
 
     async inviteUserInRoom(userMail: string, roomId: string, opts = {retries: 0, logAlreadyInvited: true}) {
 
+        userMail = userMail.toLowerCase()
+
         logger.debug("inviteUserInRoom", userMail, roomId, opts)
 
         let message = ""
@@ -47,7 +49,7 @@ export default {
         logger.notice("Inviting " + userMail + " into " + roomName + " (" + roomId + "). retries " + opts.retries)
         let invited = false
 
-        const uid = userMail.toLowerCase().replace(/@.*/, "")
+        const uid = userMail.replace(/@.*/, "")
         const alreadyInvited = botGmcd.client.getRoom(roomId)?.getMembers().some(roomMember => {
             logger.debug(roomMember.userId.toLowerCase(), "vs", uid)
             return roomMember.userId.toLowerCase().includes(uid)
@@ -63,7 +65,7 @@ export default {
 
         let tries = 0
         while (!invited && tries <= opts.retries) {
-            await botGmcd.client.inviteByEmail(roomId, userMail)
+            await botGmcd.client.inviteByEmail(roomId, userMail.toLowerCase())
                 .then(() => {
                     logger.notice(userMail + " successfully invited.")
                     invited = true
@@ -99,7 +101,7 @@ export default {
         logger.debug("createRoom", roomName, isPrivate)
 
         let message: string = ""
-        let roomId: string|undefined
+        let roomId: string | undefined
 
         await botGmcd.client.getRoomIdForAlias("#" + roomName + ":" + process.env.TCHAP_SERVER_NAME).then((data) => {
             roomId = data.room_id
