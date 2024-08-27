@@ -146,7 +146,7 @@ export function authenticate(req: Request, res: Response) {
                                 labels: [
                                     new MetricLabel("status", "UNAUTHORIZED"),
                                     new MetricLabel("username", username),
-                                    new MetricLabel("reason", "JWT"),
+                                    new MetricLabel("reason", "Wrong Password"),
                                 ]
                             })
 
