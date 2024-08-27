@@ -83,6 +83,17 @@ export async function postMessage(req: Request, res: Response) {
         webhook = value
         logger.debug("Webhook :", webhook)
     }).catch(_ => {
+
+        metricService.createOrIncrease(
+            {
+                name: "webhook",
+                labels: [
+                    new MetricLabel("status", "UNAUTHORIZED"),
+                    new MetricLabel("method", "post"),
+                    new MetricLabel("reason", "Wrong webhook")
+                ]
+            })
+
         res.status(StatusCodes.UNAUTHORIZED).send({
             message:
                 "Unauthenticated (Wrong webhook)."
@@ -91,6 +102,17 @@ export async function postMessage(req: Request, res: Response) {
     })
 
     if (!webhook) {
+
+        metricService.createOrIncrease(
+            {
+                name: "webhook",
+                labels: [
+                    new MetricLabel("status", "UNAUTHORIZED"),
+                    new MetricLabel("method", "post"),
+                    new MetricLabel("reason", "Wrong webhook")
+                ]
+            })
+
         res.status(StatusCodes.UNAUTHORIZED).send({
             message:
                 "Unauthenticated (Wrong webhook)."
@@ -128,6 +150,7 @@ export async function postMessage(req: Request, res: Response) {
         {
             name: "webhook",
             labels: [
+                new MetricLabel("status", "AUTHORIZED"),
                 new MetricLabel("method", "post"),
                 new MetricLabel("bot_id", webhook.getDataValue("bot_id")),
                 new MetricLabel("room_id", webhook.getDataValue("room_id")),
@@ -220,6 +243,17 @@ export async function uploadFile(req: Request, res: Response) {
         webhook = value
         logger.debug("Webhook :", webhook)
     }).catch(_ => {
+
+        metricService.createOrIncrease(
+            {
+                name: "webhook",
+                labels: [
+                    new MetricLabel("status", "UNAUTHORIZED"),
+                    new MetricLabel("method", "upload"),
+                    new MetricLabel("reason", "Wrong webhook")
+                ]
+            })
+
         res.status(StatusCodes.UNAUTHORIZED).send({
             message:
                 "Unauthenticated (Wrong webhook)."
@@ -228,6 +262,17 @@ export async function uploadFile(req: Request, res: Response) {
     })
 
     if (!webhook) {
+
+        metricService.createOrIncrease(
+            {
+                name: "webhook",
+                labels: [
+                    new MetricLabel("status", "UNAUTHORIZED"),
+                    new MetricLabel("method", "upload"),
+                    new MetricLabel("reason", "Wrong webhook")
+                ]
+            })
+
         res.status(StatusCodes.UNAUTHORIZED).send({
             message:
                 "Unauthenticated (Wrong webhook)."
@@ -259,6 +304,7 @@ export async function uploadFile(req: Request, res: Response) {
             {
                 name: "webhook",
                 labels: [
+                    new MetricLabel("status", "AUTHORIZED"),
                     new MetricLabel("method", "upload"),
                     new MetricLabel("bot_id", webhook.getDataValue("bot_id")),
                     new MetricLabel("room_id", webhook.getDataValue("room_id")),

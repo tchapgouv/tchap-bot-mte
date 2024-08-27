@@ -75,6 +75,7 @@ export function authenticate(req: Request, res: Response) {
                     name: "authenticate",
                     labels: [
                         new MetricLabel("status", "UNAUTHORIZED"),
+                        new MetricLabel("username", username),
                         new MetricLabel("reason", "Not found"),
                     ]
                 })
@@ -97,6 +98,7 @@ export function authenticate(req: Request, res: Response) {
                         name: "authenticate",
                         labels: [
                             new MetricLabel("status", "UNAUTHORIZED"),
+                            new MetricLabel("username", username),
                             new MetricLabel("reason", "No rights"),
                         ]
                     })
@@ -127,6 +129,7 @@ export function authenticate(req: Request, res: Response) {
                                 name: "authenticate",
                                 labels: [
                                     new MetricLabel("status", "AUTHORIZED"),
+                                    new MetricLabel("username", username),
                                 ]
                             })
 
@@ -142,6 +145,7 @@ export function authenticate(req: Request, res: Response) {
                                 name: "authenticate",
                                 labels: [
                                     new MetricLabel("status", "UNAUTHORIZED"),
+                                    new MetricLabel("username", username),
                                     new MetricLabel("reason", "JWT"),
                                 ]
                             })
