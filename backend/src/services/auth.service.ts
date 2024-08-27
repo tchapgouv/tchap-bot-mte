@@ -75,7 +75,14 @@ export default {
                     // baseDN: process.env.BASE_DN || ''
                 });
 
-                let user = await ldapService.getUserForUID(client, username)
+                client.on('error', (err) => {
+                    if (err.code === 'ENOTFOUND') logger.critical("Cannot connect to LDAP instance !")
+                    else logger.error('LDAP : ' + err.message);
+                });
+
+                let user = await ldapService.getUserForUID(client, username).catch(reason => {
+                    logger.error("Could not get mail for uid " + username + " : ", reason)
+                })
 
                 if (!user) {
                     reject({message: "User not found !"})

@@ -6,7 +6,7 @@
     "clean:dist": "rimraf dist",
     "build": "run-p clean:dist type-check build-only",
     "build-only": "vite build",
-    "dev": "vite",
+    "start-dev": "vite",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false"
   },

@@ -3,6 +3,7 @@ import https from 'https';
 import fs from 'fs';
 import db from './models/index.js'
 import userRouter from './routes/user.routes.js';
+import metricsRouter from './routes/metrics.routes.js';
 import botRoomRouter from './routes/bot.room.routes.js';
 import botUserRouter from './routes/bot.user.routes.js';
 import authRouter from './routes/auth.routes.js';
@@ -55,6 +56,7 @@ app.use(fileUpload({
     }
 }))
 
+app.use(metricsRouter);
 app.use(webhookRouter);
 app.use(userRouter);
 app.use(authRouter);

@@ -4,6 +4,7 @@ import {Webhook} from "../models/webhook.model.js";
 import {StatusCodes} from "http-status-codes";
 import logger from "../utils/logger.js";
 import botService from "../services/bot.service.js";
+import metricService, {MetricLabel} from "../services/metric.service.js";
 
 export async function destroy(req: Request, res: Response) {
 
@@ -123,6 +124,17 @@ export async function postMessage(req: Request, res: Response) {
         return
     }
 
+    metricService.createOrIncrease(
+        {
+            name: "webhook",
+            labels: [
+                new MetricLabel("method", "post"),
+                new MetricLabel("bot_id", webhook.getDataValue("bot_id")),
+                new MetricLabel("webhook_id", webhook.getDataValue("webhook_id")),
+                new MetricLabel("format", format)
+            ]
+        })
+
     await webhookService.postMessage(webhook, {formattedMessage: message, rawMessage: rawMessage}, format)
         .then(data => {
             res.json(data)
@@ -241,6 +253,17 @@ export async function uploadFile(req: Request, res: Response) {
     //     })
 
     if (webhook) {
+
+        metricService.createOrIncrease(
+            {
+                name: "webhook",
+                labels: [
+                    new MetricLabel("method", "upload"),
+                    new MetricLabel("bot_id", webhook.getDataValue("bot_id")),
+                    new MetricLabel("webhook_id", webhook.getDataValue("webhook_id")),
+                ]
+            })
+
         botService.upload(
             webhook.dataValues.room_id,
             uploadedFile.data,

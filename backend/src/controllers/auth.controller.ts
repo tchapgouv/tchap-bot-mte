@@ -6,6 +6,7 @@ import * as crypto from "crypto";
 import jwt from "jsonwebtoken";
 import {StatusCodes} from "http-status-codes";
 import {Agent} from "../services/ldap.service.js";
+import metricService, {MetricLabel} from "../services/metric.service.js";
 
 function isFromIntranet(req: Request) {
 
@@ -69,6 +70,15 @@ export function authenticate(req: Request, res: Response) {
 
         if (!data) {
 
+            metricService.createOrIncrease(
+                {
+                    name: "authenticate",
+                    labels: [
+                        new MetricLabel("status", "UNAUTHORIZED"),
+                        new MetricLabel("reason", "Not found"),
+                    ]
+                })
+
             res.status(StatusCodes.UNAUTHORIZED)
                 .json({
                     message: "No user found !",
@@ -81,6 +91,15 @@ export function authenticate(req: Request, res: Response) {
             });
 
             if (!user) {
+
+                metricService.createOrIncrease(
+                    {
+                        name: "authenticate",
+                        labels: [
+                            new MetricLabel("status", "UNAUTHORIZED"),
+                            new MetricLabel("reason", "No rights"),
+                        ]
+                    })
 
                 res.status(StatusCodes.UNAUTHORIZED)
                     .json({
@@ -103,12 +122,30 @@ export function authenticate(req: Request, res: Response) {
 
                         const token = jwt.sign(JSON.stringify(user), process.env.JWT_KEY || '');
 
+                        metricService.createOrIncrease(
+                            {
+                                name: "authenticate",
+                                labels: [
+                                    new MetricLabel("status", "AUTHORIZED"),
+                                ]
+                            })
+
                         // set the cookie
                         res.setHeader('Set-Cookie', `user_token=${token}; HttpOnly;`);
                         res.json({user, token});
 
                     }).catch(err => {
                         logger.error(JSON.stringify(err))
+
+                        metricService.createOrIncrease(
+                            {
+                                name: "authenticate",
+                                labels: [
+                                    new MetricLabel("status", "UNAUTHORIZED"),
+                                    new MetricLabel("reason", "JWT"),
+                                ]
+                            })
+
                         res.status(StatusCodes.UNAUTHORIZED).json({
                             message: "User '" + username + "' : " + err.message,
                         });
