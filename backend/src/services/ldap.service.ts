@@ -16,6 +16,11 @@ export default {
             url: process.env.LDAP_URI || ''
         });
 
+        client.on('error', (err) => {
+            if (err.code === 'ENOTFOUND') logger.critical("Cannot connect to LDAP instance !")
+            else logger.error('LDAP : ' + err.message);
+        });
+
         let userNotFoundList: string[] = []
         await Promise.all(usernames.map(async (username) => {
             await this.getMailPRForUID(client, username)
