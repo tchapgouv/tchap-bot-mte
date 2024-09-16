@@ -67,7 +67,7 @@ export default {
             scope: recursively ? 'sub' : 'one'
         };
 
-        logger.notice('LDAP : Search users in ' + baseDn)
+        logger.notice('LDAP : Search users in ' + baseDn + ' with ' + filter)
 
         let userCount = 0;
 
@@ -113,13 +113,21 @@ export default {
 
         logger.debug("getUserForUID", username)
 
-        const opts: SearchOptions = {
+        let opts: SearchOptions = {
             attributes: AGENT_ATTRIBUTES,
-            filter: "(&(uid=" + username + "))",
+            filter: "(&(uid=*" + username + "*))",
             scope: 'sub'
         };
 
-        logger.notice('LDAP : Search DN for ' + username)
+        if (username.includes("@")) {
+            opts = {
+                attributes: AGENT_ATTRIBUTES,
+                filter: "(&(mail=" + username + "))",
+                scope: 'sub'
+            }
+        }
+
+        logger.notice('LDAP : Search for uid = ' + username)
         let userCount = 0;
 
         return new Promise((resolve, reject) => {
@@ -141,6 +149,10 @@ export default {
                         if (userCount === 0) {
                             logger.alert('LDAP : ' + username + " : Not found.")
                             reject('LDAP : ' + username + " : Not found.")
+                        }
+                        if (userCount > 1) {
+                            logger.alert('LDAP : ' + username + " : More than one match.")
+                            reject('LDAP : ' + username + " : More than one match.")
                         }
                     });
 
