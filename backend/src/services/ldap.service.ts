@@ -115,7 +115,7 @@ export default {
 
         let opts: SearchOptions = {
             attributes: AGENT_ATTRIBUTES,
-            filter: "(&(uid=*" + username + "*))",
+            filter: "(&(uid=" + username + "))",
             scope: 'sub'
         };
 
