@@ -7,7 +7,7 @@ import logger from "../../../utils/logger.js";
 /***
  * @help
  * command : statut [ressource]
- * return : je retourne l’état d’une ressource (Messagerie, vpn, PFAI, nom d’un serveur, nom d’un routeur, application (Ex AMEDEE))
+ * return : je retourne l’état d’une ressource<br/> - Exemple statut AMEDEE pour une application <br/> - Exemple statut ECOL-38080-016-C1 pour un routeur <br/> - Exemple statut MS-AUTH-04 pour un serveur <br/> - Pour la messagerie : statut MESSAGERIE ou statut BNUM <br/> - Pour les applications globales (hebergement) : statut applications ou statut hebergement <br/> - Pour le VPN : statut VPN <br/> - Pour la PFAI : statut PFAI <br/> - Pour le réseau RIE : statut RIE ou RESEAU <br/> - Pour les serveurs MSAD : statut MSAD <br/> - Pour les serveurs FORTIGATE : statut FG <br/> - Seuls les 20 premiers services sont affichés
  * isAnswer : true
  */
 export function statutIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
