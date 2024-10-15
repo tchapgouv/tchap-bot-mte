@@ -54,7 +54,7 @@ export async function sendMessage(client: MatrixClient, room: string, message: s
 }
 
 
-export function extractHelpFromComments(commandes: { command: string | undefined, return: string, isAnswer: boolean }[], __dirname: string, file: string) {
+export function extractHelpFromComments(commandes: { command: string | undefined, return: string, isAnswer: boolean, isAdmin: boolean }[], __dirname: string, file: string) {
     if (/.*\.js/i.test(file)) {
         try {
             const data = fs.readFileSync(__dirname + "/" + file, 'utf8');
@@ -62,17 +62,20 @@ export function extractHelpFromComments(commandes: { command: string | undefined
             const regexCommand: RegExp = /[\s\S]* \* @help.*(?:\n \* .*)*\n \* command *: *(.*)/i
             const regexReturn: RegExp = /[\s\S]* \* @help.*(?:\n \* .*)*\n \* return *: *(.*)/i
             const regexIsAnswer: RegExp = /[\s\S]* \* @help.*(?:\n \* .*)*\n \* isAnswer *: *(.*)/i
+            const regexIsAdmin: RegExp = /[\s\S]* \* @help.*(?:\n \* .*)*\n \* isAdmin *: *(.*)/i
 
             const matchCommand = data.match(regexCommand)?.at(1)
             const matchReturn = data.match(regexReturn)?.at(1)
             const matchIsAnswer = data.match(regexIsAnswer)?.at(1)
+            const matchIsAdmin = data.match(regexIsAdmin)?.at(1)
 
             if (!matchReturn) return commandes;
 
             const command = {
                 command: matchCommand,
                 return: matchReturn,
-                isAnswer: matchIsAnswer ? matchIsAnswer === 'true' : false
+                isAnswer: matchIsAnswer ? matchIsAnswer === 'true' : false,
+                isAdmin: matchIsAdmin ? matchIsAdmin === 'true' : false
             }
 
             commandes.push(command)
@@ -219,14 +222,15 @@ export async function isSomeoneAdmin(client: MatrixClient, roomId: string): Prom
     return someoneIsAdmin
 }
 
-
-export function redactHelp(commonCommandes: { command: string | undefined; return: string; isAnswer: boolean }[],
-                           specificCommands: { command: string | undefined; return: string; isAnswer: boolean }[]): string {
+export function redactHelp(commonCommandes: { command: string | undefined; return: string; isAnswer: boolean; isAdmin: boolean }[],
+                           specificCommands: { command: string | undefined; return: string; isAnswer: boolean; isAdmin: boolean }[],
+                           isAdmin: boolean): string {
 
     let help = "Voici une liste non exhaustive des commandes auxquelles je sais répondre (Si les droits du salon me le permettent).  \n\n"
     help += specificCommands.length > 0 ? "Commandes générales à tous les Bots :  \n" : ""
     for (const commande of commonCommandes) {
         help += " - "
+        if (commande.isAdmin && !isAdmin) continue
         if (commande.command) {
             help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
             help += "`" + commande.command + "`, "
@@ -236,6 +240,7 @@ export function redactHelp(commonCommandes: { command: string | undefined; retur
     if (specificCommands.length > 0) {
         help += "\nCommandes qui me sont propres :  \n"
         for (const commande of specificCommands) {
+            if (commande.isAdmin && !isAdmin) continue
             help += " - "
             if (commande.command) {
                 help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
@@ -244,14 +249,14 @@ export function redactHelp(commonCommandes: { command: string | undefined; retur
             help += commande.return + "  \n"
         }
     }
-    help += "\n_<sup>*</sup> Administrateur uniquement_"
+    help += isAdmin ? "\n_<sup>*</sup> Administrateur uniquement_" : ""
     logger.notice(help)
     return help
 }
 
-export function generateHelp(dirname?: string): string {
+export function generateHelp(dirname: string, isAdmin: boolean): string {
 
-    let specificCommands: { command: string | undefined; return: string; isAnswer: boolean }[] = []
+    let specificCommands: { command: string | undefined; return: string; isAnswer: boolean; isAdmin: boolean }[] = []
 
     let files
 
@@ -271,7 +276,7 @@ export function generateHelp(dirname?: string): string {
         return a.return < b.return ? 1 : -1
     }).reverse()
 
-    let commonCommands: { command: string | undefined; return: string; isAnswer: boolean }[] = []
+    let commonCommands: { command: string | undefined; return: string; isAnswer: boolean; isAdmin: boolean }[] = []
 
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.resolve(__filename, "../scripts");
@@ -292,27 +297,7 @@ export function generateHelp(dirname?: string): string {
 
     // logger.notice(commonCommands);
 
-    return redactHelp(commonCommands, specificCommands)
-}
-
-export function answerHelp(body: string, event: MatrixEvent, client: MatrixClient, help: string) {
-    const regex: RegExp = /.*(help|aide).*/i
-
-    if (regex.test(body)) {
-
-        if (event?.sender?.name &&
-            event?.sender?.userId &&
-            event?.event?.room_id) {
-
-            const roomId = event.event.room_id
-
-            sendMarkdownMessage(client, roomId, help)
-
-            return true
-        }
-    }
-
-    return false
+    return redactHelp(commonCommands, specificCommands, isAdmin)
 }
 
 export function isSupport(userId: string) {
