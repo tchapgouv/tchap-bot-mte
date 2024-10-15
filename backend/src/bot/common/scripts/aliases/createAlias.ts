@@ -24,6 +24,7 @@ export function createAliasIfAsked(client: MatrixClient, event: MatrixEvent, bod
             event?.event?.room_id && botId) {
 
             const roomId = event.event.room_id
+            if (!alias.includes(":")) alias += roomId.replace(/.*(:.*)/, "$1")
 
             getUserPowerLevel(client, event).then(user => {
 
@@ -37,7 +38,7 @@ export function createAliasIfAsked(client: MatrixClient, event: MatrixEvent, bod
                                 sendMessage(client, roomId, "L'alias à été créé. 🎆")
                             }).catch(reason => {
                                 sendMessage(client, roomId, "❗Erreur lors de la création de l'alias")
-                                logger.error("Error creating alias" + reason)
+                                logger.error("Error creating alias", alias, reason)
                             })
                         }
                     })

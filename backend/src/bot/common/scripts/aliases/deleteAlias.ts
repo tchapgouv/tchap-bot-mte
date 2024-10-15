@@ -24,6 +24,7 @@ export function deleteAliasIfAsked(client: MatrixClient, event: MatrixEvent, bod
             event?.event?.room_id && botId) {
 
             const roomId = event.event.room_id
+            if (!alias.includes(":")) alias += roomId.replace(/.*(:.*)/, "$1")
 
             getUserPowerLevel(client, event).then(user => {
 
@@ -37,7 +38,7 @@ export function deleteAliasIfAsked(client: MatrixClient, event: MatrixEvent, bod
                                 sendMessage(client, roomId, "l'alias a été supprimé. 🎆")
                             }).catch(reason => {
                                 sendMessage(client, roomId, "❗Erreur lors de la suppression de l'alias.")
-                                logger.error("Error deleting alias" + reason)
+                                logger.error("Error deleting alias", alias, reason)
                             })
                         }
                     })
