@@ -16,7 +16,7 @@ export function deleteAliasIfAsked(client: MatrixClient, event: MatrixEvent, bod
 
     if (regex.test(body)) {
 
-        let alias = body.replaceAll(/.*alias +([^ ]*?).*/, "$1");
+        let alias = body.replace(/.*alias +([^ ]*?).*/, "$1");
         let botId = client.getUserId() + "";
 
         if (event?.sender?.name &&
