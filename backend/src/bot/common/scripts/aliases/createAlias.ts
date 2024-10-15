@@ -16,7 +16,7 @@ export function createAliasIfAsked(client: MatrixClient, event: MatrixEvent, bod
 
     if (regex.test(body)) {
 
-        let alias = body.replace(/.*alias +([^ ]*?).*/, "$1");
+        let alias = body.replace(/.*?alias +([^ ]*).*/, "$1");
         let botId = client.getUserId() + "";
 
         if (event?.sender?.name &&
@@ -35,7 +35,7 @@ export function createAliasIfAsked(client: MatrixClient, event: MatrixEvent, bod
                             sendMessage(client, roomId, "Un alias identique existe déjà. 🤷")
                         } else {
                             client.createAlias(alias, roomId).then(_ => {
-                                sendMessage(client, roomId, "L'alias à été créé. 🎆")
+                                sendMessage(client, roomId, "L'alias '" + alias + "' à été créé. 🎆")
                             }).catch(reason => {
                                 sendMessage(client, roomId, "❗Erreur lors de la création de l'alias")
                                 logger.error("Error creating alias", alias, reason)
