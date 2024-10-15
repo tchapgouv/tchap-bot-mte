@@ -21,6 +21,9 @@ export function ollama(client: MatrixClient, roomId: string, sender: any, body: 
 
     client.sendTyping(roomId, true, 45 * 1000)
 
+    const prompt = body.toLowerCase().replaceAll("bot-gmcd [developpement-durable]", "").replaceAll("bot-gmcd", "")
+    logger.notice("Ollama search : " + prompt)
+
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
     fetchWithError('https://Ollama.gmcd-runner01.eco4.cloud.e2.rie.gouv.fr/api/generate',
         {
@@ -33,7 +36,7 @@ export function ollama(client: MatrixClient, roomId: string, sender: any, body: 
                 },
                 body: JSON.stringify({
                     "model": "llama3",
-                    "prompt": body.toLowerCase().replaceAll("Bot-Gmcd [Developpement-Durable]", "").replaceAll("Bot-Gmcd", ""),
+                    "prompt": prompt,
                     "context": CONTEXT,
                     "stream": false,
                     "keep_alive": "24h"
