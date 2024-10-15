@@ -17,15 +17,18 @@ import {Brain} from "../common/Brain.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
 import {createMailUsersListIfAsked} from "../common/scripts/melListGroup/createMelListGroup.js";
 import {deleteMailUsersListIfAsked} from "../common/scripts/melListGroup/deleteMelListGroup.js";
+import {createAliasIfAsked} from "../common/scripts/aliases/createAlias.js";
+import {deleteAliasIfAsked} from "../common/scripts/aliases/deleteAlias.js";
+import {listAliasIfAsked} from "../common/scripts/aliases/listAlias.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: { message:string, sender: RoomMember; botId: string; roomId: string }): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: { message: string, sender: RoomMember; botId: string; roomId: string }): void {
 
     bePoliteIfNecessary(client, event, data.message)
     // Actions propres au Bot
     norrisIfAsked(client, data.roomId, data.message)
 }
 
-export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain: Brain, data: { message:string, sender: RoomMember; botId: string; roomId: string }): void {
+export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain: Brain, data: { message: string, sender: RoomMember; botId: string; roomId: string }): void {
 
     let actionTaken = false
 
@@ -38,6 +41,10 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, bra
     if (!actionTaken) actionTaken = helpIfAsked(client, event, data.message)
     if (!actionTaken) actionTaken = downgradeIfAsked(client, event, data.message)
     if (!actionTaken) actionTaken = deleteRoomIfAsked(client, data.roomId, data.sender.userId, data.message)
+
+    if (!actionTaken) actionTaken = createAliasIfAsked(client, event, data.message)
+    if (!actionTaken) actionTaken = deleteAliasIfAsked(client, event, data.message)
+    if (!actionTaken) actionTaken = listAliasIfAsked(client, event, data.message)
 
     if (!actionTaken) actionTaken = createLdapUsersListIfAsked(client, event, data.message, brain)
     if (!actionTaken) actionTaken = deleteLdapUsersListIfAsked(client, event, data.message)
