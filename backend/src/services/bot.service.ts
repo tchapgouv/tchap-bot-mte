@@ -65,7 +65,15 @@ export default {
 
         let tries = 0
         while (!invited && tries <= opts.retries) {
-            await botGmcd.client.inviteByEmail(roomId, userMail.toLowerCase())
+
+            const userInternalId = "@" + userMail.toLowerCase().replace("@", "-") + ":agent.dev-durable.tchap.gouv.fr"
+            const user = botGmcd.client.getUser(userInternalId)
+
+            let inviteRequest;
+            if (user !== null) inviteRequest = botGmcd.client.invite(roomId, userInternalId)
+            else inviteRequest = botGmcd.client.inviteByEmail(roomId, userMail.toLowerCase())
+
+            await inviteRequest
                 .then(() => {
                     logger.notice(userMail + " successfully invited.")
                     invited = true
