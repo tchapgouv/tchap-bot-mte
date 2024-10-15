@@ -30,7 +30,7 @@ export function listAliasIfAsked(client: MatrixClient, event: MatrixEvent, body:
                     for (const aliasName of value.aliases) {
                         aliases += " - " + aliasName + "\n"
                     }
-                    sendMessage(client, roomId, "l'alias a été supprimé. 🎆")
+                    sendMessage(client, roomId, aliases)
                 }
             })
 

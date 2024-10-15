@@ -5,7 +5,7 @@ import logger from "../../../../utils/logger.js";
 
 /**
  * @help
- * command : create alias nom-de-l-alias|créer alias nom-de-l-alias
+ * command : create alias #nom-de-l-alias|créer alias #nom-de-l-alias
  * return : je crée un alias pour le salon <sup>*</sup>
  * isAnswer : true
  * isAdmin : true
@@ -16,7 +16,7 @@ export function createAliasIfAsked(client: MatrixClient, event: MatrixEvent, bod
 
     if (regex.test(body)) {
 
-        let alias = body.replace(/.*?alias +([^ ]*).*/, "$1");
+        let alias = body.replace(/.*?(#[^ ]*).*/, "$1");
         let botId = client.getUserId() + "";
 
         if (event?.sender?.name &&
@@ -24,7 +24,7 @@ export function createAliasIfAsked(client: MatrixClient, event: MatrixEvent, bod
             event?.event?.room_id && botId) {
 
             const roomId = event.event.room_id
-            // if (!alias.includes(":")) alias += roomId.replace(/.*(:.*)/, "$1")
+            if (!alias.includes(":")) alias += roomId.replace(/.*(:.*)/, "$1")
 
             getUserPowerLevel(client, event).then(user => {
 
