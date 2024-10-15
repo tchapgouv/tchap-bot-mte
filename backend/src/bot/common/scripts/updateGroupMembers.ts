@@ -7,6 +7,7 @@ import botService from "../../../services/bot.service.js";
  * command : update members
  * return : je mets à jour les utilisateurs de ce salon <sup>*</sup>
  * isAnswer : true
+ * isAdmin : true
  */
 export function updateRoomUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 

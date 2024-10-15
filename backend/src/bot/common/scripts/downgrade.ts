@@ -8,6 +8,7 @@ import {getPowerLevel, getUserPowerLevel, sendMessage} from "../helper.js";
  * command : downgrade yourself|rétrograde toi
  * return : je me rétrograde à modérateur ou utilisateur lambda <sup>*</sup>
  * isAnswer : true
+ * isAdmin : true
  */
 export function downgradeIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 

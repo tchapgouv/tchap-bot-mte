@@ -8,6 +8,7 @@ import botService from "../../../services/bot.service.js";
  * command : delete room !roomId
  * return : je supprime le canal <sup>*</sup>
  * isAnswer : true
+ * isAdmin : true
  */
 export function deleteRoomIfAsked(client: MatrixClient, roomId: string, userId: string, body: string) {
 

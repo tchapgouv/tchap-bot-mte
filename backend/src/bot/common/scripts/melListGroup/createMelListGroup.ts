@@ -10,6 +10,7 @@ import logger from "../../../../utils/logger.js";
  * command : create mail group mailinglist@developpement-durable.gouv.fr
  * return : je gère les utilisateurs de ce salon en me basant sur une liste ldap <sup>*</sup>
  * isAnswer : true
+ * isAdmin : true
  */
 // create list group Agents.GMCD.DETN.UNI.DNUM.SG@developpement-durable.gouv.fr
 export function createMailUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string, brain: Brain) {

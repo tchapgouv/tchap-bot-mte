@@ -7,6 +7,7 @@ import mailGroupService from "../../../../services/mailListGroup.service.js";
  * command : delete list group
  * return : Je supprime la configuration gérant les membres de ce salon <sup>*</sup>
  * isAnswer : true
+ * isAdmin : true
  */
 export function deleteMailUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 

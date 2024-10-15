@@ -7,6 +7,7 @@ import ldapGroupService from "../../../../services/ldapListGroup.service.js";
  * command : delete ldap group
  * return : Je supprime la requête ldap gérant les membres de ce salon <sup>*</sup>
  * isAnswer : true
+ * isAdmin : true
  */
 export function deleteLdapUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 

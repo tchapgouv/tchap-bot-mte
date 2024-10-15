@@ -10,6 +10,7 @@ import logger from "../../../../utils/logger.js";
  * command : create ldap group basedn:BASE_DN filter:FILTER recursive:true
  * return : je gère les utilisateurs de ce salon en me basant sur une requête ldap <sup>*</sup>
  * isAnswer : true
+ * isAdmin : true
  */
 // create ldap group basedn:ou=GMCD,ou=DETN,ou=UNI,ou=DNUM,ou=SG,ou=AC,ou=melanie,ou=organisation,dc=equipement,dc=gouv,dc=fr filter:(&(mailPr=*)(objectclass=mineqPerson)(objectclass=mineqMelBoite)) recursive:true
 export function createLdapUsersListIfAsked(client: MatrixClient, event: MatrixEvent, body: string, brain: Brain) {
