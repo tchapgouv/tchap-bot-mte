@@ -24,7 +24,7 @@ export function createAliasIfAsked(client: MatrixClient, event: MatrixEvent, bod
             event?.event?.room_id && botId) {
 
             const roomId = event.event.room_id
-            if (!alias.includes(":")) alias += roomId.replace(/.*(:.*)/, "$1")
+            // if (!alias.includes(":")) alias += roomId.replace(/.*(:.*)/, "$1")
 
             getUserPowerLevel(client, event).then(user => {
 
