@@ -39,7 +39,25 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                     let message = ""
                     if (full) {
                         for (const agent of agentList) {
-                            message += "- "+ agent.displayName + " => " + agent.mailPR + "\n"
+                            message += "- " + agent.displayName + " => " + agent.departmentNumber + "\n"
+                        }
+                    } else {
+                        let dnList = []
+                        for (const agent of agentList) {
+                            dnList.push(agent.departmentNumber)
+                        }
+                        dnList.sort((a, b) => a.localeCompare(b))
+                        let previousDn: string | null = null
+                        let count = 0
+                        for (let i = 0; i < dnList.length; i++) {
+                            const dn = dnList[i];
+                            if (previousDn === null) previousDn = dn
+                            if (previousDn === dn) count++
+                            if (previousDn !== dn || i == dnList.length - 1) {
+                                message += "- " + dn + " (" + count + ")"
+                                count = 0
+                            }
+                            previousDn = dn
                         }
                     }
                     console.log(agentList[0])
@@ -51,6 +69,7 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                     message += "- agent.dn = " + agent.dn + "\n"
                     message += "- agent.cn = " + agent.cn + "\n"
                     message += "- agent.mail = " + agent.mail + "\n"
+                    message += "- agent.departmentNumber = " + agent.departmentNumber + "\n"
                     sendMessage(client, roomId, message)
                 })
             } else {
