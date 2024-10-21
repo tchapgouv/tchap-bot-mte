@@ -60,7 +60,7 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                             const isLast = i == dnList.length - 1
                             if (previousDn === null) previousDn = dn
                             if (previousDn === dn) count++
-                            if (previousDn !== dn && !isLast) {
+                            if (previousDn !== dn) {
                                 message += "- `" + previousDn + "` (" + count + ")\n"
                                 count = 1
                             }
