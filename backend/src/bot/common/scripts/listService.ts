@@ -41,11 +41,13 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                     let message = ""
                     if (full) {
                         for (const agent of agentList) {
+                            if (agent.displayName === 'PAMELA') continue
                             message += "- " + agent.displayName + " => `" + agent.departmentNumber + "`\n"
                         }
                     } else {
                         let dnList = []
                         for (const agent of agentList) {
+                            if (agent.displayName === 'PAMELA') continue
                             dnList.push(agent.departmentNumber)
                         }
                         dnList.sort((a, b) => a.localeCompare(b))
