@@ -31,7 +31,7 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                 let filter = "(|"
                 for (const roomMember of roomMemberList) {
                     const userUID = roomMember.name.replace(/(.*?) \[.*/, "$1").replaceAll(" ", ".").toLowerCase()
-                    const domain = roomMember.userId.replace(/@(.*):.*/, "$1").replace('julien.delamarre' + "-", "")
+                    const domain = roomMember.userId.replace(/@(.*):.*/, "$1").replace(userUID + "-", "")
                     const mail = userUID + "@" + domain
                     filter += "(mail=" + mail + ")"
                 }
