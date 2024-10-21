@@ -284,6 +284,7 @@ export class Agent {
     mail: string[]
     objectClass: string[]
     displayName: string
+    departmentNumber: string
 
     constructor(data: {
         uid: string | undefined,
@@ -292,7 +293,8 @@ export class Agent {
         mailPR: string,
         mail: string[],
         objectClass: string[],
-        displayName: string
+        displayName: string,
+        departmentNumber: string
     }) {
         this.uid = data.uid;
         this.dn = data.dn;
@@ -301,6 +303,7 @@ export class Agent {
         this.mailPR = data.mailPR;
         this.mail = data.mail;
         this.displayName = data.displayName;
+        this.departmentNumber = data.departmentNumber;
     }
 
     static fromPojo(pojo: any): Agent {
@@ -316,6 +319,7 @@ export class Agent {
                 mailPR: this.getPojoValue(pojo, "mailPR")[0],
                 mail: this.getPojoValue(pojo, "mail"),
                 displayName: this.getPojoValue(pojo, "displayName")[0],
+                departmentNumber: this.getPojoValue(pojo, "departmentNumber")[0],
             }
         )
     }

@@ -35,9 +35,15 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                 }
                 filter += ")"
                 ldapService.getUsersWithLdapRequest(getDefaultClient(), process.env.BASE_DN || '', true, filter).then(agentList => {
+
+                    let message = ""
+                    if (full) {
+                        for (const agent of agentList) {
+                            message += "- "+ agent.displayName + " => " + agent.mailPR + "\n"
+                        }
+                    }
                     console.log(agentList[0])
                     const agent = agentList[0]
-                    let message = ""
                     message += "- agent.mailPR = " + agent.mailPR + "\n"
                     message += "- agent.objectClass = " + agent.objectClass + "\n"
                     message += "- agent.displayName = " + agent.displayName + "\n"
