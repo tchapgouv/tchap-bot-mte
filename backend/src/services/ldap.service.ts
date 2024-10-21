@@ -2,7 +2,7 @@ import ldap, {SearchOptions} from "ldapjs";
 import logger from "../utils/logger.js";
 
 
-const AGENT_ATTRIBUTES = ['uid', 'cn', 'mail', 'mailPR', 'displayName', 'objectClass']
+const AGENT_ATTRIBUTES = ['uid', 'cn', 'mail', 'mailPR', 'displayName', 'objectClass', 'departmentNumber']
 
 export default {
 
