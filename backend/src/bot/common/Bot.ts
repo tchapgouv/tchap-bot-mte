@@ -14,8 +14,8 @@ export class Bot {
 
     client: MatrixClient;
     brain: Brain = new Brain()
-    private readonly parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message: string, sender: RoomMember; botId: string; roomId: string }) => void;
-    private readonly parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message: string, sender: RoomMember; botId: string; roomId: string }) => void;
+    private readonly parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }) => void;
+    private readonly parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }) => void;
 
     ids_token: { token: string, valid_until: Date } | undefined
 
@@ -26,8 +26,8 @@ export class Bot {
                     deviceId: string,
                     idBaseUrl: string
                 },
-                parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message: string, sender: RoomMember; botId: string; roomId: string }) => void,
-                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message: string, sender: RoomMember; botId: string; roomId: string }) => void) {
+                parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }) => void,
+                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }) => void) {
 
         const getIST = () => {
             return this.getIdentityServerToken()
@@ -127,13 +127,15 @@ export class Bot {
 
                 if (isNewMessage) {
 
-                    const message: string | undefined = event.event.content?.body.toLowerCase() || ""
+                    const message: string = event.event.content?.body.toLowerCase() || ""
+                    const formatted_message: string = event.event.content?.formatted_body.toLowerCase() || ""
                     const roomId = event.event.room_id
 
-                    if (roomId && message && event.sender && this.client.getUserId()) {
+                    if (roomId && event.sender && this.client.getUserId()) {
 
-                        const data: { message: string, sender: RoomMember; botId: string; roomId: string } = {
+                        const data: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string } = {
                             message,
+                            formatted_message,
                             sender: event.sender,
                             roomId,
                             botId: this.client.getUserId() || configGmcd.userId
