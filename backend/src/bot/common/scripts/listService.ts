@@ -6,7 +6,7 @@ import logger from "../../../utils/logger.js";
 
 /**
  * @help
- * command : list alias|lister services
+ * command : list|lister services
  * return : je fais la liste des services des membres du salon (Amande uniquement)
  * isAnswer : true
  */
