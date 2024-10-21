@@ -1,5 +1,5 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
-import {getPowerLevel, sendMessage} from "../../helper.js";
+import {getPowerLevel, isSupport, sendMessage} from "../../helper.js";
 import mailGroupService from "../../../../services/mailListGroup.service.js";
 import botService from "../../../../services/bot.service.js";
 import {Brain} from "../../Brain.js";
@@ -48,7 +48,7 @@ export function createMailUsersListIfAsked(client: MatrixClient, event: MatrixEv
 
             getPowerLevel(client, roomId, userId).then(powerLevel => {
 
-                if (powerLevel === 100) {
+                if (powerLevel === 100 || isSupport(userId)) {
 
                     const mail = event.event.content?.body.match(/.* (\S.*@\S.*)(?: |$).*/i)?.at(1)
 

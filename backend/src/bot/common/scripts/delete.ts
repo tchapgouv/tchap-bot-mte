@@ -1,6 +1,6 @@
 import {MatrixClient} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
-import {getPowerLevel, sendMessage} from "../helper.js";
+import {getPowerLevel, isSupport, sendMessage} from "../helper.js";
 import botService from "../../../services/bot.service.js";
 
 /**
@@ -18,7 +18,7 @@ export function deleteRoomIfAsked(client: MatrixClient, roomId: string, userId: 
 
         getPowerLevel(client, roomId, userId).then(powerLevel => {
 
-            if (powerLevel === 100) {
+            if (powerLevel === 100 || isSupport(userId)) {
 
                 logger.warning(userId + " deleted room : " + roomId)
                 sendMessage(client, roomId, "This is 'The End of the ******* World' ! 😭")

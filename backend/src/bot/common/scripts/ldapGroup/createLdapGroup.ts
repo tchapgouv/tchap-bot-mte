@@ -1,5 +1,5 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
-import {getPowerLevel, sendMessage} from "../../helper.js";
+import {getPowerLevel, isSupport, sendMessage} from "../../helper.js";
 import ldapGroupService from "../../../../services/ldapListGroup.service.js";
 import botService from "../../../../services/bot.service.js";
 import {Brain} from "../../Brain.js";
@@ -47,7 +47,7 @@ export function createLdapUsersListIfAsked(client: MatrixClient, event: MatrixEv
 
             getPowerLevel(client, roomId, userId).then(powerLevel => {
 
-                if (powerLevel === 100) {
+                if (powerLevel === 100 || isSupport(userId)) {
 
                     const base_dn = event.event.content?.body.match(/.* basedn:(.*?)(?: |$).*/i)?.at(1)
                     const filter = event.event.content?.body.match(/.* filter:(.*?)(?: |$).*/i)?.at(1)

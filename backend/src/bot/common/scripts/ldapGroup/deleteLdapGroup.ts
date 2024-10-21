@@ -1,5 +1,5 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
-import {getPowerLevel, sendMessage} from "../../helper.js";
+import {getPowerLevel, isSupport, sendMessage} from "../../helper.js";
 import ldapGroupService from "../../../../services/ldapListGroup.service.js";
 
 /**
@@ -24,7 +24,7 @@ export function deleteLdapUsersListIfAsked(client: MatrixClient, event: MatrixEv
 
             getPowerLevel(client, roomId, userId).then(powerLevel => {
 
-                if (powerLevel === 100) {
+                if (powerLevel === 100 || isSupport(userId)) {
 
                     ldapGroupService.destroy(roomId).then(numberOfDeletedRows => {
                         if (numberOfDeletedRows > 0) {

@@ -1,6 +1,6 @@
 import {MatrixClient} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
-import {getPowerLevel, sendMessage} from "../helper.js";
+import {getPowerLevel, isSupport, sendMessage} from "../helper.js";
 
 /**
  * @help
@@ -17,7 +17,7 @@ export function leaveRoomIfAsked(client: MatrixClient, roomId: string, userId: s
 
         getPowerLevel(client, roomId, userId).then(powerLevel => {
 
-            if (powerLevel === 100) {
+            if (powerLevel === 100 || isSupport(userId)) {
 
                 logger.warning("Someone dismissed me :(")
                 sendMessage(client, roomId, "Au revoir ! 😭")
