@@ -12,7 +12,7 @@ import logger from "../../../utils/logger.js";
  */
 export function getServicesIfAsked(client: MatrixClient, event: MatrixEvent, body: string, formatted_message: string) {
 
-    const regex: RegExp = /.*service.*@thomas.bouchardon.*/i
+    const regex: RegExp = /.*service.*@.*/i
 
     if (regex.test(body)) {
 
