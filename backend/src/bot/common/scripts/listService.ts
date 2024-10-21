@@ -1,6 +1,7 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import ldapService, {getDefaultClient} from "../../../services/ldap.service.js";
 import {sendMarkdownMessage, sendMessage} from "../helper.js";
+import logger from "../../../utils/logger.js";
 
 
 /**
@@ -36,6 +37,7 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                     filter += "(mail=" + mail + ")"
                 }
                 filter += ")"
+                logger.debug("listServicesIfAsked filter = ", filter)
                 ldapService.getUsersWithLdapRequest(getDefaultClient(), process.env.BASE_DN || '', true, filter).then(agentList => {
 
                     let message = ""
