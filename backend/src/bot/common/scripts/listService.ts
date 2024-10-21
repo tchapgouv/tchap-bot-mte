@@ -44,13 +44,15 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                     if (full) {
                         for (const agent of agentList) {
                             if (agent.displayName === 'PAMELA') continue
-                            message += "- " + agent.displayName + " => `" + agent.departmentNumber + "`\n"
+                            const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
+                            message += "- " + agent.displayName + " => `" + root + "/" + agent.departmentNumber + "`\n"
                         }
                     } else {
                         let dnList = []
                         for (const agent of agentList) {
                             if (agent.displayName === 'PAMELA') continue
-                            dnList.push(agent.departmentNumber)
+                            const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
+                            dnList.push(root + "/" + agent.departmentNumber)
                         }
                         dnList.sort((a, b) => a.localeCompare(b))
                         let previousDn: string | null = null
