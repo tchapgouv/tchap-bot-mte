@@ -36,7 +36,6 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                     filter += "(mail=" + mail + ")"
                 }
                 filter += ")"
-                sendMessage(client, roomId, filter)
                 ldapService.getUsersWithLdapRequest(getDefaultClient(), process.env.BASE_DN || '', true, filter).then(agentList => {
 
                     let message = ""
@@ -54,11 +53,15 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                         let count = 0
                         for (let i = 0; i < dnList.length; i++) {
                             const dn = dnList[i];
+                            const isLast = i == dnList.length - 1
                             if (previousDn === null) previousDn = dn
                             if (previousDn === dn) count++
-                            if (previousDn !== dn || i == dnList.length - 1) {
-                                message += "- `" + dn + "` (" + count + ")\n"
-                                count = 0
+                            if (previousDn !== dn && !isLast) {
+                                message += "- `" + previousDn + "` (" + count + ")\n"
+                                count = 1
+                            }
+                            if (isLast) {
+                                message += "- `" + dn + "` (" + (previousDn !== dn ? 1 : count) + ")\n"
                             }
                             previousDn = dn
                         }
