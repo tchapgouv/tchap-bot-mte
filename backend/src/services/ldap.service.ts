@@ -12,14 +12,7 @@ export default {
 
         let userMailList: string[] = []
 
-        const client = ldap.createClient({
-            url: process.env.LDAP_URI || ''
-        });
-
-        client.on('error', (err) => {
-            if (err.code === 'ENOTFOUND') logger.critical("Cannot connect to LDAP instance !")
-            else logger.error('LDAP : ' + err.message);
-        });
+        const client = getDefaultClient()
 
         let userNotFoundList: string[] = []
         await Promise.all(usernames.map(async (username) => {
@@ -264,6 +257,21 @@ export default {
             })()
         })
     }
+}
+
+export function getDefaultClient() {
+
+    logger.debug(process.env.LDAP_URI)
+    logger.debug(process.env.BASE_DN)
+
+    const client = ldap.createClient({url: process.env.LDAP_URI || ''});
+
+    client.on('error', (err) => {
+        if (err.code === 'ENOTFOUND') logger.critical("Cannot connect to LDAP instance !")
+        else logger.error('LDAP : ' + err.message);
+    });
+
+    return client
 }
 
 

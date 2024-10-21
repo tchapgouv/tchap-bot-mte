@@ -20,6 +20,7 @@ import {deleteMailUsersListIfAsked} from "../common/scripts/melListGroup/deleteM
 import {createAliasIfAsked} from "../common/scripts/aliases/createAlias.js";
 import {deleteAliasIfAsked} from "../common/scripts/aliases/deleteAlias.js";
 import {listAliasIfAsked} from "../common/scripts/aliases/listAlias.js";
+import {listServicesIfAsked} from "../common/scripts/listService.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: { message: string, sender: RoomMember; botId: string; roomId: string }): void {
 
@@ -45,6 +46,8 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, bra
     if (!actionTaken) actionTaken = createAliasIfAsked(client, event, data.message)
     if (!actionTaken) actionTaken = deleteAliasIfAsked(client, event, data.message)
     if (!actionTaken) actionTaken = listAliasIfAsked(client, event, data.message)
+
+    if (!actionTaken) actionTaken = listServicesIfAsked(client, event, data.message)
 
     if (!actionTaken) actionTaken = createLdapUsersListIfAsked(client, event, data.message, brain)
     if (!actionTaken) actionTaken = deleteLdapUsersListIfAsked(client, event, data.message)
