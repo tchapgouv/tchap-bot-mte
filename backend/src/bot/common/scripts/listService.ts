@@ -1,12 +1,12 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import ldapService, {getDefaultClient} from "../../../services/ldap.service.js";
-import {sendMessage} from "../helper.js";
+import {sendMarkdownMessage, sendMessage} from "../helper.js";
 
 
 /**
  * @help
  * command : list alias|lister services
- * return : je fais la liste des services des membres du salon
+ * return : je fais la liste des services des membres du salon (Amande uniquement)
  * isAnswer : true
  */
 export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
@@ -34,12 +34,13 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                     filter += "(uid=" + userUID + ")"
                 }
                 filter += ")"
+                sendMessage(client, roomId, filter)
                 ldapService.getUsersWithLdapRequest(getDefaultClient(), process.env.BASE_DN || '', true, filter).then(agentList => {
 
                     let message = ""
                     if (full) {
                         for (const agent of agentList) {
-                            message += "- " + agent.displayName + " => " + agent.departmentNumber + "\n"
+                            message += "- " + agent.displayName + " => `" + agent.departmentNumber + "`\n"
                         }
                     } else {
                         let dnList = []
@@ -54,23 +55,13 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                             if (previousDn === null) previousDn = dn
                             if (previousDn === dn) count++
                             if (previousDn !== dn || i == dnList.length - 1) {
-                                message += "- " + dn + " (" + count + ")"
+                                message += "- `" + dn + "` (" + count + ")\n"
                                 count = 0
                             }
                             previousDn = dn
                         }
                     }
-                    console.log(agentList[0])
-                    const agent = agentList[0]
-                    message += "- agent.mailPR = " + agent.mailPR + "\n"
-                    message += "- agent.objectClass = " + agent.objectClass + "\n"
-                    message += "- agent.displayName = " + agent.displayName + "\n"
-                    message += "- agent.uid = " + agent.uid + "\n"
-                    message += "- agent.dn = " + agent.dn + "\n"
-                    message += "- agent.cn = " + agent.cn + "\n"
-                    message += "- agent.mail = " + agent.mail + "\n"
-                    message += "- agent.departmentNumber = " + agent.departmentNumber + "\n"
-                    sendMessage(client, roomId, message)
+                    sendMarkdownMessage(client, roomId, message)
                 })
             } else {
                 sendMessage(client, roomId, "Je n'ai pas réussi à récupérer la liste des membres du salon. 🤷")
