@@ -4,8 +4,7 @@ import logger from "./logger.js";
 
 export default function (url: string, opts: { requestInit?: RequestInit, timeout?: number, proxify?: boolean, proxy?: string } = {}): Promise<any> {
 
-    if (opts.requestInit === undefined) opts.requestInit = {method: "GET"}
-    if (opts.timeout === undefined) opts.timeout = 7000
+    if (opts.requestInit === undefined) opts.requestInit = {method: "GET", signal: AbortSignal.timeout(opts.timeout ? opts.timeout : 7000)}
     if (opts.proxify === undefined) opts.proxify = false
 
     if (opts.proxify) {
@@ -16,12 +15,5 @@ export default function (url: string, opts: { requestInit?: RequestInit, timeout
 
     opts.requestInit.method = opts.requestInit.method ? opts.requestInit.method : "GET"
 
-    // logger.debug("fetchWithError : ", url, opts.requestInit)
-
-    return Promise.race([
-        fetch(url, opts.requestInit),
-        new Promise((_resolve, reject) =>
-            setTimeout(() => reject(new Error('timeout')), opts.timeout)
-        )
-    ])
+    return fetch(url, opts.requestInit)
 }
