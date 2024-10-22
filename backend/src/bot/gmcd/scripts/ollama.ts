@@ -1,6 +1,6 @@
 import fetchWithError from "../../../utils/fetchWithError.js";
 import {MatrixClient} from "matrix-js-sdk";
-import {sendMessage} from "../../common/helper.js";
+import {sendMarkdownMessage, sendMessage} from "../../common/helper.js";
 import logger from "../../../utils/logger.js";
 
 /**
@@ -52,7 +52,7 @@ export function ollama(client: MatrixClient, roomId: string, sender: any, body: 
         .catch(reason => {
             logger.error("Ollama error : ", reason)
             client.sendTyping(roomId, false, 60 * 1000)
-            if (reason.message === 'timeout') sendMessage(client, roomId, `J'ai bien peur que mes créateurs ne m'aient alloué trop peu de ressources pour vous répondre dans un temps raisonnable 🤯.`)
+            if (reason.message === 'timeout') sendMarkdownMessage(client, roomId, `J'ai bien peur que mes créateurs ne m'aient alloué trop peu de ressources pour vous répondre dans un temps raisonnable 🤯.`)
             else sendMessage(client, roomId, `Je crois avoir un problème d'accès à mes neurones 😶‍🌫️.`)
 
         }).finally(() => {
