@@ -155,6 +155,7 @@ export async function postMessage(req: Request, res: Response) {
                 new MetricLabel("bot_id", webhook.getDataValue("bot_id")),
                 new MetricLabel("room_id", webhook.getDataValue("room_id")),
                 new MetricLabel("webhook_id", webhook.getDataValue("webhook_id")),
+                new MetricLabel("webhook_label", webhook.getDataValue("webhook_label")),
                 new MetricLabel("format", format)
             ]
         })
@@ -309,6 +310,7 @@ export async function uploadFile(req: Request, res: Response) {
                     new MetricLabel("bot_id", webhook.getDataValue("bot_id")),
                     new MetricLabel("room_id", webhook.getDataValue("room_id")),
                     new MetricLabel("webhook_id", webhook.getDataValue("webhook_id")),
+                    new MetricLabel("webhook_label", webhook.getDataValue("webhook_label")),
                 ]
             })
 
