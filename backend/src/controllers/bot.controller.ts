@@ -3,6 +3,7 @@ import botService from "../services/bot.service.js";
 import logger from "../utils/logger.js";
 import {StatusCodes} from "http-status-codes";
 import config from "../bot/gmcd/config.js";
+import metricService, {MetricLabel} from "../services/metric.service.js";
 
 export async function migrateRoom(req: Request, res: Response) {
 
@@ -18,6 +19,10 @@ export async function migrateRoom(req: Request, res: Response) {
 
         }).catch(reason => {
             logger.error("Error inviting users (" + req.body.room_name + ")", reason)
+            metricService.createOrIncrease({
+                name: "error",
+                labels: [new MetricLabel("reason", "Error inviting users")]
+            })
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
         })
 
@@ -41,6 +46,10 @@ export async function migrateRoom(req: Request, res: Response) {
 
             }).catch(reason => {
                 logger.error("Error inviting users (" + req.body.room_name + ")", reason)
+                metricService.createOrIncrease({
+                    name: "error",
+                    labels: [new MetricLabel("reason", "Error inviting users")]
+                })
             })
         }
     }
@@ -128,6 +137,10 @@ export async function inviteUsers(req: Request, res: Response) {
 
     }).catch(reason => {
         logger.error("Error inviting users (" + req.body.room_name + ")", reason)
+        metricService.createOrIncrease({
+            name: "error",
+            labels: [new MetricLabel("reason", "Error inviting users")]
+        })
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(reason)
     })
 }

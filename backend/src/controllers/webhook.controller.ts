@@ -166,6 +166,10 @@ export async function postMessage(req: Request, res: Response) {
         })
         .catch(err => {
             logger.error("Error posting message :", err)
+            metricService.createOrIncrease({
+                name: "error",
+                labels: [new MetricLabel("reason", "Error posting message")]
+            })
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
                 message:
                     err.message || "Some error occurred while posting message."
