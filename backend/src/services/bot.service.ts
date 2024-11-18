@@ -70,17 +70,21 @@ export default {
             const userInternalId = userInternalIdLeftPart + ":agent.dev-durable.tchap.gouv.fr"
             const user = botGmcd.client.getUser(userInternalId)
 
-            let inviteRequest;
-            if (user !== null) inviteRequest = botGmcd.client.invite(roomId, userInternalId)
-            else inviteRequest = botGmcd.client.inviteByEmail(roomId, userMail.toLowerCase())
-
-            const userToLog = user !== null ? userInternalIdLeftPart : userInternalId
-            const userToMarkdown = `[${userToLog}](${userToLog})`
+            let inviteRequest, userToLog: string, userToMarkdown: string
+            if (user !== null) {
+                inviteRequest = botGmcd.client.invite(roomId, userInternalId)
+                userToLog = userInternalIdLeftPart
+                userToMarkdown = `[${userToLog}](https://matrix.to/#/${userInternalId})`
+            } else {
+                inviteRequest = botGmcd.client.inviteByEmail(roomId, userMail.toLowerCase())
+                userToLog = userMail.toLowerCase()
+                userToMarkdown = userMail.toLowerCase()
+            }
 
             await inviteRequest
                 .then(() => {
-                        logger.notice(userToLog + " successfully invited.")
-                        message = " ✅ " + userToMarkdown + " invité.\n"
+                    logger.notice(userToLog + " successfully invited.")
+                    message = " ✅ " + userToMarkdown + " invité.\n"
                     invited = true
                 })
                 .catch(reason => {
