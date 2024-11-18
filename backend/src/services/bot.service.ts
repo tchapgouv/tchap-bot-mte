@@ -66,38 +66,36 @@ export default {
         let tries = 0
         while (!invited && tries <= opts.retries) {
 
-            const userInternalId = "@" + userMail.toLowerCase().replace("@", "-") + ":agent.dev-durable.tchap.gouv.fr"
+            const userInternalIdLeftPart = "@" + userMail.toLowerCase().replace("@", "-")
+            const userInternalId = userInternalIdLeftPart + ":agent.dev-durable.tchap.gouv.fr"
             const user = botGmcd.client.getUser(userInternalId)
 
             let inviteRequest;
             if (user !== null) inviteRequest = botGmcd.client.invite(roomId, userInternalId)
             else inviteRequest = botGmcd.client.inviteByEmail(roomId, userMail.toLowerCase())
 
+            const userToLog = user !== null ? userInternalIdLeftPart : userInternalId
+            const userToMarkdown = `[${userToLog}](${userToLog})`
+
             await inviteRequest
                 .then(() => {
-                    if (user !== null) {
-                        logger.notice(userInternalId + " successfully invited.")
-                        message = " ✅ " + userInternalId + " invité.\n"
-                    }
-                    else {
-                        logger.notice(userMail + " successfully invited.")
-                        message = " ✅ " + userMail + " invité.\n"
-                    }
+                        logger.notice(userToLog + " successfully invited.")
+                        message = " ✅ " + userToMarkdown + " invité.\n"
                     invited = true
                 })
                 .catch(reason => {
                     if (reason.data?.error?.includes("already in the room")) {
-                        opts.logAlreadyInvited ? message = " 🤷 " + userMail + " était déjà présent.\n" : ""
+                        opts.logAlreadyInvited ? message = " 🤷 " + userToMarkdown + " était déjà présent.\n" : ""
                         invited = true
                     } else {
                         logger.debug("typeof reason :", typeof reason, reason?.HTTPError, reason?.httpStatus)
-                        logger.error("Error inviting " + userMail + " will retry in 10 seconds", reason)
+                        logger.error("Error inviting " + userToLog + " will retry in 10 seconds", reason)
                         if (tries == opts.retries) {
 
                             if (reason?.httpStatus === '502') {
-                                message = " ❗️ " + userMail + ", Tchap returned 502...\n"
+                                message = " ❗️ " + userToLog + ", Tchap returned 502...\n"
                             } else {
-                                message = " ❗️ " + userMail + ", " + (reason?.data?.error) + "\n"
+                                message = " ❗️ " + userToLog + ", " + (reason?.data?.error) + "\n"
                                 hasError = true
                             }
                         }
@@ -436,7 +434,7 @@ export default {
             let inviteResultMessage = ""
             await Promise.all(chunk).then(results => {
                 for (const result of results) {
-                    inviteResultMessage += result.message
+                    inviteResultMessage += "-" + result.message
                     if (result.hasError) mailInErrorList.push(result.mail)
                     logger.debug("inviteResult : ", result)
                 }
@@ -444,7 +442,7 @@ export default {
                 logger.error("Promise.all(inviteByEmail) : ", reason)
                 throw (reason)
             })
-            sendMessage(client, roomId, inviteResultMessage)
+            sendMarkdownMessage(client, roomId, inviteResultMessage)
         })
 
         logger.debug("Inviting tasks completed")
