@@ -75,9 +75,15 @@ export default {
 
             await inviteRequest
                 .then(() => {
-                    logger.notice(userMail + " successfully invited.")
+                    if (user !== null) {
+                        logger.notice(userInternalId + " successfully invited.")
+                        message = " ✅ " + userInternalId + " invité.\n"
+                    }
+                    else {
+                        logger.notice(userMail + " successfully invited.")
+                        message = " ✅ " + userMail + " invité.\n"
+                    }
                     invited = true
-                    message = " ✅ " + userMail + " invité.\n"
                 })
                 .catch(reason => {
                     if (reason.data?.error?.includes("already in the room")) {

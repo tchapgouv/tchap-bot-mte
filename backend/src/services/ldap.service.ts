@@ -315,13 +315,17 @@ export class Agent {
                 dn: pojo.objectName,
                 objectClass: this.getPojoValue(pojo, "objectClass"),
                 uid: (uids && uids[0]) ? uids[0] : undefined,
-                cn: this.getPojoValue(pojo, "cn")[0],
-                mailPR: this.getPojoValue(pojo, "mailPR")[0],
+                cn: this.getFirstMultivaluedValue(this.getPojoValue(pojo, "cn")),
+                mailPR: this.getFirstMultivaluedValue(this.getPojoValue(pojo, "mailPR")),
                 mail: this.getPojoValue(pojo, "mail"),
-                displayName: this.getPojoValue(pojo, "displayName")[0],
-                departmentNumber: this.getPojoValue(pojo, "departmentNumber")[0],
+                displayName: this.getFirstMultivaluedValue(this.getPojoValue(pojo, "displayName")),
+                departmentNumber: this.getFirstMultivaluedValue(this.getPojoValue(pojo, "departmentNumber")),
             }
         )
+    }
+
+    static getFirstMultivaluedValue(object: string[] | undefined) {
+        return Array.isArray(object) && object.length ? object[0] : ""
     }
 
     static dumpPojo(pojo: any) {

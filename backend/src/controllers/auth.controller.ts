@@ -14,15 +14,15 @@ function isFromIntranet(req: Request) {
     const isFromIntranet = req.headers['x-mineqprovenance'] === 'intranet'
     logger.debug("isFromIntranet ?", isFromIntranet)
 
-    return isFromIntranet;
+    return isFromIntranet
 }
 
 export const verifyToken: RequestHandler = (req, res, next) => {
 
     logger.debug(">>>> verifyToken")
 
-    if (!isFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'});
-    if (!req.headers.cookie) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Cookie)'});
+    if (!isFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'})
+    if (!req.headers.cookie) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Cookie)'})
 
     // get cookie from header with name token
     let token = req.headers.cookie.split(';').find((c: string) => {
