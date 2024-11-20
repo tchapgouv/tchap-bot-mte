@@ -57,6 +57,7 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
 
                         if (full) {
                             message += "`" + service + "` : \n"
+                            serviceDict[service].sort((a, b) => a.displayName.localeCompare(b.displayName))
                             for (const agent of serviceDict[service]) {
                                 message += "- " + agent.displayName + "\n"
                             }
