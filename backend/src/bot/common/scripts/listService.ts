@@ -60,7 +60,7 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                             for (const agent of serviceDict[service]) {
                                 message += "- " + agent.displayName + "`\n"
                             }
-
+                            message += "\n"
                         } else {
                             message += "- `" + service + "` (" + serviceDict[service].length + ")\n"
                         }
