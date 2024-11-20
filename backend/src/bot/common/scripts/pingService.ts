@@ -58,7 +58,7 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
 
                     let message = "Ping "
                     for (const agent of filteredAgentList) {
-                        const agentInternalId = "@" + agent.mailPR.replace("@", "-") + ":agent.dev-durable.tchap.gouv.fr"
+                        const agentInternalId = "@" + agent.mailPR.toLowerCase().replace("@", "-") + ":agent.dev-durable.tchap.gouv.fr"
                         message += `[${agentInternalId}](https://matrix.to/#/${agentInternalId}) `
                     }
                     sendMarkdownMessage(client, roomId, message)

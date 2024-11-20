@@ -14,7 +14,7 @@ export function getServicesIfAsked(client: MatrixClient, event: MatrixEvent, bod
 
     const regex: RegExp = /.*service.*@.*/i
 
-    if (regex.test(formatted_message)) {
+    if (regex.test(formatted_message) && !formatted_message.toLowerCase().includes(" ping ")) {
 
         const userId = formatted_message.replace(/.*service.*(@.*:.*?\.fr).*/, "$1");
         const botId = client.getUserId() + "";
