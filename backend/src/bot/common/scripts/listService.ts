@@ -54,7 +54,7 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                         serviceList.sort((a, b) => a.localeCompare(b))
 
                         for (const service of serviceList) {
-                            message += "- " + service + " : `\n"
+                            message += "- `" + service + "` : \n"
                             for (const agent of serviceDict[service]) {
                                 message += "  - " + agent.displayName + "`\n"
                             }
@@ -64,7 +64,8 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                         for (const agent of agentList) {
                             if (agent.displayName === 'PAMELA') continue
                             const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
-                            dnList.push(root + "/" + agent.departmentNumber)
+                            const fullDn = root + "/" + agent.departmentNumber
+                            dnList.push(fullDn)
                         }
                         dnList.sort((a, b) => a.localeCompare(b))
                         let previousDn: string | null = null
