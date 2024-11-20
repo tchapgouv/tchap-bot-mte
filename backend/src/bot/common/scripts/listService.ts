@@ -41,50 +41,31 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                 ldapService.getUsersWithLdapRequest(getDefaultClient(), process.env.BASE_DN || '', true, filter).then(agentList => {
 
                     let message = ""
-                    if (full) {
-                        let serviceDict: { [id: string]: Agent[] } = {}
-                        for (const agent of agentList) {
-                            if (agent.displayName === 'PAMELA') continue
-                            const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
-                            const fullDn = root + "/" + agent.departmentNumber
-                            if (!serviceDict[fullDn]) serviceDict[fullDn] = []
-                            serviceDict[fullDn].push(agent)
-                        }
-                        let serviceList = Object.keys(serviceDict)
-                        serviceList.sort((a, b) => a.localeCompare(b))
+                    let serviceDict: { [id: string]: Agent[] } = {}
+                    for (const agent of agentList) {
+                        if (agent.displayName === 'PAMELA') continue
+                        const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
+                        const fullDn = root + "/" + agent.departmentNumber
+                        if (!serviceDict[fullDn]) serviceDict[fullDn] = []
+                        serviceDict[fullDn].push(agent)
+                    }
 
-                        for (const service of serviceList) {
+                    let serviceList = Object.keys(serviceDict)
+                    serviceList.sort((a, b) => a.localeCompare(b))
+
+                    for (const service of serviceList) {
+
+                        if (full) {
                             message += "- `" + service + "` : \n"
                             for (const agent of serviceDict[service]) {
                                 message += "  - " + agent.displayName + "`\n"
                             }
-                        }
-                    } else {
-                        let dnList = []
-                        for (const agent of agentList) {
-                            if (agent.displayName === 'PAMELA') continue
-                            const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
-                            const fullDn = root + "/" + agent.departmentNumber
-                            dnList.push(fullDn)
-                        }
-                        dnList.sort((a, b) => a.localeCompare(b))
-                        let previousDn: string | null = null
-                        let count = 0
-                        for (let i = 0; i < dnList.length; i++) {
-                            const dn = dnList[i];
-                            const isLast = i == dnList.length - 1
-                            if (previousDn === null) previousDn = dn
-                            if (previousDn === dn) count++
-                            if (previousDn !== dn) {
-                                message += "- `" + previousDn + "` (" + count + ")\n"
-                                count = 1
-                            }
-                            if (isLast) {
-                                message += "- `" + dn + "` (" + (previousDn !== dn ? 1 : count) + ")\n"
-                            }
-                            previousDn = dn
+
+                        } else {
+                            message += "- `" + service + "` (" + serviceDict[service].length + ")\n"
                         }
                     }
+
                     sendMarkdownMessage(client, roomId, message)
                 })
             } else {
