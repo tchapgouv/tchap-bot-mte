@@ -24,12 +24,17 @@ import {listServicesIfAsked} from "../common/scripts/listService.js";
 import {getServicesIfAsked} from "../common/scripts/getService.js";
 import {pingService} from "../common/scripts/pingService.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, _data: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }): void {
 
-    bePoliteIfHeard(client, event, data.message)
-    pingService(client, event, data.message)
+    const message: string | undefined = event.event.content?.body.toLowerCase()
+    const roomId = event.event.room_id
+
+    if (!roomId || !message || !event.sender) return
+
+    bePoliteIfHeard(client, event, message)
+    pingService(client, event, message)
     // Actions propres au Bot
-    norrisIfHeard(client, data.roomId, data.message)
+    norrisIfHeard(client, roomId, message)
 }
 
 export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain: Brain, data: {

@@ -16,7 +16,7 @@ import {contactsIfAsked} from "./scripts/contacts.js";
 import {statutIfAsked} from "./scripts/statut.js";
 import {pingService} from "../common/scripts/pingService.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: { message: string, sender: RoomMember; botId: string; roomId: string }): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, _data: { message: string, sender: RoomMember; botId: string; roomId: string }): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -24,7 +24,7 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: B
     if (!roomId || !message || !event.sender) return
 
     bePoliteIfHeard(client, event, message)
-    pingService(client, event, data.message)
+    pingService(client, event, message)
     // Actions propres au Bot
 }
 
