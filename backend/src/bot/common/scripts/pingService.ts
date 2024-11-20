@@ -45,16 +45,18 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
                         const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
                         const fullDn = root + "/" + agent.departmentNumber
                         return service.toLowerCase() === fullDn.toLowerCase()
-                    });
+                    })
 
                     if (filteredAgentList.length === 0) {
                         sendMessage(client, roomId, "Aucun membre du salon ne semble appartenir au service mentionné. 🤷")
                         return
                     }
 
+                    sendMessage(client, roomId, "filteredAgentList.length = " + filteredAgentList.length)
+
                     let message = "Ping "
                     for (const agent of filteredAgentList) {
-                        const agentInternalId = "@" + agent.mailPR.replace("@","-") + ":agent.dev-durable.tchap.gouv.fr"
+                        const agentInternalId = "@" + agent.mailPR.replace("@", "-") + ":agent.dev-durable.tchap.gouv.fr"
                         message += `[${agentInternalId}](https://matrix.to/#/${agentInternalId}) `
                     }
                     sendMarkdownMessage(client, roomId, message)
