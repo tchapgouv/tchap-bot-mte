@@ -145,8 +145,8 @@ export class Bot {
 
                 if (isNewMessage) {
 
-                    const message: string = event.event.content?.body.toLowerCase() || ""
-                    const formatted_message: string = event.event.content?.formatted_body.toLowerCase() || ""
+                    const message: string = event.event.content?.body?.toLowerCase() || ""
+                    const formatted_message: string = event.event.content?.formatted_body?.toLowerCase() || ""
                     const roomId = event.event.room_id
 
                     logger.debug("roomId", roomId, "event.sender", event.sender, "this.client.getUserId()", this.client.getUserId())
