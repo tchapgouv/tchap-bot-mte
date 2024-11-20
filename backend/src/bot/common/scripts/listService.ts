@@ -1,5 +1,5 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
-import ldapService, {getDefaultClient} from "../../../services/ldap.service.js";
+import ldapService, {Agent, getDefaultClient} from "../../../services/ldap.service.js";
 import {sendMarkdownMessage, sendMessage} from "../helper.js";
 import logger from "../../../utils/logger.js";
 
@@ -7,7 +7,7 @@ import logger from "../../../utils/logger.js";
 /**
  * @help
  * command : list|lister services
- * return : je fais la liste des services des membres du salon (Amande uniquement)
+ * return : je fais la liste des services des membres du salon (Amande uniquement)<br/> Options : <br/> - `--full` liste les services et leurs membres
  * isAnswer : true
  */
 export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
@@ -42,10 +42,22 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
 
                     let message = ""
                     if (full) {
+                        let serviceDict: { [id: string]: Agent[] } = {}
                         for (const agent of agentList) {
                             if (agent.displayName === 'PAMELA') continue
                             const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
-                            message += "- " + agent.displayName + " => `" + root + "/" + agent.departmentNumber + "`\n"
+                            const fullDn = root + "/" + agent.departmentNumber
+                            if (!serviceDict[fullDn]) serviceDict[fullDn] = []
+                            serviceDict[fullDn].push(agent)
+                        }
+                        let serviceList = Object.keys(serviceDict)
+                        serviceList.sort((a, b) => a.localeCompare(b))
+
+                        for (const service of serviceList) {
+                            message += "- " + service + " : `\n"
+                            for (const agent of serviceDict[service]) {
+                                message += "  - " + agent.displayName + "`\n"
+                            }
                         }
                     } else {
                         let dnList = []
