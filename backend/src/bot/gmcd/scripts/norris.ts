@@ -4,11 +4,11 @@ import {sendMessage} from "../../common/helper.js";
 
 
 /**
- * @help
+ * --help
  * command : norris
  * return : quand j’entends parler de Chuck, je propose une blague 😁
  */
-export function norrisIfAsked(client: MatrixClient, roomId: string, body: string) {
+export function norrisIfHeard(client: MatrixClient, roomId: string, body: string) {
 
     const regex: RegExp = /.*(norris( |$)).*/i
 

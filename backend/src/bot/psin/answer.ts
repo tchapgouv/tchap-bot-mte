@@ -1,6 +1,6 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import logger from "../../utils/logger.js";
-import {bePoliteIfNecessary} from "../common/scripts/gallantry.js";
+import {bePoliteIfHeard} from "../common/scripts/gallantry.js";
 import {leaveRoomIfAsked} from "../common/scripts/leave.js";
 import {createWebhookIfAsked} from "../common/scripts/webhoook.js";
 import {promoteUserIfAsked} from "../common/scripts/promote.js";
@@ -14,15 +14,17 @@ import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
 import {sendMarkdownMessage} from "../common/helper.js";
 import {contactsIfAsked} from "./scripts/contacts.js";
 import {statutIfAsked} from "./scripts/statut.js";
+import {pingService} from "../common/scripts/pingService.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, _data: { message: string, sender: RoomMember; botId: string; roomId: string }): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: { message: string, sender: RoomMember; botId: string; roomId: string }): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
 
     if (!roomId || !message || !event.sender) return
 
-    bePoliteIfNecessary(client, event, message)
+    bePoliteIfHeard(client, event, message)
+    pingService(client, event, data.message)
     // Actions propres au Bot
 }
 

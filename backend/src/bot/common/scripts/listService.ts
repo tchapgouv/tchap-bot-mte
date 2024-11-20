@@ -56,9 +56,9 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                     for (const service of serviceList) {
 
                         if (full) {
-                            message += "- `" + service + "` : \n"
+                            message += "`" + service + "` : \n"
                             for (const agent of serviceDict[service]) {
-                                message += "  - " + agent.displayName + "`\n"
+                                message += "- " + agent.displayName + "`\n"
                             }
 
                         } else {

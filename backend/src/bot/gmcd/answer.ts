@@ -1,10 +1,10 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import logger from "../../utils/logger.js";
 import {sendMessage} from "../common/helper.js";
-import {norrisIfAsked} from "./scripts/norris.js";
+import {norrisIfHeard} from "./scripts/norris.js";
 import {promoteUserIfAsked} from "../common/scripts/promote.js";
 import {helpIfAsked} from "./scripts/help.js";
-import {bePoliteIfNecessary} from "../common/scripts/gallantry.js";
+import {bePoliteIfHeard} from "../common/scripts/gallantry.js";
 import {leaveRoomIfAsked} from "../common/scripts/leave.js";
 import {createWebhookIfAsked} from "../common/scripts/webhoook.js";
 import {deleteRoomIfAsked} from "../common/scripts/delete.js";
@@ -22,15 +22,23 @@ import {deleteAliasIfAsked} from "../common/scripts/aliases/deleteAlias.js";
 import {listAliasIfAsked} from "../common/scripts/aliases/listAlias.js";
 import {listServicesIfAsked} from "../common/scripts/listService.js";
 import {getServicesIfAsked} from "../common/scripts/getService.js";
+import {pingService} from "../common/scripts/pingService.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }): void {
 
-    bePoliteIfNecessary(client, event, data.message)
+    bePoliteIfHeard(client, event, data.message)
+    pingService(client, event, data.message)
     // Actions propres au Bot
-    norrisIfAsked(client, data.roomId, data.message)
+    norrisIfHeard(client, data.roomId, data.message)
 }
 
-export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain: Brain, data: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }): void {
+export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain: Brain, data: {
+    message: string,
+    formatted_message: string,
+    sender: RoomMember;
+    botId: string;
+    roomId: string
+}): void {
 
     let actionTaken = false
 
