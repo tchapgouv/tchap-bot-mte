@@ -123,6 +123,11 @@ export class Bot {
                     return
                 }
 
+                if (event.sender?.userId.toLowerCase().includes("@bot-")) {
+                    logger.info("Message is one of fellow Bot =)")
+                    return
+                }
+
                 const botName = this.client.getUser(botId)?.displayName?.replace(/ \[.*/, "")
                 const userIds = event.getContent()["m.mentions"]?.user_ids;
 
