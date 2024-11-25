@@ -34,7 +34,7 @@ export function getServicesIfAsked(client: MatrixClient, event: MatrixEvent, bod
                 const mail = userUID + "@" + domain
                 filter += "(mail=" + mail + ")"
                 filter += ")"
-                logger.debug("listServicesIfAsked filter = ", filter)
+                logger.debug("getServicesIfAsked filter = ", filter)
                 ldapService.getUsersWithLdapRequest(getDefaultClient(), process.env.BASE_DN || '', true, filter).then(agentList => {
 
                     let message = ""

@@ -41,7 +41,7 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
                     filter += "(mail=" + mail + ")"
                 }
                 filter += ")"
-                logger.debug("listServicesIfAsked filter = ", filter)
+                logger.debug("pingService filter = ", filter)
                 ldapService.getUsersWithLdapRequest(getDefaultClient(), process.env.BASE_DN || '', true, filter).then(agentList => {
 
                     let filteredAgentList = agentList.filter(agent => {
@@ -56,10 +56,10 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
                         return
                     }
 
-                    let message = "Ping "
+                    let message = `Ping @${service} !\n`
                     for (const agent of filteredAgentList) {
                         const agentInternalId = "@" + agent.mailPR.toLowerCase().replace("@", "-") + ":agent.dev-durable.tchap.gouv.fr"
-                        message += `[${agentInternalId}](https://matrix.to/#/${agentInternalId}) `
+                        message += `- [${agentInternalId}](https://matrix.to/#/${agentInternalId}) \n`
                     }
                     sendMarkdownMessage(client, roomId, message)
                 })

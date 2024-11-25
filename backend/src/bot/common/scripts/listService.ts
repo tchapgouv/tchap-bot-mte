@@ -7,7 +7,7 @@ import logger from "../../../utils/logger.js";
 /**
  * @help
  * command : list|lister services
- * return : je fais la liste des services des membres du salon (Amande uniquement)<br/> Options : <br/> - `--full` liste les services et leurs membres
+ * return : je fais la liste des services des membres du salon (Amande uniquement)<br/> Options : <br/>    - `--full|-f` liste les services et leurs membres
  * isAnswer : true
  */
 export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
