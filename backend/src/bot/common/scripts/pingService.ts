@@ -52,7 +52,7 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
                     })
 
                     if (filteredAgentList.length === 0) {
-                        sendMessage(client, roomId, "Aucun membre du salon ne semble appartenir au service mentionné. 🤷")
+                        sendMessage(client, roomId, "Aucun membre du salon ne semble appartenir au service `" + service + "` mentionné. 🤷")
                         return
                     }
 
