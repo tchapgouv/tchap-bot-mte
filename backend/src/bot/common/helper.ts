@@ -1,4 +1,4 @@
-import {EventType, MatrixClient, MatrixEvent, MsgType, RelationType} from "matrix-js-sdk";
+import {EventType, MatrixClient, MatrixEvent, MsgType, RelationType, Room} from "matrix-js-sdk";
 import logger from "../../utils/logger.js";
 import {User} from "../classes/User.js";
 import fs from "fs";
@@ -317,3 +317,19 @@ export function fullDnFromAgent(agent: Agent): string {
     const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
     return root + "/" + agent.departmentNumber
 }
+
+export function getMatrixIdFromLdapAgent(agent: Agent, room: Room | null) {
+
+    const roomMemberList = room?.getMembers()
+
+    if (roomMemberList && roomMemberList.length > 0) {
+        for (const roomMember of roomMemberList) {
+            for (const mail of agent.mail) {
+                if (roomMember.userId.toLowerCase().includes(mail.toLowerCase().replace("@", "-"))) return roomMember.userId
+            }
+        }
+    }
+
+    return "@" + agent.mailPR.toLowerCase().replace("@", "-") + ":agent.dev-durable.tchap.gouv.fr"
+}
+

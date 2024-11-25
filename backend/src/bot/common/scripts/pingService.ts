@@ -1,6 +1,6 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import ldapService, {getDefaultClient} from "../../../services/ldap.service.js";
-import {fullDnFromAgent, mailFromRoomMember, sendMarkdownMessage, sendMessage} from "../helper.js";
+import {fullDnFromAgent, getMatrixIdFromLdapAgent, mailFromRoomMember, sendMarkdownMessage, sendMessage} from "../helper.js";
 import logger from "../../../utils/logger.js";
 
 
@@ -55,8 +55,8 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
 
                     let message = "Ping `@" + service + "`\n"
                     for (const agent of filteredAgentList) {
-                        const agentInternalId = "@" + agent.mailPR.toLowerCase().replace("@", "-") + ":agent.dev-durable.tchap.gouv.fr"
-                        message += `- [${agentInternalId}](https://matrix.to/#/${agentInternalId}) \n`
+                        const matrixId = getMatrixIdFromLdapAgent(agent, client.getRoom(roomId))
+                        message += `- [${matrixId}](https://matrix.to/#/${matrixId}) \n`
                     }
                     sendMarkdownMessage(client, roomId, message)
                 }).catch(_ => {
