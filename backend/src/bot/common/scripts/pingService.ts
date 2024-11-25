@@ -1,6 +1,6 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import ldapService, {getDefaultClient} from "../../../services/ldap.service.js";
-import {sendMarkdownMessage, sendMessage} from "../helper.js";
+import {fullDnFromAgent, mailFromRoomMember, sendMarkdownMessage, sendMessage} from "../helper.js";
 import logger from "../../../utils/logger.js";
 
 
@@ -35,9 +35,7 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
             if (roomMemberList && roomMemberList.length > 0) {
                 let filter = "(|"
                 for (const roomMember of roomMemberList) {
-                    const userUID = roomMember.name.replace(/(.*?) \[.*/, "$1").replaceAll(" ", ".").toLowerCase()
-                    const domain = roomMember.userId.replace(/@(.*):.*/, "$1").replace(userUID + "-", "")
-                    const mail = userUID + "@" + domain
+                    const mail = mailFromRoomMember(roomMember.name, roomMember.userId)
                     filter += "(mail=" + mail + ")"
                 }
                 filter += ")"
@@ -46,17 +44,16 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
 
                     let filteredAgentList = agentList.filter(agent => {
                         if (agent.displayName === 'PAMELA') return false
-                        const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
-                        const fullDn = root + "/" + agent.departmentNumber
+                        const fullDn = fullDnFromAgent(agent)
                         return service.toLowerCase() === fullDn.toLowerCase() || fullDn.toLowerCase().includes("/" + service.toLowerCase())
                     })
 
                     if (filteredAgentList.length === 0) {
-                        sendMessage(client, roomId, "Aucun membre du salon ne semble appartenir au service `" + service + "` mentionné. 🤷")
+                        sendMarkdownMessage(client, roomId, "Aucun membre du salon ne semble appartenir au service `" + service + "`. 🤷")
                         return
                     }
 
-                    let message = `Ping @${service} !\n`
+                    let message = "Ping `@" + service + "`\n"
                     for (const agent of filteredAgentList) {
                         const agentInternalId = "@" + agent.mailPR.toLowerCase().replace("@", "-") + ":agent.dev-durable.tchap.gouv.fr"
                         message += `- [${agentInternalId}](https://matrix.to/#/${agentInternalId}) \n`

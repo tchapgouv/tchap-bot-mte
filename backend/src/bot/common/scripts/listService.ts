@@ -1,6 +1,6 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import ldapService, {Agent, getDefaultClient} from "../../../services/ldap.service.js";
-import {sendMarkdownMessage, sendMessage} from "../helper.js";
+import {fullDnFromAgent, mailFromRoomMember, sendMarkdownMessage, sendMessage} from "../helper.js";
 import logger from "../../../utils/logger.js";
 
 
@@ -31,21 +31,18 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
             if (roomMemberList && roomMemberList.length > 0) {
                 let filter = "(|"
                 for (const roomMember of roomMemberList) {
-                    const userUID = roomMember.name.replace(/(.*?) \[.*/, "$1").replaceAll(" ", ".").toLowerCase()
-                    const domain = roomMember.userId.replace(/@(.*):.*/, "$1").replace(userUID + "-", "")
-                    const mail = userUID + "@" + domain
+                    const mail = mailFromRoomMember(roomMember.name, roomMember.userId)
                     filter += "(mail=" + mail + ")"
                 }
                 filter += ")"
                 logger.debug("listServicesIfAsked filter = ", filter)
                 ldapService.getUsersWithLdapRequest(getDefaultClient(), process.env.BASE_DN || '', true, filter).then(agentList => {
 
-                    let message = ""
+                    let message = "Voici la liste des services d'appartenance des agents présents dans ce salon :"
                     let serviceDict: { [id: string]: Agent[] } = {}
                     for (const agent of agentList) {
                         if (agent.displayName === 'PAMELA') continue
-                        const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
-                        const fullDn = root + "/" + agent.departmentNumber
+                        const fullDn = fullDnFromAgent(agent)
                         if (!serviceDict[fullDn]) serviceDict[fullDn] = []
                         serviceDict[fullDn].push(agent)
                     }

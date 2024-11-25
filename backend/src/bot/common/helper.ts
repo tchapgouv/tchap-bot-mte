@@ -6,6 +6,7 @@ import showdown from "showdown";
 import path from "path";
 import {fileURLToPath} from "url";
 import {ADMINS} from "./config.js";
+import {Agent} from "../../services/ldap.service.js";
 
 const converter = new showdown.Converter({simpleLineBreaks: true})
 
@@ -304,4 +305,15 @@ export function isSupport(userId: string) {
     return ADMINS.some(admin => {
         return userId.includes(admin)
     })
+}
+
+export function mailFromRoomMember(username: string, userId: string): string {
+    const userUID = username.replace(/(.*?) \[.*/, "$1").replaceAll(" ", ".").toLowerCase()
+    const domain = userId.replace(/@(.*?)[0-1]*:.*/, "$1").replace(userUID + "-", "")
+    return userUID + "@" + domain
+}
+
+export function fullDnFromAgent(agent: Agent): string {
+    const root = agent.dn.replace(/.*ou=(.*?),ou=organisation.*/, "$1").replace("melanie", "MTEL")
+    return root + "/" + agent.departmentNumber
 }

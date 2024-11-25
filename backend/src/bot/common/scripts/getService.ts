@@ -1,6 +1,6 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import ldapService, {getDefaultClient} from "../../../services/ldap.service.js";
-import {sendMarkdownMessage, sendMessage} from "../helper.js";
+import {mailFromRoomMember, sendMarkdownMessage, sendMessage} from "../helper.js";
 import logger from "../../../utils/logger.js";
 
 
@@ -29,9 +29,7 @@ export function getServicesIfAsked(client: MatrixClient, event: MatrixEvent, bod
 
             if (roomMember && roomMember.displayName) {
                 let filter = "(|"
-                const userUID = roomMember.displayName.replace(/(.*?) \[.*/, "$1").replaceAll(" ", ".").toLowerCase()
-                const domain = roomMember.userId.replace(/@(.*):.*/, "$1").replace(userUID + "-", "")
-                const mail = userUID + "@" + domain
+                const mail = mailFromRoomMember(roomMember.displayName, roomMember.userId)
                 filter += "(mail=" + mail + ")"
                 filter += ")"
                 logger.debug("getServicesIfAsked filter = ", filter)
