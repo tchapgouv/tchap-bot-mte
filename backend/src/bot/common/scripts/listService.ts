@@ -65,6 +65,8 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                     }
 
                     sendMarkdownMessage(client, roomId, message)
+                }).catch(_ => {
+                    sendMessage(client, roomId, "Je n'ai pas réussi à récupérer la liste des membres du salon. 🤷")
                 })
             } else {
                 sendMessage(client, roomId, "Je n'ai pas réussi à récupérer la liste des membres du salon. 🤷")

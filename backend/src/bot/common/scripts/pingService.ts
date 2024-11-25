@@ -59,6 +59,8 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
                         message += `- [${agentInternalId}](https://matrix.to/#/${agentInternalId}) \n`
                     }
                     sendMarkdownMessage(client, roomId, message)
+                }).catch(_ => {
+                    sendMessage(client, roomId, "Je n'ai pas réussi à récupérer les détails de l'utilisateur. 🤷")
                 })
             } else {
                 sendMessage(client, roomId, "Je n'ai pas réussi à récupérer la liste des membres du salon. 🤷")

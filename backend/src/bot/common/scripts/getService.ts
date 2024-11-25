@@ -42,6 +42,8 @@ export function getServicesIfAsked(client: MatrixClient, event: MatrixEvent, bod
                         message += "- " + agent.displayName + " => `" + root + "/" + agent.departmentNumber + "`\n"
                     }
                     sendMarkdownMessage(client, roomId, message)
+                }).catch(_ => {
+                    sendMessage(client, roomId, "Je n'ai pas réussi à récupérer les détails de l'utilisateur. 🤷")
                 })
             } else {
                 sendMessage(client, roomId, "Je n'ai pas réussi à récupérer les détails de l'utilisateur. 🤷")
