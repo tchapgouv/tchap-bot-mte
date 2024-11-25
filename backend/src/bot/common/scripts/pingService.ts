@@ -53,7 +53,7 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
                         return
                     }
 
-                    let message = "Ping `@" + service + "`\n"
+                    let message = "Ping `@" + service.toUpperCase() + "`\n"
                     for (const agent of filteredAgentList) {
                         const matrixId = getMatrixIdFromLdapAgent(agent, client.getRoom(roomId))
                         message += `- [${matrixId}](https://matrix.to/#/${matrixId}) \n`
