@@ -223,6 +223,18 @@ export async function isSomeoneAdmin(client: MatrixClient, roomId: string): Prom
     return someoneIsAdmin
 }
 
+function extracted(commande: { command: string | undefined; return: string; isAnswer: boolean; isAdmin: boolean }, isAdmin: boolean) {
+    let help = ""
+    if (commande.isAdmin && !isAdmin) return help;
+    help += " - "
+    if (commande.command) {
+        help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
+        help += "`" + commande.command + "`, "
+    }
+    help += commande.return + "  \n"
+    return help;
+}
+
 export function redactHelp(commonCommandes: { command: string | undefined; return: string; isAnswer: boolean; isAdmin: boolean }[],
                            specificCommands: { command: string | undefined; return: string; isAnswer: boolean; isAdmin: boolean }[],
                            isAdmin: boolean): string {
@@ -230,24 +242,12 @@ export function redactHelp(commonCommandes: { command: string | undefined; retur
     let help = "Voici une liste non exhaustive des commandes auxquelles je sais répondre (Si les droits du salon me le permettent).  \n\n"
     help += specificCommands.length > 0 ? "Commandes générales à tous les Bots :  \n" : ""
     for (const commande of commonCommandes) {
-        help += " - "
-        if (commande.isAdmin && !isAdmin) continue
-        if (commande.command) {
-            help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
-            help += "`" + commande.command + "`, "
-        }
-        help += commande.return + "  \n"
+        help += extracted(commande, isAdmin);
     }
     if (specificCommands.length > 0) {
         help += "\nCommandes qui me sont propres :  \n"
         for (const commande of specificCommands) {
-            if (commande.isAdmin && !isAdmin) continue
-            help += " - "
-            if (commande.command) {
-                help += commande.isAnswer ? "Si on me dit " : "Si j'entends "
-                help += "`" + commande.command + "`, "
-            }
-            help += commande.return + "  \n"
+            help += extracted(commande, isAdmin);
         }
     }
     help += isAdmin ? "\n_<sup>*</sup> Administrateur uniquement_" : ""
