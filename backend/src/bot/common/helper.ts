@@ -223,7 +223,7 @@ export async function isSomeoneAdmin(client: MatrixClient, roomId: string): Prom
     return someoneIsAdmin
 }
 
-function extracted(commande: { command: string | undefined; return: string; isAnswer: boolean; isAdmin: boolean }, isAdmin: boolean) {
+function extractHelpFromCommand(commande: { command: string | undefined; return: string; isAnswer: boolean; isAdmin: boolean }, isAdmin: boolean) {
     let help = ""
     if (commande.isAdmin && !isAdmin) return help;
     help += " - "
@@ -242,12 +242,12 @@ export function redactHelp(commonCommandes: { command: string | undefined; retur
     let help = "Voici une liste non exhaustive des commandes auxquelles je sais répondre (Si les droits du salon me le permettent).  \n\n"
     help += specificCommands.length > 0 ? "Commandes générales à tous les Bots :  \n" : ""
     for (const commande of commonCommandes) {
-        help += extracted(commande, isAdmin);
+        help += extractHelpFromCommand(commande, isAdmin);
     }
     if (specificCommands.length > 0) {
         help += "\nCommandes qui me sont propres :  \n"
         for (const commande of specificCommands) {
-            help += extracted(commande, isAdmin);
+            help += extractHelpFromCommand(commande, isAdmin);
         }
     }
     help += isAdmin ? "\n_<sup>*</sup> Administrateur uniquement_" : ""
