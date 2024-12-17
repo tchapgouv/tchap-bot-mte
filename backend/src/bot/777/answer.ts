@@ -8,10 +8,12 @@ import {helpIfAsked} from "./scripts/help.js";
 import {deleteRoomIfAsked} from "../common/scripts/delete.js";
 import {downgradeIfAsked} from "../common/scripts/downgrade.js";
 import {Brain} from "../common/Brain.js";
-import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
 import {pingService} from "../common/scripts/pingService.js";
+import {BotMessageData} from "../common/BotMessageData.js";
+import {listServicesIfAsked} from "../common/scripts/listService.js";
+import {getServicesIfAsked} from "../common/scripts/getService.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain:Brain, _data: { message:string, sender: RoomMember; botId: string; roomId: string }): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, _data: BotMessageData): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -20,10 +22,11 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain:Br
 
     bePoliteIfHeard(client, event, message)
     pingService(client, event, message)
+
     // Actions propres au Bot
 }
 
-export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, _brain:Brain, _data: { message:string, sender: RoomMember; botId: string; roomId: string }): void {
+export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: BotMessageData): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -40,8 +43,13 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, _br
     if (!actionTaken) actionTaken = helpIfAsked(client, event, message)
     if (!actionTaken) actionTaken = downgradeIfAsked(client, event, message)
     if (!actionTaken) actionTaken = deleteRoomIfAsked(client, roomId, event.sender.userId, message)
+
+    if (!actionTaken) actionTaken = listServicesIfAsked(client, event, data.message)
+    if (!actionTaken) actionTaken = getServicesIfAsked(client, event, data.message, data.formatted_message)
+
     // Actions propres au Bot
 
     // Default
+
     if (!actionTaken) logger.debug("parseMessageToSelf : No action taken") // sendMessage(client, roomId, "Bonjour " + event.sender.name + ", en quoi puis-je aider ?")
 }

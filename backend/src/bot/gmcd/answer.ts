@@ -14,7 +14,6 @@ import {createLdapUsersListIfAsked} from "../common/scripts/ldapGroup/createLdap
 import {deleteLdapUsersListIfAsked} from "../common/scripts/ldapGroup/deleteLdapGroup.js";
 import {updateRoomUsersListIfAsked} from "../common/scripts/updateGroupMembers.js";
 import {Brain} from "../common/Brain.js";
-import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
 import {createMailUsersListIfAsked} from "../common/scripts/melListGroup/createMelListGroup.js";
 import {deleteMailUsersListIfAsked} from "../common/scripts/melListGroup/deleteMelListGroup.js";
 import {createAliasIfAsked} from "../common/scripts/aliases/createAlias.js";
@@ -23,8 +22,9 @@ import {listAliasIfAsked} from "../common/scripts/aliases/listAlias.js";
 import {listServicesIfAsked} from "../common/scripts/listService.js";
 import {getServicesIfAsked} from "../common/scripts/getService.js";
 import {pingService} from "../common/scripts/pingService.js";
+import {BotMessageData} from "../common/BotMessageData.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, _data: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, _data: BotMessageData): void {
 
     const message: string | undefined = event.event.content?.body.toLowerCase()
     const roomId = event.event.room_id
@@ -33,17 +33,13 @@ export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: B
 
     bePoliteIfHeard(client, event, message)
     pingService(client, event, message)
+
     // Actions propres au Bot
+
     norrisIfHeard(client, roomId, message)
 }
 
-export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain: Brain, data: {
-    message: string,
-    formatted_message: string,
-    sender: RoomMember;
-    botId: string;
-    roomId: string
-}): void {
+export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain: Brain, data: BotMessageData): void {
 
     let actionTaken = false
 
@@ -73,8 +69,10 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, bra
     if (!actionTaken) actionTaken = updateRoomUsersListIfAsked(client, event, data.message)
 
     // Actions propres au Bot
+
     if (!actionTaken) actionTaken = ollama(client, data.roomId, data.sender, data.message)
 
     // Default
+
     if (!actionTaken) sendMessage(client, data.roomId, "Bonjour " + data.sender.name + ", en quoi puis-je aider ?")
 }
