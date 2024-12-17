@@ -38,7 +38,7 @@ export function listServicesIfAsked(client: MatrixClient, event: MatrixEvent, bo
                 logger.debug("listServicesIfAsked filter = ", filter)
                 ldapService.getUsersWithLdapRequest(getDefaultClient(), process.env.BASE_DN || '', true, filter).then(agentList => {
 
-                    let message = "Voici la liste des services d'appartenance des agents présents dans ce salon :"
+                    let message = "Voici la liste des services d'appartenance des agents présents dans ce salon : \n"
                     let serviceDict: { [id: string]: Agent[] } = {}
                     for (const agent of agentList) {
                         if (agent.displayName === 'PAMELA') continue

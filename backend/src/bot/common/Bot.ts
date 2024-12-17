@@ -9,25 +9,14 @@ import {Brain} from "./Brain.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
 import configGmcd from "../gmcd/config.js";
 import metricService, {MetricLabel} from "../../services/metric.service.js";
+import {BotMessageData} from "./BotMessageData.js";
 
 export class Bot {
 
     client: MatrixClient;
     brain: Brain = new Brain()
-    private readonly parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: {
-        message: string,
-        formatted_message: string,
-        sender: RoomMember;
-        botId: string;
-        roomId: string
-    }) => void;
-    private readonly parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: {
-        message: string,
-        formatted_message: string,
-        sender: RoomMember;
-        botId: string;
-        roomId: string
-    }) => void;
+    private readonly parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: BotMessageData) => void;
+    private readonly parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: BotMessageData) => void;
 
     ids_token: { token: string, valid_until: Date } | undefined
 
@@ -158,7 +147,7 @@ export class Bot {
 
                     if (roomId && event.sender && this.client.getUserId()) {
 
-                        const data: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string } = {
+                        const data: BotMessageData = {
                             message,
                             formatted_message,
                             sender: event.sender,
