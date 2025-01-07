@@ -176,7 +176,7 @@ function getAppendedLabel(row: WebhookRow) {
   let appended = ''
 
   if (script || internet) {
-    appended += '(W. '
+    appended += ' (W. '
     if (script) appended += "Script"
     if (script && internet) appended += ' & '
     if (internet) appended += 'Internet'
