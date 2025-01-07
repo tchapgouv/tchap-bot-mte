@@ -17,6 +17,11 @@ export function isFromIntranet(req: Request) {
     return isFromIntranet
 }
 
+export function isFromInternet(req: Request) {
+
+    return !isFromIntranet(req)
+}
+
 export const verifyToken: RequestHandler = (req, res, next) => {
 
     logger.debug(">>>> verifyToken")
