@@ -25,16 +25,6 @@
               :type="'text'"
               :label-visible="true"/>
 
-  <span style="display: inline-block"
-        class="custom-checkbox">
-      <DsfrCheckbox v-model="webhook.internet"
-                    :label="'Accessible depuis internet.'"
-                    name="checkbox-simple"/>
-      <v-icon scale="1"
-              color="#00FF00"
-              name="gi-biohazard"/>
-    </span>
-
   <dsfr-input v-model="webhook.id"
               :label="'Webhook ID :'"
               :type="'text'"
@@ -49,6 +39,16 @@
               rows="10"/>
 
   <br/>
+
+  <span style="display: inline-block"
+        class="custom-checkbox">
+      <DsfrCheckbox v-model="webhook.internet"
+                    :label="'Accessible depuis internet.'"
+                    name="checkbox-simple"/>
+      <v-icon scale="1"
+              color="#00FF00"
+              name="gi-biohazard"/>
+    </span>
 
   <DsfrModal :opened="modalDeleteOpened"
              :is-alert="true"
