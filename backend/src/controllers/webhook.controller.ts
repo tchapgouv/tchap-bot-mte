@@ -5,6 +5,7 @@ import {StatusCodes} from "http-status-codes";
 import logger from "../utils/logger.js";
 import botService from "../services/bot.service.js";
 import metricService, {MetricLabel} from "../services/metric.service.js";
+import {isFromIntranet} from "./auth.controller.js";
 
 export async function destroy(req: Request, res: Response) {
 
@@ -120,6 +121,24 @@ export async function postMessage(req: Request, res: Response) {
         return
     }
 
+    if (isFromIntranet(req) && !webhook.dataValues.internet) {
+        metricService.createOrIncrease(
+            {
+                name: "webhook",
+                labels: [
+                    new MetricLabel("status", "UNAUTHORIZED"),
+                    new MetricLabel("method", "post"),
+                    new MetricLabel("reason", "Internet origin not allowed")
+                ]
+            })
+
+        res.status(StatusCodes.UNAUTHORIZED).send({
+            message:
+                "Unauthorized."
+        })
+        return
+    }
+
     logger.info("Applying script to message")
 
     logger.debug('Message before script : ', message);
@@ -183,6 +202,7 @@ export async function update(req: Request, res: Response) {
         webhook_label: req.body.webhook.webhook_label,
         room_id: req.body.webhook.room_id,
         bot_id: req.body.webhook.bot_id,
+        internet: req.body.webhook.internet,
         script: req.body.webhook.script,
     }
 
@@ -281,6 +301,24 @@ export async function uploadFile(req: Request, res: Response) {
         res.status(StatusCodes.UNAUTHORIZED).send({
             message:
                 "Unauthenticated (Wrong webhook)."
+        })
+        return
+    }
+
+    if (isFromIntranet(req) && !webhook.dataValues.internet) {
+        metricService.createOrIncrease(
+            {
+                name: "webhook",
+                labels: [
+                    new MetricLabel("status", "UNAUTHORIZED"),
+                    new MetricLabel("method", "upload"),
+                    new MetricLabel("reason", "Internet origin not allowed")
+                ]
+            })
+
+        res.status(StatusCodes.UNAUTHORIZED).send({
+            message:
+                "Unauthorized."
         })
         return
     }

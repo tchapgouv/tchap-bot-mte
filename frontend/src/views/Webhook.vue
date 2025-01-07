@@ -25,6 +25,16 @@
               :type="'text'"
               :label-visible="true"/>
 
+  <span style="display: inline-block"
+        class="custom-checkbox">
+      <DsfrCheckbox v-model="webhook.internet"
+                    :label="'Accessible depuis internet.'"
+                    name="checkbox-simple"/>
+      <v-icon scale="1"
+              color="#00FF00"
+              name="gi-biohazard"/>
+    </span>
+
   <dsfr-input v-model="webhook.id"
               :label="'Webhook ID :'"
               :type="'text'"
@@ -70,6 +80,10 @@
 table {
   display : inline-table !important;
 }
+
+.custom-checkbox .fr-fieldset__element {
+  display : inherit;
+}
 </style>
 
 <script setup
@@ -90,22 +104,23 @@ const alerteClosed = ref(true)
 
 const modalDeleteText = ref('')
 const modalDeleteOpened = ref(false)
-const modalDeleteActions:Ref<any[]> = ref([])
+const modalDeleteActions: Ref<any[]> = ref([])
 
 const webhook = ref({
   label: '',
   roomId: '',
   botId: '',
+  internet: false,
   id: '',
   script: ''
 })
 
 onMounted(() => {
-  getWebhook(<string> route.params.webhookId)
+  getWebhook(<string>route.params.webhookId)
 })
 
-function getWebhook (webhookId:string) {
-  
+function getWebhook(webhookId: string) {
+
   fetchWithError(apiPath + '/api/webhook/get',
     {
       method: "POST",
@@ -123,26 +138,27 @@ function getWebhook (webhookId:string) {
       webhook.value.label = value.webhook_label
       webhook.value.roomId = value.room_id
       webhook.value.botId = value.bot_id
+      webhook.value.internet = value.internet
       webhook.value.id = value.webhook_id
       webhook.value.script = value.script
     })
 }
 
-function close () {
+function close() {
   alerteClosed.value = !alerteClosed.value
 }
 
-function returnToWebhookList () {
+function returnToWebhookList() {
   router.push("/webhooks")
 }
 
-function cancelDeleteWebhook () {
+function cancelDeleteWebhook() {
   modalDeleteOpened.value = false
   modalDeleteText.value = ''
   modalDeleteActions.value = []
 }
 
-function confirmDeleteWebhook () {
+function confirmDeleteWebhook() {
   modalDeleteText.value = webhook.value.label
   modalDeleteOpened.value = true
   modalDeleteActions.value = [
@@ -158,7 +174,7 @@ function confirmDeleteWebhook () {
   ]
 }
 
-function deleteWebhook (webhookId:string) {
+function deleteWebhook(webhookId: string) {
   fetchWithError(apiPath + '/api/webhook/delete/',
     {
       method: "DELETE",
@@ -186,7 +202,7 @@ function deleteWebhook (webhookId:string) {
     })
 }
 
-function saveWebhook () {
+function saveWebhook() {
   fetchWithError(apiPath + '/api/webhook/update',
     {
       method: "PUT",
@@ -199,6 +215,7 @@ function saveWebhook () {
           'webhook_id': webhook.value.id,
           'room_id': webhook.value.roomId,
           'bot_id': webhook.value.botId,
+          'internet': webhook.value.internet,
           'script': webhook.value.script,
         },
       })

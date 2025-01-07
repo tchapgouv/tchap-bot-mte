@@ -15,4 +15,6 @@ export class Webhook extends Model<InferAttributes<Webhook>, InferCreationAttrib
     declare room_id: string;
     @Column(DataType.TEXT)
     declare script: string;
+    @Column(DataType.BOOLEAN)
+    declare internet: boolean;
 }

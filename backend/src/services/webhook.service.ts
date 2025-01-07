@@ -43,6 +43,7 @@ export default {
             webhook_label: webhook_label,
             bot_id: bot_id ? bot_id : "" + process.env.BOT_USER_ID,
             room_id: room_id,
+            internet: false,
             script: script
         };
 
@@ -75,6 +76,7 @@ export default {
         webhook_label: string,
         room_id: string,
         bot_id: string,
+        internet: boolean,
         script: string,
     }) {
 

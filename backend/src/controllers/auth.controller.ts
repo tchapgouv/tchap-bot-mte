@@ -8,7 +8,7 @@ import {StatusCodes} from "http-status-codes";
 import {Agent} from "../services/ldap.service.js";
 import metricService, {MetricLabel} from "../services/metric.service.js";
 
-function isFromIntranet(req: Request) {
+export function isFromIntranet(req: Request) {
 
     logger.debug("X-MineqProvenance = ", req.headers['x-mineqprovenance'])
     const isFromIntranet = req.headers['x-mineqprovenance'] === 'intranet'
