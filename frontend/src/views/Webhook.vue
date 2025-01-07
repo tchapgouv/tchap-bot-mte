@@ -50,6 +50,8 @@
               name="gi-biohazard"/>
     </span>
 
+  <br/>
+
   <DsfrModal :opened="modalDeleteOpened"
              :is-alert="true"
              :icon="'fr-icon-anchor-fill'"

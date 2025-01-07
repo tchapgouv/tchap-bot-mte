@@ -169,6 +169,23 @@ function hasScript(script: string) {
   return script !== '';
 }
 
+function getAppendedLabel(row: WebhookRow) {
+
+  const script: boolean = hasScript(row.script)
+  const internet: boolean = row.internet
+  let appended = ''
+
+  if (script || internet) {
+    appended += '(W. '
+    if (script) appended += "Script"
+    if (script && internet) appended += ' & '
+    if (internet) appended += 'Internet'
+    appended += ')'
+  }
+
+  return appended;
+}
+
 function updateList() {
   fetchWithError(apiPath + '/api/webhook/list',
     {
@@ -181,7 +198,7 @@ function updateList() {
         (row: WebhookRow) => [
           {
             component: Span,
-            label: row.webhook_label.replace(/:.*?($| )/g, "$1") + (hasScript(row.script) ? " (w. script)" : ""),
+            label: row.webhook_label.replace(/:.*?($| )/g, "$1") + getAppendedLabel(row),
             hasScript: hasScript(row.script),
             isInternet: row.internet
           },
