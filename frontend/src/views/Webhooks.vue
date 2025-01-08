@@ -43,7 +43,7 @@
               'Room Id', 
               'Bot Id', 
               'Action']"
-             title="''"
+             title=""
              :rows="filteredWebhooks"
              v-if="filteredWebhooks.length > 0"/>
 
