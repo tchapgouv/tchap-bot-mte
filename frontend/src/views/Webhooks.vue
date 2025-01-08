@@ -12,39 +12,40 @@
 
   <h4 style="margin-top: 1em;">Générer un Webhook</h4>
 
-  <dsfr-input v-model="hookLabel"
-              :label="'Webhook Label :'"
-              :type="'text'"
-              :label-visible="true">test
-  </dsfr-input>
+  <DsfrInput v-model="hookLabel"
+             :label="'Webhook Label :'"
+             :type="'text'"
+             :label-visible="true">test
+  </DsfrInput>
 
-  <dsfr-input v-model="roomId"
-              :label="'Room ID :'"
-              :type="'text'"
-              :label-visible="true">test
-  </dsfr-input>
-  <dsfr-button :label="'Générer'"
-               @click="onClickGenerate"
-               :style="'margin-bottom:25px; margin-top:25px; float: right;'"/>
+  <DsfrInput v-model="roomId"
+             :label="'Room ID :'"
+             :type="'text'"
+             :label-visible="true">test
+  </DsfrInput>
+  <DsfrButton :label="'Générer'"
+              @click="onClickGenerate"
+              :style="'margin-bottom:25px; margin-top:25px; float: right;'"/>
 
   <!--  float clear hack  -->
   <div style="clear: both"/>
 
   <h4>Liste des Webhooks</h4>
 
-  <dsfr-input v-model="filter"
-              :label="'filtre :'"
-              :type="'text'"
-              :label-visible="true"
-              :style="'width : 25%;'"/>
+  <DsfrInput v-model="filter"
+             :label="'filtre :'"
+             :type="'text'"
+             :label-visible="true"
+             :style="'width : 25%;'"/>
 
-  <dsfr-table :headers="['Label', 
+  <DsfrTable :headers="['Label', 
               'Webhook', 
               'Room Id', 
               'Bot Id', 
               'Action']"
-              :rows="filteredWebhooks"
-              v-if="filteredWebhooks.length > 0"/>
+             title="''"
+             :rows="filteredWebhooks"
+             v-if="filteredWebhooks.length > 0"/>
 
   <br/>
 

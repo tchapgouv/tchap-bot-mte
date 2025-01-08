@@ -1,15 +1,15 @@
 <template>
   <h1>Tester un Webhook</h1>
-  <dsfr-input v-model="webhook_id"
+  <DsfrInput v-model="webhook_id"
               :label="'Webhook ID :'"
               :type="'text'"
-              :label-visible="true"></dsfr-input>
+              :label-visible="true"></DsfrInput>
   <br/>
 
   <div style="padding-bottom: 2em;">
     <div style="width: 49%; float: left;">
 
-      <dsfr-input v-model="message"
+      <DsfrInput v-model="message"
                   :label="'Message :'"
                   :type="'text'"
                   :label-visible="true"
@@ -18,7 +18,7 @@
     </div>
     <div style="width: 49%; float: left; margin-left:2%">
 
-      <dsfr-input :label="'Charge utile (endpoint : /api/webhook/post) :'"
+      <DsfrInput :label="'Charge utile (endpoint : /api/webhook/post) :'"
                   :type="'text'"
                   :model-value="
               '{\n' +  
@@ -32,7 +32,7 @@
     </div>
     <div style="clear: both"/>
   </div>
-  <dsfr-button :label="'Envoyer'"
+  <DsfrButton :label="'Envoyer'"
                @click="onClick"/>
   <p style="line-break: anywhere">
     E.g. :

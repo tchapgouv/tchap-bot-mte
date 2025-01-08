@@ -8,18 +8,18 @@
                :closed="alerteClosed"
                @close="close"/>
     <br/>
-      <dsfr-input v-model="username"
-                  :label="'Identifiant :'"
-                  :type="'text'"
-                  :label-visible="true"></dsfr-input>
-      <br/>
-      <dsfr-input v-model="password"
-                  :label="'Mot de passe :'"
-                  :type="'password'"
-                  :label-visible="true"></dsfr-input>
-      <br/>
-      <dsfr-button :label="'Se connecter'"
-                   @click="login"></dsfr-button>
+    <DsfrInput v-model="username"
+               :label="'Identifiant :'"
+               :type="'text'"
+               :label-visible="true"></DsfrInput>
+    <br/>
+    <DsfrInput v-model="password"
+               :label="'Mot de passe :'"
+               :type="'password'"
+               :label-visible="true"></DsfrInput>
+    <br/>
+    <DsfrButton :label="'Se connecter'"
+                @click="login"></DsfrButton>
   </div>
 </template>
 
@@ -31,6 +31,7 @@
 import fetchWithError from "../scripts/fetchWithError";
 import useAuth from "../composable/useAuth";
 import {useRouter} from 'vue-router'
+import {DsfrInput} from "@gouvminint/vue-dsfr";
 
 const username = ref('');
 const password = ref('');
@@ -44,11 +45,11 @@ const alerteClosed = ref(true)
 
 if (user.value) router.push('/webhooks')
 
-function close () {
+function close() {
   if (!alerteClosed.value) alerteClosed.value = true
 }
 
-function login () {
+function login() {
 
   fetchWithError(apiPath + '/api/auth',
     {

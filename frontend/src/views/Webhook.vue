@@ -10,45 +10,54 @@
 
   <h1 style="margin-top: 1em;">Modifier un Webhook</h1>
 
-  <dsfr-input v-model="webhook.label"
-              :label="'Webhook Label :'"
-              :type="'text'"
-              :label-visible="true"/>
+  <DsfrInput v-model="webhook.label"
+             :label="'Webhook Label :'"
+             :type="'text'"
+             :label-visible="true"/>
 
-  <dsfr-input v-model="webhook.roomId"
-              :label="'Room ID :'"
-              :type="'text'"
-              :label-visible="true"/>
+  <DsfrInput v-model="webhook.roomId"
+             :label="'Room ID :'"
+             :type="'text'"
+             :label-visible="true"/>
 
-  <dsfr-input v-model="webhook.botId"
-              :label="'Bot User ID :'"
-              :type="'text'"
-              :label-visible="true"/>
+  <DsfrInput v-model="webhook.botId"
+             :label="'Bot User ID :'"
+             :type="'text'"
+             :label-visible="true"/>
 
-  <dsfr-input v-model="webhook.id"
-              :label="'Webhook ID :'"
-              :type="'text'"
-              :label-visible="true"
-              disabled="disabled"/>
+  <DsfrInput v-model="webhook.id"
+             :label="'Webhook ID :'"
+             :type="'text'"
+             :label-visible="true"
+             disabled="disabled"/>
 
-  <dsfr-input v-model="webhook.script"
-              :label="'Webhook script :'"
-              :type="'text'"
-              :label-visible="true"
-              :is-textarea="true"
-              rows="10"/>
+  <DsfrInput v-model="webhook.script"
+             :type="'text'"
+             label-visible
+             :is-textarea="true"
+             rows="10">
+
+    <template #label>
+      <VIcon scale="1"
+             color="#d64d00"
+             name="px-warning-box"
+             style="margin-right: 5px;"/>
+      Webhook script :
+    </template>
+  </DsfrInput>
 
   <br/>
 
-  <span style="display: inline-block"
-        class="custom-checkbox">
-      <DsfrCheckbox v-model="webhook.internet"
-                    :label="'Accessible depuis internet.'"
-                    name="checkbox-simple"/>
-      <v-icon scale="1"
-              color="#00FF00"
-              name="gi-biohazard"/>
-    </span>
+  <DsfrCheckbox v-model="webhook.internet"
+                name="checkbox-simple">
+    <template #label>
+      <VIcon scale="1"
+             color="#00FF00"
+             name="gi-biohazard"
+             style="margin-right: 5px;"/>
+      Accessible depuis internet
+    </template>
+  </DsfrCheckbox>
 
   <br/>
 
@@ -61,30 +70,26 @@
                                                                          {{ modalDeleteText }} <br/>Cette action est irréversible.</p>
   </DsfrModal>
 
-  <dsfr-button-group :inlineLayoutWhen="true">
-    <dsfr-button :label="'Retour'"
-                 :icon="'ri-arrow-go-back-line'"
-                 @click="returnToWebhookList"
-                 :tertiary="true"/>
-    <dsfr-button :label="'Enregistrer'"
-                 :icon="'ri-save-line'"
-                 @click="saveWebhook"/>
-    <dsfr-button :label="'Supprimer'"
-                 :icon="{name: 'ri-delete-bin-line', fill: 'var(--red-marianne-main-472)'}"
-                 @click="confirmDeleteWebhook"/>
-    <dsfr-button :label="'Tester'"
-                 :icon="{name: 'ri-flask-line', fill: 'var(--yellow-moutarde-sun-348-moon-860)'}"
-                 @click="router.push('/postman/' + webhook.id)"/>
-  </dsfr-button-group>
+  <DsfrButtonGroup :inlineLayoutWhen="true">
+    <DsfrButton :label="'Retour'"
+                :icon="'ri-arrow-go-back-line'"
+                @click="returnToWebhookList"
+                :tertiary="true"/>
+    <DsfrButton :label="'Enregistrer'"
+                :icon="'ri-save-line'"
+                @click="saveWebhook"/>
+    <DsfrButton :label="'Supprimer'"
+                :icon="{name: 'ri-delete-bin-line', fill: 'var(--red-marianne-main-472)'}"
+                @click="confirmDeleteWebhook"/>
+    <DsfrButton :label="'Tester'"
+                :icon="{name: 'ri-flask-line', fill: 'var(--yellow-moutarde-sun-348-moon-860)'}"
+                @click="router.push('/postman/' + webhook.id)"/>
+  </DsfrButtonGroup>
 </template>
 
 <style>
 table {
   display : inline-table !important;
-}
-
-.custom-checkbox .fr-fieldset__element {
-  display : inherit;
 }
 </style>
 
