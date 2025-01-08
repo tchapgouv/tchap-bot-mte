@@ -1,25 +1,36 @@
 <template>
-  <div>
-    <DsfrAlert :title="alerteTitle"
-               :description="alerteDescription"
-               :type="alerteType"
-               :small="true"
-               :closeable="true"
-               :closed="alerteClosed"
-               @close="close"/>
-    <br/>
-    <DsfrInput v-model="username"
-               :label="'Identifiant :'"
-               :type="'text'"
-               :label-visible="true"></DsfrInput>
-    <br/>
-    <DsfrInput v-model="password"
-               :label="'Mot de passe :'"
-               :type="'password'"
-               :label-visible="true"></DsfrInput>
-    <br/>
-    <DsfrButton :label="'Se connecter'"
-                @click="login"></DsfrButton>
+  <div class="fr-container">
+    <div class="fr-grid-row fr-mb-3w fr-grid-row--center">
+      <DsfrAlert :title="alerteTitle"
+                 :description="alerteDescription"
+                 :type="alerteType"
+                 :small="true"
+                 :closeable="true"
+                 :closed="alerteClosed"
+                 @close="close"/>
+    </div>
+    <div class="fr-grid-row fr-mb-3w">
+      <div class="fr-col-offset-3"/>
+      <div class="fr-col-6">
+        <DsfrInput v-model="username"
+                   :label="'Identifiant :'"
+                   :type="'text'"
+                   :label-visible="true"></DsfrInput>
+      </div>
+    </div>
+    <div class="fr-grid-row fr-mb-8w">
+      <div class="fr-col-offset-3"/>
+      <div class="fr-col-6">
+        <DsfrInput v-model="password"
+                   :label="'Mot de passe :'"
+                   :type="'password'"
+                   :label-visible="true"></DsfrInput>
+      </div>
+    </div>
+    <div class="fr-grid-row fr-mb-3w fr-grid-row--center">
+      <DsfrButton :label="'Se connecter'"
+                  @click="login"></DsfrButton>
+    </div>
   </div>
 </template>
 
