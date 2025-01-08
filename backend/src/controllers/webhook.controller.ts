@@ -5,7 +5,7 @@ import {StatusCodes} from "http-status-codes";
 import logger from "../utils/logger.js";
 import botService from "../services/bot.service.js";
 import metricService, {MetricLabel} from "../services/metric.service.js";
-import {isFromInternet, isFromIntranet} from "./auth.controller.js";
+import {isRequestFromInternet, isRequestFromIntranet} from "./auth.controller.js";
 
 export async function destroy(req: Request, res: Response) {
 
@@ -121,7 +121,7 @@ export async function postMessage(req: Request, res: Response) {
         return
     }
 
-    if (isFromInternet(req) && !webhook.dataValues.internet) {
+    if (isRequestFromInternet(req) && !webhook.dataValues.internet) {
         metricService.createOrIncrease(
             {
                 name: "webhook",
@@ -305,7 +305,7 @@ export async function uploadFile(req: Request, res: Response) {
         return
     }
 
-    if (isFromInternet(req) && !webhook.dataValues.internet) {
+    if (isRequestFromInternet(req) && !webhook.dataValues.internet) {
         metricService.createOrIncrease(
             {
                 name: "webhook",

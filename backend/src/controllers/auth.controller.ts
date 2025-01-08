@@ -8,7 +8,7 @@ import {StatusCodes} from "http-status-codes";
 import {Agent} from "../services/ldap.service.js";
 import metricService, {MetricLabel} from "../services/metric.service.js";
 
-export function isFromIntranet(req: Request) {
+export function isRequestFromIntranet(req: Request) {
 
     logger.debug("X-MineqProvenance = ", req.headers['x-mineqprovenance'])
     const isFromIntranet = req.headers['x-mineqprovenance'] === 'intranet'
@@ -17,16 +17,16 @@ export function isFromIntranet(req: Request) {
     return isFromIntranet
 }
 
-export function isFromInternet(req: Request) {
+export function isRequestFromInternet(req: Request) {
 
-    return !isFromIntranet(req)
+    return !isRequestFromIntranet(req)
 }
 
 export const verifyToken: RequestHandler = (req, res, next) => {
 
     logger.debug(">>>> verifyToken")
 
-    if (!isFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'})
+    if (!isRequestFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'})
     if (!req.headers.cookie) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Cookie)'})
 
     // get cookie from header with name token
@@ -53,7 +53,7 @@ export const verifyTimeBasedToken: RequestHandler = (req, res, next) => {
 
     logger.debug(">>>> verifyTimeToken")
 
-    if (!isFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'});
+    if (!isRequestFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'});
     if (!req.body.token) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Token)'});
 
     const token = req.body.token
