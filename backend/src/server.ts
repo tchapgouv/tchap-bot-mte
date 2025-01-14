@@ -6,6 +6,7 @@ import userRouter from './routes/user.routes.js';
 import metricsRouter from './routes/metrics.routes.js';
 import botRoomRouter from './routes/bot.room.routes.js';
 import botUserRouter from './routes/bot.user.routes.js';
+import testsRouter from './routes/tests.routes.js';
 import authRouter from './routes/auth.routes.js';
 import cors from 'cors';
 import logger from "./utils/logger.js";
@@ -56,6 +57,7 @@ app.use(fileUpload({
     }
 }))
 
+app.use(testsRouter);
 app.use(metricsRouter);
 app.use(webhookRouter);
 app.use(userRouter);
