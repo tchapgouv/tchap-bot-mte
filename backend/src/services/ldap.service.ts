@@ -104,6 +104,8 @@ export default {
 
     async getUserForUID(client: ldap.Client, username: string): Promise<Agent | null> {
 
+        if (username === undefined || username.trim().length === 0) throw "Empty username !"
+
         logger.debug("getUserForUID", username)
 
         let opts: SearchOptions = {
