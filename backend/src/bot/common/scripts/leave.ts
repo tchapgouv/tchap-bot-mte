@@ -1,6 +1,7 @@
 import {MatrixClient} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
 import {getPowerLevel, isSupport, sendMessage} from "../helper.js";
+import botService from "../../../services/bot.service.js";
 
 /**
  * @help
@@ -19,9 +20,14 @@ export function leaveRoomIfAsked(client: MatrixClient, roomId: string, userId: s
 
             if (powerLevel === 100 || isSupport(userId)) {
 
-                logger.warning("Someone dismissed me :(")
-                sendMessage(client, roomId, "Au revoir ! 😭")
-                client.leave(roomId).catch(e => logger.error(e))
+                botService.isMemberOfRoom(roomId, client.getUserId() || "").then(isBotMemberOfRoom => {
+                    if (!isBotMemberOfRoom) logger.warning("Someone is trying to make " + client.getUserId() + " leave " + roomId + " which he is not a member of !")
+                    else {
+                        logger.warning("Someone dismissed me :(")
+                        sendMessage(client, roomId, "Au revoir ! 😭")
+                        client.leave(roomId).catch(e => logger.error(e))
+                    }
+                })
 
             } else {
                 sendMessage(client, roomId, "Désolé, seul un administrateur peut me renvoyer ! 🤷")
