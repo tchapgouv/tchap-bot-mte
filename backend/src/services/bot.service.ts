@@ -13,6 +13,7 @@ import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
 import ldap from "ldapjs";
 import ldapGroupService from "./ldapListGroup.service.js";
 import mailGroupService from "./mailListGroup.service.js";
+import metricService, {MetricLabel} from "./metric.service.js";
 
 const bots: Bot[] = [
     botGmcd,
@@ -239,19 +240,28 @@ export default {
 
         let adminList: { name: string, userId: string }[] = []
 
-        let members: RoomMember[] | undefined = botGmcd.client.getRoom(roomId)?.getMembers();
+        let members: RoomMember[] | undefined = client.getRoom(roomId)?.getMembers();
 
         if (members) {
             for (const roomMember of members) {
+                if (roomMember.userId === botId) continue
                 await this.kickUser(roomId, roomMember.userId, opts.kickReason)
                 if (roomMember.powerLevel === 100) adminList.push({name: roomMember.name, userId: roomMember.userId})
             }
         }
 
         if (adminList.length > 0) sendMessage(client, roomId, "Quelques Administrateurs demeurent dans ce salon et je ne peux les exclure.\nCe salon ne sera pas purgé tant qu'ils ne l'auront pas quitté.\nN'oubliez pas d'éteindre la lumière en partant ! 💡\n 👋")
-        else sendMessage(client, roomId, "🚪")
+        else sendMessage(client, roomId, "👋🚪")
 
-        client.leave(roomId)
+        client.leave(roomId).then(() => {
+            logger.notice("Room " + roomId + " successfully left.")
+        }).catch((error) => {
+            logger.error("Error leaving room " + roomId + " : " + error)
+            metricService.createOrIncrease({
+                name: "error",
+                labels: [new MetricLabel("reason", "Error leaving room")]
+            })
+        })
 
         return adminList
     },
