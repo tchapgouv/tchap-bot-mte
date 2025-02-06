@@ -222,7 +222,7 @@ export default {
         })
     },
 
-    async deleteRoom(roomId: string, opts: { kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷", client?: MatrixClient, }) {
+    async deleteRoom(roomId: string, opts: { kickReason?: "Quelqu'un m'a demandé de vous expulser, désolé 🤷", client?: MatrixClient, }) {
 
         logger.debug("deleteRoom", roomId)
 
@@ -297,7 +297,7 @@ export default {
         return user
     },
 
-    async kickUser(roomId: string, userTerm: string, kickReason: string = "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
+    async kickUser(roomId: string, userTerm: string, kickReason: string = "Quelqu'un m'a demandé de vous expulser, désolé 🤷") {
 
         logger.debug("kickUser : ", roomId, userTerm, kickReason)
 
