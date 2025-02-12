@@ -22,7 +22,7 @@ onMounted(() => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        "webhook_id": webhook_id.value,
+        "webhook_id": props.webhook_id,
       })
     }
   )
