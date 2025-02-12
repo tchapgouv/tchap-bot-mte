@@ -20,5 +20,7 @@ export {
 } from 'oh-vue-icons/icons/px/index.js'
 
 export {
-  GiBiohazard
+  GiBiohazard,
+  GiAlarmClock,
+  GiDeadHead
 } from 'oh-vue-icons/icons/gi/index.js'

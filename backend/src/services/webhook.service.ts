@@ -35,6 +35,23 @@ export default {
             {messageFormat: messageFormat})
     },
 
+    async check(webhookId: string) {
+
+        let hasError = false
+        let isBotMemberOfRoom = null
+
+        const webhook = await this.findOneWithWebhookId(webhookId)
+
+        if (webhook == null) {
+            hasError = true
+        } else {
+            isBotMemberOfRoom = await botService.isMemberOfRoom(webhook.dataValues.webhook_id)
+            if (!isBotMemberOfRoom) hasError = true
+        }
+
+        return {hasError, isBotMemberOfRoom}
+    },
+
 
 // Create and Save a new Webhook
     async create(webhook_label: string,

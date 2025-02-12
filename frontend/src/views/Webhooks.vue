@@ -201,7 +201,9 @@ function updateList() {
             component: Span,
             label: row.webhook_label.replace(/:.*?($| )/g, "$1") + getAppendedLabel(row),
             hasScript: hasScript(row.script),
-            isInternet: row.internet
+            isInternet: row.internet,
+            lastUseEpoch: row.lastUseEpoch,
+            botId: row.webhook_id
           },
           {
             component: DsfrButton,
@@ -256,6 +258,7 @@ interface WebhookRow {
   room_id: string
   bot_id: string
   internet: boolean
+  lastUseEpoch: boolean
 }
 
 </script>

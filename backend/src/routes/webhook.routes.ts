@@ -1,5 +1,5 @@
 import express from 'express';
-import {create, destroy, findAll, findOneWithWebhook, postMessage, update, uploadFile} from "../controllers/webhook.controller.js";
+import {check, create, destroy, findAll, findOneWithWebhook, postMessage, update, uploadFile} from "../controllers/webhook.controller.js";
 import {verifyToken} from "../controllers/auth.controller.js";
 
 const webhookRouter = express.Router();
@@ -9,6 +9,8 @@ webhookRouter.post("/api/webhook/create", verifyToken, create);
 webhookRouter.delete("/api/webhook/delete", verifyToken, destroy);
 
 webhookRouter.get("/api/webhook/list", verifyToken, findAll);
+
+webhookRouter.get("/api/webhook/check", verifyToken, check);
 
 webhookRouter.post("/api/webhook/get", verifyToken, findOneWithWebhook);
 

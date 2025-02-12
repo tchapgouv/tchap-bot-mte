@@ -5,7 +5,7 @@ import {StatusCodes} from "http-status-codes";
 import logger from "../utils/logger.js";
 import botService from "../services/bot.service.js";
 import metricService, {MetricLabel} from "../services/metric.service.js";
-import {isRequestFromInternet, isRequestFromIntranet} from "./auth.controller.js";
+import {isRequestFromInternet} from "./auth.controller.js";
 
 export async function destroy(req: Request, res: Response) {
 
@@ -194,6 +194,21 @@ export async function postMessage(req: Request, res: Response) {
                     err.message || "Some error occurred while posting message."
             });
         });
+}
+
+export async function check(req: Request, res: Response) {
+
+    if (!req.body.webhook_id) {
+        res.status(StatusCodes.BAD_REQUEST).send({
+            message: "Webhook id can not be empty!"
+        });
+        return;
+    }
+
+
+    await webhookService.check(req.body.webhook_id).then(value => {
+        res.send(value)
+    })
 }
 
 export async function update(req: Request, res: Response) {
