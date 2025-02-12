@@ -20,3 +20,5 @@ export class Webhook extends Model<InferAttributes<Webhook>, InferCreationAttrib
     @Column(DataType.NUMBER)
     declare lastUseEpoch: number;
 }
+
+// ALTER TABLE webhooks ADD COLUMN lastUseEpoch INTEGER DEFAULT 0;

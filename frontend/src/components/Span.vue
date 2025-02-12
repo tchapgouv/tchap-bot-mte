@@ -1,6 +1,6 @@
 <script setup>
 
-import fetchWithError from "@/scripts/fetchWithError.js";
+import fetchWithError from "@/scripts/fetchWithError";
 
 const props = defineProps({
   label: String,
