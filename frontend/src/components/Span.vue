@@ -11,7 +11,7 @@ const props = defineProps({
 })
 
 const hasError = ref(false)
-
+const apiPath = import.meta.env.VITE_API_ENDPOINT
 const EXPIRY_DATE = 1000 * 60 * 60 * 24 * 182 // 6 months
 
 onMounted(() => {
@@ -36,7 +36,7 @@ onMounted(() => {
 
 <template>
   <p>
-    <VIcon v-if="props.hasError"
+    <VIcon v-if="hasError"
            style="margin-bottom: -2px"
            scale="1.5"
            color="#FF0000"
