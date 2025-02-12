@@ -58,8 +58,4 @@ onMounted(() => {
            name="gi-alarmclock"/>
     {{ props.label }}
   </p>
-  <style>
-    .toto {
-    }
-  </style>
 </template>
