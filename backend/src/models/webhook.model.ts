@@ -17,4 +17,6 @@ export class Webhook extends Model<InferAttributes<Webhook>, InferCreationAttrib
     declare script: string;
     @Column(DataType.BOOLEAN)
     declare internet: boolean;
+    @Column(DataType.NUMBER)
+    declare lastUseEpoch: number;
 }

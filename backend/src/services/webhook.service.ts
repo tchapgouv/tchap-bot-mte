@@ -24,6 +24,11 @@ export default {
 
         logger.debug("Posting from webhook : ", webhook.dataValues.webhook_id)
 
+        webhook.set({lastUseEpoch: Date.now()})
+        webhook.save().catch(reason => {
+            logger.error("Error updating webhook's lastUseEpoch :", reason)
+        })
+
         return await botService.postMessage(webhook.dataValues.room_id,
             message,
             webhook.dataValues.bot_id,
@@ -44,7 +49,8 @@ export default {
             bot_id: bot_id ? bot_id : "" + process.env.BOT_USER_ID,
             room_id: room_id,
             internet: false,
-            script: script
+            script: script,
+            lastUseEpoch: Date.now()
         };
 
         let webhook
