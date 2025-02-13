@@ -15,6 +15,12 @@ const apiPath = import.meta.env.VITE_API_ENDPOINT
 const EXPIRY_DATE = 1000 * 60 * 60 * 24 * 182 // 6 months
 
 onMounted(() => {
+
+  console.log(props.webhook_id)
+  console.log(Date.now())
+  console.log(props.lastUseEpoch)
+  console.log(EXPIRY_DATE)
+
   fetchWithError(apiPath + '/api/webhook/check',
     {
       method: "POST", // *GET, POST, PUT, DELETE, etc.

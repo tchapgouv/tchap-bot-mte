@@ -78,7 +78,7 @@ table {
 import {type DsfrAlertType, DsfrButton, DsfrButtonGroup, DsfrInput} from "@gouvminint/vue-dsfr";
 import fetchWithError from "@/scripts/fetchWithError";
 import {useRouter} from "vue-router";
-import Span from "@/components/Span.vue";
+import WebhookTableLabel from "@/components/Span.vue";
 import {storeToRefs} from 'pinia';
 import {useWebhookFilterStore} from '@/stores/webhooks'
 
@@ -159,8 +159,6 @@ function onClickGenerate() {
   )
     .then(stream => stream.json())
     .then(value => {
-      // console.log(value)
-      // updateList()
       router.push('/webhook/' + value.webhook_id)
     })
 }
@@ -198,7 +196,7 @@ function updateList() {
       if (value.map) webhookList.value = value.map(
         (row: WebhookRow) => [
           {
-            component: Span,
+            component: WebhookTableLabel,
             label: row.webhook_label.replace(/:.*?($| )/g, "$1") + getAppendedLabel(row),
             hasScript: hasScript(row.script),
             isInternet: row.internet,
