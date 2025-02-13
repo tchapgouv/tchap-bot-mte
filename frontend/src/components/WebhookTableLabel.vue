@@ -1,41 +1,15 @@
 <script setup>
 
-import fetchWithError from "@/scripts/fetchWithError";
-
 const props = defineProps({
   label: String,
   hasScript: Boolean,
   isInternet: Boolean,
   lastUseEpoch: Number,
   webhook_id: String,
-  error: String
-})
-
-const loading = ref(true)
-const hasError = ref(false)
-const errorReason = ref('')
-const apiPath = import.meta.env.VITE_API_ENDPOINT
-const EXPIRY_DATE = 1000 * 60 * 60 * 24 * 182 // 6 months
-
-onMounted(() => {
-
-  fetchWithError(apiPath + '/api/webhook/check',
-    {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        "webhook_id": props.webhook_id,
-      })
-    }
-  )
-    .then(stream => stream.json())
-    .then(value => {
-      loading.value = false
-      hasError.value = value.hasError
-      errorReason.value = value.reason
-    })
+  expired: Boolean,
+  loading: Boolean,
+  error: Boolean,
+  errorReason: String
 })
 
 </script>
@@ -49,7 +23,7 @@ onMounted(() => {
            title="Vérifications en cours"
            label="Vérifications en cours"
            name="md-rotateright-round"/>
-    <VIcon v-if="hasError"
+    <VIcon v-if="error"
            style="margin-bottom: -2px"
            scale="1.5"
            color="var(--error-425-625)"
@@ -70,7 +44,7 @@ onMounted(() => {
            label="Accessible depuis internet"
            color="var(--green-emeraude-sun-425-moon-753)"
            name="gi-biohazard"/>
-    <VIcon v-if="Date.now() - props.lastUseEpoch > EXPIRY_DATE"
+    <VIcon v-if="expired"
            style="margin-bottom: -2px"
            scale="1.5"
            title="Inutilisé"

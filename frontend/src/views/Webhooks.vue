@@ -106,6 +106,8 @@ const modalDeleteText = ref('')
 const modalDeleteOpened = ref(false)
 const modalDeleteActions = ref([])
 
+const EXPIRY_DATE = 1000 * 60 * 60 * 24 * 182 // 6 months
+
 declare global {
   const navigator: any;
 }
@@ -116,10 +118,17 @@ const filteredWebhooks = computed(() => {
   for (const webhook of webhookList.value) {
     let push = false
     for (const index in webhook) {
-      let value: any = webhook[index]
-      if (value?.label) value = value.label
-      if (typeof value === 'string') {
-        if (value.toLowerCase().includes(filter.value.toLowerCase())) {
+      let tableCellData: any = webhook[index]
+      let tableCellDataLabel, tableCellDataHiddenLabel
+      if (tableCellData?.label) tableCellDataLabel = tableCellData.label
+      if (typeof tableCellDataLabel === 'string') {
+        if (tableCellDataLabel.toLowerCase().includes(filter.value.toLowerCase())) {
+          push = true
+        }
+      }
+      if (tableCellData?.hiddenLabel) tableCellDataHiddenLabel = tableCellData.hiddenLabel
+      if (typeof tableCellDataHiddenLabel === 'string') {
+        if (tableCellDataHiddenLabel.toLowerCase().includes(filter.value.toLowerCase())) {
           push = true
         }
       }
@@ -199,11 +208,15 @@ function updateList() {
           {
             component: WebhookTableLabel,
             label: row.webhook_label.replace(/:.*?($| )/g, "$1") + getAppendedLabel(row),
+            hiddenLabel: (hasScript(row.script) ? "script " : " ") + (row.internet ? "internet " : " ") + (Date.now() - row.lastUseEpoch > EXPIRY_DATE ? "inutilisé expiré vieux old " : " "),
             hasScript: hasScript(row.script),
+            expired: Date.now() - row.lastUseEpoch > EXPIRY_DATE,
             isInternet: row.internet,
             lastUseEpoch: row.lastUseEpoch,
             webhook_id: row.webhook_id,
-            error:"inside"
+            loading: true,
+            error: false,
+            errorReason: ""
           },
           {
             component: DsfrButton,
@@ -237,7 +250,6 @@ function updateList() {
 
       for (const mappedListElement of mappedList) {
         console.log(mappedListElement[0])
-        mappedListElement[0].error = 'before'
         fetchWithError(apiPath + '/api/webhook/check',
           {
             method: "POST", // *GET, POST, PUT, DELETE, etc.
@@ -251,7 +263,10 @@ function updateList() {
         )
           .then(stream => stream.json())
           .then(value => {
-            mappedListElement[0].error = "after"
+            mappedListElement[0].loading = false
+            mappedListElement[0].error = value.hasError
+            mappedListElement[0].errorReason = value.reason
+            if (value.hasError)mappedListElement[0].hiddenLabel += "erreur error " + value.reason
           })
 
       }
@@ -281,7 +296,7 @@ interface WebhookRow {
   room_id: string
   bot_id: string
   internet: boolean
-  lastUseEpoch: boolean
+  lastUseEpoch: number
 }
 
 </script>
