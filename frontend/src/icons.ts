@@ -22,6 +22,7 @@ export {
 } from 'oh-vue-icons/icons/px/index.js'
 
 export {
+  MdThumbdownoffalt,
   MdRotaterightRound,
 } from 'oh-vue-icons/icons/md/index.js'
 
