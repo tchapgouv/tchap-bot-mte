@@ -47,21 +47,21 @@ onMounted(() => {
            scale="1.5"
            color="#FF0000"
            name="gi-dead-head "/>
-    <VIcon v-if="props.hasScript"
-           style="margin-bottom: -2px"
-           scale="1.5"
-           color="#d64d00"
-           name="px-warning-box"/>
-    <VIcon v-if="props.isInternet"
-           style="margin-bottom: -2px"
-           scale="1.5"
-           color="#00FF00"
-           name="gi-biohazard"/>
     <VIcon v-if="Date.now() - props.lastUseEpoch > EXPIRY_DATE"
            style="margin-bottom: -2px"
            scale="1.5"
            color="#FF7700"
            name="gi-dead-wood"/>
+    <VIcon v-if="props.isInternet"
+           style="margin-bottom: -2px"
+           scale="1.5"
+           color="#00FF00"
+           name="gi-biohazard"/>
+    <VIcon v-if="props.hasScript"
+           style="margin-bottom: -2px"
+           scale="1.5"
+           color="#d64d00"
+           name="px-warning-box"/>
     {{ props.label }}
   </p>
 </template>
