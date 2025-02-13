@@ -61,7 +61,7 @@ onMounted(() => {
            style="margin-bottom: -2px"
            scale="1.5"
            color="#FF7700"
-           name="gi-alarmclock"/>
+           name="gi-alarm-clock"/>
     {{ props.label }}
   </p>
 </template>
