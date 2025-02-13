@@ -59,6 +59,12 @@
              v-if="filteredWebhooks.length > 0"/>
 
   <div class="fr-grid-row fr-mb-3w fr-grid-row--center">
+    <p>{{
+        'De ' + (currentPage * numberPerPages + 1) + ' à ' + Math.min((currentPage + 1) * numberPerPages, filteredWebhooks.length) + ' sur ' + filteredWebhooks.length + '.'
+       }}</p>
+  </div>
+
+  <div class="fr-grid-row fr-mb-3w fr-grid-row--center">
     <DsfrPagination v-model:current-page="currentPage"
                     :pages="pages"
                     v-if="filteredWebhooks.length > 0"/>
@@ -300,7 +306,7 @@ function updateList() {
             mappedListElement[0].loading = false
             mappedListElement[0].error = value.hasError
             mappedListElement[0].errorReason = value.reason
-            if (value.hasError)mappedListElement[0].hiddenLabel += "#erreur #error #KO #HS " + value.reason
+            if (value.hasError) mappedListElement[0].hiddenLabel += "#erreur #error #KO #HS " + value.reason
             triggerRef(webhookList)
           })
 
