@@ -243,7 +243,7 @@ function updateList() {
           {
             component: WebhookTableLabel,
             label: row.webhook_label.replace(/:.*?($| )/g, "$1") + getAppendedLabel(row),
-            hiddenLabel: (hasScript(row.script) ? "script " : " ") + (row.internet ? "internet " : " ") + (Date.now() - row.lastUseEpoch > EXPIRY_DATE ? "inutilisé expiré vieux old " : " "),
+            hiddenLabel: (hasScript(row.script) ? "#script #custom " : "") + (row.internet ? "#internet #net " : "") + (Date.now() - row.lastUseEpoch > EXPIRY_DATE ? "#inutilisé #expiré #vieux #old #unused " : ""),
             hasScript: hasScript(row.script),
             expired: Date.now() - row.lastUseEpoch > EXPIRY_DATE,
             isInternet: row.internet,
@@ -300,7 +300,7 @@ function updateList() {
             mappedListElement[0].loading = false
             mappedListElement[0].error = value.hasError
             mappedListElement[0].errorReason = value.reason
-            if (value.hasError)mappedListElement[0].hiddenLabel += "erreur error KO " + value.reason
+            if (value.hasError)mappedListElement[0].hiddenLabel += "#erreur #error #KO #HS " + value.reason
             triggerRef(webhookList)
           })
 
