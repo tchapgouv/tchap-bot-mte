@@ -249,7 +249,6 @@ function updateList() {
         ]);
 
       for (const mappedListElement of mappedList) {
-        console.log(mappedListElement[0])
         fetchWithError(apiPath + '/api/webhook/check',
           {
             method: "POST", // *GET, POST, PUT, DELETE, etc.
@@ -267,6 +266,7 @@ function updateList() {
             mappedListElement[0].error = value.hasError
             mappedListElement[0].errorReason = value.reason
             if (value.hasError)mappedListElement[0].hiddenLabel += "erreur error " + value.reason
+            triggerRef(webhookList)
           })
 
       }
