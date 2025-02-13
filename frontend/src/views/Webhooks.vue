@@ -60,7 +60,7 @@
 
   <div class="fr-grid-row fr-mb-3w fr-grid-row--center">
     <p>{{
-        'De ' + (currentPage * numberPerPages + 1) + ' à ' + Math.min((currentPage + 1) * numberPerPages, filteredWebhooks.length) + ' sur ' + filteredWebhooks.length + '.'
+        'De ' + (currentPage * numberPerPages + 1) + ' à ' + Math.min((currentPage + 1) * numberPerPages, totalFiltered) + ' sur ' + totalFiltered + '.'
        }}</p>
   </div>
 
@@ -112,6 +112,7 @@ const pages = ref<{
   title: string
 }[]>([])
 const numberPerPages = ref(10)
+const totalFiltered = ref(0)
 
 const router = useRouter()
 
@@ -176,6 +177,8 @@ const filteredWebhooks = computed(() => {
   }
 
   if (currentPage.value > maxPage) currentPage.value = maxPage
+  
+  totalFiltered.value = webhooks.length
 
   return webhooks.slice(currentPage.value * numberPerPages.value, (currentPage.value + 1) * numberPerPages.value)
 })
