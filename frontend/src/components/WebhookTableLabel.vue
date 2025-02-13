@@ -17,6 +17,7 @@ const props = defineProps({
 <template>
   <p>
     <VIcon v-if="loading"
+           animation="spin"
            style="margin-bottom: -2px"
            scale="1.5"
            color="var(--text-default-grey)"
