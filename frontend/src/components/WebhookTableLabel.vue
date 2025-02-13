@@ -7,7 +7,8 @@ const props = defineProps({
   hasScript: Boolean,
   isInternet: Boolean,
   lastUseEpoch: Number,
-  webhook_id: String
+  webhook_id: String,
+  error: String
 })
 
 const loading = ref(true)

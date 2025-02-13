@@ -193,7 +193,8 @@ function updateList() {
   )
     .then(stream => stream.json())
     .then(value => {
-      if (value.map) webhookList.value = value.map(
+      let mappedList = []
+      if (value.map) mappedList = value.map(
         (row: WebhookRow) => [
           {
             component: WebhookTableLabel,
@@ -201,7 +202,8 @@ function updateList() {
             hasScript: hasScript(row.script),
             isInternet: row.internet,
             lastUseEpoch: row.lastUseEpoch,
-            webhook_id: row.webhook_id
+            webhook_id: row.webhook_id,
+            error:"inside"
           },
           {
             component: DsfrButton,
@@ -232,6 +234,29 @@ function updateList() {
               ]
           }
         ]);
+
+      for (const mappedListElement of mappedList) {
+        console.log(mappedListElement[0])
+        mappedListElement[0].error = 'before'
+        fetchWithError(apiPath + '/api/webhook/check',
+          {
+            method: "POST", // *GET, POST, PUT, DELETE, etc.
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              "webhook_id": mappedListElement[0].webhook_id,
+            })
+          }
+        )
+          .then(stream => stream.json())
+          .then(value => {
+            mappedListElement[0].error = "after"
+          })
+
+      }
+
+      webhookList.value = mappedList
     })
 }
 
