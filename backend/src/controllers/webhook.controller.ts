@@ -208,10 +208,10 @@ export async function check(req: Request, res: Response) {
 
     await webhookService.check(req.body.webhook_id).then(value => {
 
-        let reason = ''
-        if (value.hasError && !value.isBotMemberOfRoom) reason += 'Bot non membre.\n'
+        let reasons: string[] = []
+        if (!value.isBotMemberOfRoom) reasons.push('Bot non membre')
 
-        res.send({hasError: value.hasError, reason})
+        res.send({hasError: value.hasError, reason: reasons.join(", ")})
     })
 }
 
