@@ -78,7 +78,7 @@ table {
 import {type DsfrAlertType, DsfrButton, DsfrButtonGroup, DsfrInput} from "@gouvminint/vue-dsfr";
 import fetchWithError from "@/scripts/fetchWithError";
 import {useRouter} from "vue-router";
-import WebhookTableLabel from "@/components/Span.vue";
+import WebhookTableLabel from "@/components/WebhookTableLabel.vue";
 import {storeToRefs} from 'pinia';
 import {useWebhookFilterStore} from '@/stores/webhooks'
 
