@@ -30,5 +30,6 @@ export {
   GiBiohazard,
   GiAlarmClock,
   GiDeadHead,
-  GiDeadWood
+  GiDeadWood,
+  GiTombstone
 } from 'oh-vue-icons/icons/gi/index.js'

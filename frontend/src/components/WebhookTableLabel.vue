@@ -51,7 +51,7 @@ const props = defineProps({
            title="Inutilisé"
            label="Inutilisé"
            color="var(--text-default-grey)"
-           name="gi-dead-wood"/>
+           name="gi-tombstone"/>
     {{ props.label }}
   </p>
 </template>
