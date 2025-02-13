@@ -201,7 +201,7 @@ function updateList() {
             hasScript: hasScript(row.script),
             isInternet: row.internet,
             lastUseEpoch: row.lastUseEpoch,
-            botId: row.webhook_id
+            webhook_id: row.webhook_id
           },
           {
             component: DsfrButton,
