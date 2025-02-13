@@ -46,7 +46,7 @@ onMounted(() => {
            style="margin-bottom: -2px"
            scale="1.5"
            color="#FF0000"
-           name="gi-deadhead"/>
+           name="gi-dead-head "/>
     <VIcon v-if="props.hasScript"
            style="margin-bottom: -2px"
            scale="1.5"
@@ -61,7 +61,7 @@ onMounted(() => {
            style="margin-bottom: -2px"
            scale="1.5"
            color="#FF7700"
-           name="gi-alarm-clock"/>
+           name="gi-dead-wood"/>
     {{ props.label }}
   </p>
 </template>

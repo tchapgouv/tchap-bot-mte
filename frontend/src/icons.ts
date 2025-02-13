@@ -1,3 +1,5 @@
+// https://oh-vue-icons.js.org/
+
 export {
   RiCloseLine,
   RiFlagLine,
@@ -22,5 +24,6 @@ export {
 export {
   GiBiohazard,
   GiAlarmClock,
-  GiDeadHead
+  GiDeadHead,
+  GiDeadWood
 } from 'oh-vue-icons/icons/gi/index.js'
