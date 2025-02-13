@@ -207,7 +207,11 @@ export async function check(req: Request, res: Response) {
 
 
     await webhookService.check(req.body.webhook_id).then(value => {
-        res.send(value)
+
+        let reason = ''
+        if (value.hasError && !value.isBotMemberOfRoom) reason += 'Bot non membre.\n'
+
+        res.send({hasError: value.hasError, reason})
     })
 }
 
