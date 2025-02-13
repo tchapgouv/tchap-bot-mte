@@ -10,7 +10,7 @@ webhookRouter.delete("/api/webhook/delete", verifyToken, destroy);
 
 webhookRouter.get("/api/webhook/list", verifyToken, findAll);
 
-webhookRouter.get("/api/webhook/check", verifyToken, check);
+webhookRouter.post("/api/webhook/check", verifyToken, check);
 
 webhookRouter.post("/api/webhook/get", verifyToken, findOneWithWebhook);
 
