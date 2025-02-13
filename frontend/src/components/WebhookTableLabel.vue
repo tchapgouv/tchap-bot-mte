@@ -10,6 +10,7 @@ const props = defineProps({
   webhook_id: String
 })
 
+const loading = ref(true)
 const hasError = ref(false)
 const errorReason = ref('')
 const apiPath = import.meta.env.VITE_API_ENDPOINT
@@ -30,6 +31,7 @@ onMounted(() => {
   )
     .then(stream => stream.json())
     .then(value => {
+      loading.value = false
       hasError.value = value.hasError
       errorReason.value = value.reason
     })
@@ -39,11 +41,18 @@ onMounted(() => {
 
 <template>
   <p>
+    <VIcon v-if="loading"
+           style="margin-bottom: -2px"
+           scale="1.5"
+           color="var(--text-default-grey)"
+           title="Vérifications en cours"
+           label="Vérifications en cours"
+           name="md-rotateright-round"/>
     <VIcon v-if="hasError"
            style="margin-bottom: -2px"
            scale="1.5"
            color="#FF0000"
-           :title="'Erreur (' + errorReason + ')'"
+           :title="'Vérifications'"
            :label="'Erreur (' + errorReason + ')'"
            name="gi-dead-head"/>
     <VIcon v-if="Date.now() - props.lastUseEpoch > EXPIRY_DATE"

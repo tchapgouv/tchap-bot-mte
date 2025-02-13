@@ -22,6 +22,10 @@ export {
 } from 'oh-vue-icons/icons/px/index.js'
 
 export {
+  MdRotaterightRound,
+} from 'oh-vue-icons/icons/md/index.js'
+
+export {
   GiBiohazard,
   GiAlarmClock,
   GiDeadHead,
