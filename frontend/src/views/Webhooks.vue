@@ -112,7 +112,7 @@ const pages = ref<{
   title: string
 }[]>([])
 const numberPerPages = ref(10)
-const totalFiltered = ref(0)
+const totalFiltered = shallowRef(0)
 
 const router = useRouter()
 
