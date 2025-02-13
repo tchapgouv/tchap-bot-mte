@@ -14,10 +14,13 @@ declare module 'vue' {
     DsfrHeader: typeof import('@gouvminint/vue-dsfr')['DsfrHeader']
     DsfrInput: typeof import('@gouvminint/vue-dsfr')['DsfrInput']
     DsfrModal: typeof import('@gouvminint/vue-dsfr')['DsfrModal']
+    DsfrPagination: typeof import('@gouvminint/vue-dsfr')['DsfrPagination']
+    DsfrSelect: typeof import('@gouvminint/vue-dsfr')['DsfrSelect']
     DsfrTable: typeof import('@gouvminint/vue-dsfr')['DsfrTable']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Span: typeof import('./components/WebhookTableLabel.vue')['default']
     VIcon: typeof import('oh-vue-icons')['OhVueIcon']
+    WebhookTableLabel: typeof import('./components/WebhookTableLabel.vue')['default']
   }
 }

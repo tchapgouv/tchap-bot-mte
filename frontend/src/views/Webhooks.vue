@@ -32,11 +32,22 @@
 
   <h4>Liste des Webhooks</h4>
 
-  <DsfrInput v-model="filter"
-             :label="'filtre :'"
-             :type="'text'"
-             :label-visible="true"
-             :style="'width : 25%;'"/>
+  <div class="fr-grid-row fr-mb-3w">
+    <div class="fr-col-10">
+      <DsfrInput v-model="filter"
+                 :label="'filtre :'"
+                 :type="'text'"
+                 :label-visible="true"
+                 :style="'width : 33%;'"/>
+
+    </div>
+    <div class="fr-col-2 fr-grid-row--right">
+      <DsfrSelect v-model="numberPerPages"
+                  :label="'Par pages :'"
+                  :options="[5, 10, 15, 25, 50, 100, 1000]"
+                  :label-visible="true"/>
+    </div>
+  </div>
 
   <DsfrTable :headers="['Label', 
               'Webhook', 
@@ -47,6 +58,11 @@
              :rows="filteredWebhooks"
              v-if="filteredWebhooks.length > 0"/>
 
+  <div class="fr-grid-row fr-mb-3w fr-grid-row--center">
+    <DsfrPagination v-model:current-page="currentPage"
+                    :pages="pages"
+                    v-if="filteredWebhooks.length > 0"/>
+  </div>
   <br/>
 
   <DsfrModal :opened="modalCopyOpened"
@@ -83,6 +99,13 @@ import {storeToRefs} from 'pinia';
 import {useWebhookFilterStore} from '@/stores/webhooks'
 
 const filterStore = useWebhookFilterStore()
+const currentPage = ref(0)
+const pages = ref<{
+  href?: string,
+  label: string,
+  title: string
+}[]>([])
+const numberPerPages = ref(10)
 
 const router = useRouter()
 
@@ -136,7 +159,19 @@ const filteredWebhooks = computed(() => {
     if (push) webhooks.push(webhook)
   }
 
-  return webhooks
+  pages.value = []
+  const maxPage = Math.round(webhooks.length / numberPerPages.value + 0.5)
+  for (let i = 0; i < maxPage; i++) {
+    pages.value.push({
+      href: "#" + (i + 1),
+      label: (i + 1) + '',
+      title: (i + 1) + ''
+    })
+  }
+
+  if (currentPage.value > maxPage) currentPage.value = maxPage
+
+  return webhooks.slice(currentPage.value * numberPerPages.value, (currentPage.value + 1) * numberPerPages.value)
 })
 
 
@@ -265,7 +300,7 @@ function updateList() {
             mappedListElement[0].loading = false
             mappedListElement[0].error = value.hasError
             mappedListElement[0].errorReason = value.reason
-            if (value.hasError)mappedListElement[0].hiddenLabel += "erreur error " + value.reason
+            if (value.hasError)mappedListElement[0].hiddenLabel += "erreur error KO " + value.reason
             triggerRef(webhookList)
           })
 
