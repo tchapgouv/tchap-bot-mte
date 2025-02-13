@@ -528,6 +528,28 @@ export default {
         return isMember
     },
 
+    async isBotAMemberOfRoom(roomId: string | null, botId: string) {
+
+        logger.debug("isBotAMemberOfRoom", roomId, botId)
+
+        if (!roomId) throw "isBotAMemberOfRoom ? roomId cannot be empty"
+
+        let isMember = false
+
+        const bot = this.getBotById(botId);
+
+        await bot.client.getJoinedRoomMembers(roomId)
+            .then(value => {
+                isMember = !!value.joined[botId]
+            })
+            .catch(reason => {
+                logger.error("isMemberOfRoom", reason)
+                isMember = false
+            })
+
+        return isMember
+    },
+
     async updateRoomMemberList(client: MatrixClient, roomId: string, dryRun: boolean = true) {
 
         let dryRunMessage: string = "Les changements suivants seront opérés <sup>*</sup> : \n\n"

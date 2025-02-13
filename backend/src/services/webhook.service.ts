@@ -45,7 +45,7 @@ export default {
         if (webhook == null) {
             hasError = true
         } else {
-            isBotMemberOfRoom = await botService.isMemberOfRoom(webhook.dataValues.webhook_id)
+            isBotMemberOfRoom = await botService.isBotAMemberOfRoom(webhook.dataValues.webhook_id, webhook.dataValues.bot_id)
             if (!isBotMemberOfRoom) hasError = true
         }
 
