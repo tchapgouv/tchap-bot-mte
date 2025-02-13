@@ -27,26 +27,34 @@ export const verifyToken: RequestHandler = (req, res, next) => {
     logger.debug(">>>> verifyToken")
 
     if (!isRequestFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'})
-    if (!req.headers.cookie) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Cookie)'})
 
-    // get cookie from header with name token
-    let token = req.headers.cookie.split(';').find((c: string) => {
-        return c.trim().startsWith('user_token=')
-    });
-
-    if (!token) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Token)'});
-
-    token = token.split('=')[1];
-
-    if (!token) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Empty Token)'});
-
-    authService.verifyJwt(token).then(user => {
-        logger.debug(user)
-
-        if (!user) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (User not found)'});
-
+    if (req.body.token) {
+        logger.debug("Found Time Based Token")
+        verifyTimeBasedToken(req, res, next)
         next()
-    })
+    } else {
+
+        if (!req.headers.cookie) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Cookie)'})
+
+        // get cookie from header with name token
+        let token = req.headers.cookie.split(';').find((c: string) => {
+            return c.trim().startsWith('user_token=')
+        });
+
+        if (!token) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Token)'});
+
+        token = token.split('=')[1];
+
+        if (!token) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Empty Token)'});
+
+        authService.verifyJwt(token).then(user => {
+            logger.debug(user)
+
+            if (!user) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (User not found)'});
+
+            next()
+        })
+    }
 }
 
 export const verifyTimeBasedToken: RequestHandler = (req, res, next) => {
