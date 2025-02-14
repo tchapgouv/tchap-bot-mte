@@ -1,5 +1,5 @@
 import express from 'express';
-import {verifyTimeBasedToken} from "../controllers/auth.controller.js";
+import {verifyOrigin, verifyAuth} from "../controllers/auth.controller.js";
 import {createRoom, deleteRoom, getRoomName, inviteUsers, migrateRoom} from "../controllers/bot.controller.js";
 
 const botRouter = express.Router();
@@ -43,7 +43,7 @@ const botRouter = express.Router();
  *                 room_id:
  *                   type: string
  */
-botRouter.post("/api/migrate/room", verifyTimeBasedToken, migrateRoom)
+botRouter.post("/api/migrate/room", verifyOrigin, verifyAuth, migrateRoom)
 
 /**
  * @openapi
@@ -79,7 +79,7 @@ botRouter.post("/api/migrate/room", verifyTimeBasedToken, migrateRoom)
  *                 room_id:
  *                   type: string
  */
-botRouter.post("/api/room/create", verifyTimeBasedToken, createRoom)
+botRouter.post("/api/room/create", verifyOrigin, verifyAuth, createRoom)
 
 /**
  * @openapi
@@ -116,7 +116,7 @@ botRouter.post("/api/room/create", verifyTimeBasedToken, createRoom)
  *                 message:
  *                   type: string
  */
-botRouter.post("/api/room/invite", verifyTimeBasedToken, inviteUsers)
+botRouter.post("/api/room/invite", verifyOrigin, verifyAuth, inviteUsers)
 
 /**
  * @openapi
@@ -150,7 +150,7 @@ botRouter.post("/api/room/invite", verifyTimeBasedToken, inviteUsers)
  *                 room_name:
  *                   type: string
  */
-botRouter.post("/api/room/name", verifyTimeBasedToken, getRoomName)
+botRouter.post("/api/room/name", verifyOrigin, verifyAuth, getRoomName)
 
 /**
  * @openapi
@@ -182,7 +182,7 @@ botRouter.post("/api/room/name", verifyTimeBasedToken, getRoomName)
  *                 message:
  *                   type: string
  */
-botRouter.delete("/api/room/delete", verifyTimeBasedToken, deleteRoom)
+botRouter.delete("/api/room/delete", verifyOrigin, verifyAuth, deleteRoom)
 
 /**
  * @openapi
@@ -216,6 +216,6 @@ botRouter.delete("/api/room/delete", verifyTimeBasedToken, deleteRoom)
  *                 message:
  *                   type: string
  */
-botRouter.post("/api/room/member", verifyTimeBasedToken, getRoomName)
+botRouter.post("/api/room/member", verifyOrigin, verifyAuth, getRoomName)
 
 export default botRouter

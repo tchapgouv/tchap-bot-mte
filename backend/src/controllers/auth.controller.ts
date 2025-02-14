@@ -22,57 +22,84 @@ export function isRequestFromInternet(req: Request) {
     return !isRequestFromIntranet(req)
 }
 
-export const verifyToken: RequestHandler = (req, res, next) => {
+export const verifyAuth: RequestHandler = (req, res, next) => {
 
-    logger.debug(">>>> verifyToken")
-
-    if (!isRequestFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'})
+    logger.debug(">>>> verifyAuth")
 
     if (req.body.token) {
         logger.debug("Found Time Based Token")
-        verifyTimeBasedToken(req, res, next)
-        next()
+        verifyTimeBasedToken(req, res)
     } else {
-
-        if (!req.headers.cookie) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Cookie)'})
-
-        // get cookie from header with name token
-        let token = req.headers.cookie.split(';').find((c: string) => {
-            return c.trim().startsWith('user_token=')
-        });
-
-        if (!token) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Token)'});
-
-        token = token.split('=')[1];
-
-        if (!token) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Empty Token)'});
-
-        authService.verifyJwt(token).then(user => {
-            logger.debug(user)
-
-            if (!user) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (User not found)'});
-
-            next()
-        })
+        verifyToken(req, res)
     }
+
+    if (res.statusCode === StatusCodes.OK) next()
 }
 
-export const verifyTimeBasedToken: RequestHandler = (req, res, next) => {
+function verifyToken(req: Request, res: Response): void {
+
+    logger.debug(">>>> verifyToken")
+
+    if (!req.headers.cookie) {
+        res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Cookie)'})
+        return
+    }
+
+    // get cookie from header with name token
+    let token = req.headers.cookie.split(';').find((c: string) => {
+        return c.trim().startsWith('user_token=')
+    });
+
+    if (!token) {
+        res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Token)'});
+        return
+    }
+
+    token = token.split('=')[1];
+
+    if (!token) {
+        res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Empty Token)'});
+        return
+    }
+
+    authService.verifyJwt(token).then(user => {
+        logger.debug(user)
+
+        if (!user) {
+            res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (User not found)'});
+            return
+        }
+
+    })
+}
+
+export const verifyOrigin: RequestHandler = (req, res, next) => {
+
+    logger.debug(">>>> verifyOrigin")
+
+    if (!isRequestFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'})
+
+    next()
+}
+
+function verifyTimeBasedToken(req: Request, res: Response): void {
 
     logger.debug(">>>> verifyTimeToken")
 
-    if (!isRequestFromIntranet(req)) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'This endpoint is only accessible from within the intranet'});
-    if (!req.body.token) return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Token)'});
+    if (!req.body.token) {
+        res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Missing Token)'});
+        return
+    }
 
     const token = req.body.token
     const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString("fr-FR") + "-" + process.env.JWT_KEY).digest('hex')
 
     if (token !== currentToken) {
         logger.alert("Wrong token provided : ", token, "Current token is :", currentToken.substring(0, 15) + "***************" + currentToken.substring(currentToken.length - 15, currentToken.length))
-        return res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Token Error)'});
+        res.status(StatusCodes.UNAUTHORIZED).json({message: 'Unauthenticated (Token Error)'});
+        return
     }
 
-    next()
 }
 
 export function authenticate(req: Request, res: Response) {

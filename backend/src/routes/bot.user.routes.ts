@@ -1,5 +1,5 @@
 import express from 'express';
-import {verifyTimeBasedToken} from "../controllers/auth.controller.js";
+import {verifyOrigin, verifyAuth} from "../controllers/auth.controller.js";
 import {searchUser, kickUser, searchUserFromMail} from "../controllers/bot.controller.js";
 
 const botRouter = express.Router();
@@ -37,7 +37,7 @@ const botRouter = express.Router();
  *                 message:
  *                   type: string
  */
-botRouter.delete("/api/user/kick", verifyTimeBasedToken, kickUser)
+botRouter.delete("/api/user/kick", verifyOrigin, verifyAuth, kickUser)
 
 /**
  * @openapi
@@ -73,7 +73,7 @@ botRouter.delete("/api/user/kick", verifyTimeBasedToken, kickUser)
  *                 avatar_url?:
  *                   type: string
  */
-botRouter.post("/api/user/search/mail", verifyTimeBasedToken, searchUserFromMail)
+botRouter.post("/api/user/search/mail", verifyOrigin, verifyAuth, searchUserFromMail)
 
 /**
  * @openapi
@@ -109,6 +109,6 @@ botRouter.post("/api/user/search/mail", verifyTimeBasedToken, searchUserFromMail
  *                 avatar_url?:
  *                   type: string
  */
-botRouter.post("/api/user/search", verifyTimeBasedToken, searchUser)
+botRouter.post("/api/user/search", verifyOrigin, verifyAuth, searchUser)
 
 export default botRouter

@@ -1,20 +1,20 @@
 import express from 'express';
 import {check, create, destroy, findAll, findOneWithWebhook, postMessage, update, uploadFile} from "../controllers/webhook.controller.js";
-import {verifyToken} from "../controllers/auth.controller.js";
+import {verifyAuth, verifyOrigin} from "../controllers/auth.controller.js";
 
 const webhookRouter = express.Router();
 
-webhookRouter.post("/api/webhook/create", verifyToken, create);
+webhookRouter.post("/api/webhook/create", verifyOrigin, verifyAuth, create);
 
-webhookRouter.delete("/api/webhook/delete", verifyToken, destroy);
+webhookRouter.delete("/api/webhook/delete", verifyOrigin, verifyAuth, destroy);
 
-webhookRouter.get("/api/webhook/list", verifyToken, findAll);
+webhookRouter.get("/api/webhook/list", verifyOrigin, verifyAuth, findAll);
 
-webhookRouter.post("/api/webhook/check", verifyToken, check);
+webhookRouter.post("/api/webhook/check", verifyOrigin, verifyAuth, check);
 
-webhookRouter.post("/api/webhook/get", verifyToken, findOneWithWebhook);
+webhookRouter.post("/api/webhook/get", verifyOrigin, verifyAuth, findOneWithWebhook);
 
-webhookRouter.put("/api/webhook/update", verifyToken, update);
+webhookRouter.put("/api/webhook/update", verifyOrigin, verifyAuth, update);
 
 /**
  * @openapi
