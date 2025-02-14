@@ -1,6 +1,8 @@
 import express from 'express';
 import {check, create, destroy, findAll, findOneWithWebhook, postMessage, update, uploadFile} from "../controllers/webhook.controller.js";
 import {verifyAuth, verifyOrigin} from "../controllers/auth.controller.js";
+import fileUpload from "express-fileupload";
+import logger from "../utils/logger.js";
 
 const webhookRouter = express.Router();
 
@@ -54,6 +56,17 @@ webhookRouter.put("/api/webhook/update", verifyOrigin, verifyAuth, update);
  */
 webhookRouter.post("/api/webhook/post/:webhook?", postMessage)
 
-webhookRouter.post("/api/webhook/upload/:webhook?", uploadFile)
+webhookRouter.post("/api/webhook/upload/:webhook?", fileUpload({
+    abortOnLimit: true,
+    limits: {
+        fileSize: 10 * 1024 * 1024
+    },
+    debug: true,
+    logger: {
+        log: (msg) => {
+            logger.debug(msg)
+        }
+    }
+}), uploadFile)
 
 export default webhookRouter
