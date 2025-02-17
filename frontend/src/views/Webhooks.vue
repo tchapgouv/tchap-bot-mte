@@ -12,40 +12,63 @@
 
   <h4 style="margin-top: 1em;">Générer un Webhook</h4>
 
-  <dsfr-input v-model="hookLabel"
-              :label="'Webhook Label :'"
-              :type="'text'"
-              :label-visible="true">test
-  </dsfr-input>
+  <DsfrInput v-model="hookLabel"
+             :label="'Webhook Label :'"
+             :type="'text'"
+             :label-visible="true">test
+  </DsfrInput>
 
-  <dsfr-input v-model="roomId"
-              :label="'Room ID :'"
-              :type="'text'"
-              :label-visible="true">test
-  </dsfr-input>
-  <dsfr-button :label="'Générer'"
-               @click="onClickGenerate"
-               :style="'margin-bottom:25px; margin-top:25px; float: right;'"/>
+  <DsfrInput v-model="roomId"
+             :label="'Room ID :'"
+             :type="'text'"
+             :label-visible="true">test
+  </DsfrInput>
+  <DsfrButton :label="'Générer'"
+              @click="onClickGenerate"
+              :style="'margin-bottom:25px; margin-top:25px; float: right;'"/>
 
   <!--  float clear hack  -->
   <div style="clear: both"/>
 
   <h4>Liste des Webhooks</h4>
 
-  <dsfr-input v-model="filter"
-              :label="'filtre :'"
-              :type="'text'"
-              :label-visible="true"
-              :style="'width : 25%;'"/>
+  <div class="fr-grid-row fr-mb-3w">
+    <div class="fr-col-10">
+      <DsfrInput v-model="filter"
+                 :label="'filtre :'"
+                 :type="'text'"
+                 :label-visible="true"
+                 :style="'width : 33%;'"/>
 
-  <dsfr-table :headers="['Label', 
+    </div>
+    <div class="fr-col-2 fr-grid-row--right">
+      <DsfrSelect v-model="numberPerPages"
+                  :label="'Par pages :'"
+                  :options="[5, 10, 15, 25, 50, 100, 1000]"
+                  :label-visible="true"/>
+    </div>
+  </div>
+
+  <DsfrTable :headers="['Label', 
               'Webhook', 
               'Room Id', 
               'Bot Id', 
               'Action']"
-              :rows="filteredWebhooks"
-              v-if="filteredWebhooks.length > 0"/>
+             title=""
+             :rows="filteredWebhooks"
+             v-if="filteredWebhooks.length > 0"/>
 
+  <div class="fr-grid-row fr-mb-3w fr-grid-row--center">
+    <p>{{
+        'De ' + (currentPage * numberPerPages + 1) + ' à ' + Math.min((currentPage + 1) * numberPerPages, totalFiltered) + ' sur ' + totalFiltered + '.'
+       }}</p>
+  </div>
+
+  <div class="fr-grid-row fr-mb-3w fr-grid-row--center">
+    <DsfrPagination v-model:current-page="currentPage"
+                    :pages="pages"
+                    v-if="filteredWebhooks.length > 0"/>
+  </div>
   <br/>
 
   <DsfrModal :opened="modalCopyOpened"
@@ -77,11 +100,19 @@ table {
 import {type DsfrAlertType, DsfrButton, DsfrButtonGroup, DsfrInput} from "@gouvminint/vue-dsfr";
 import fetchWithError from "@/scripts/fetchWithError";
 import {useRouter} from "vue-router";
-import Span from "@/components/Span.vue";
+import WebhookTableLabel from "@/components/WebhookTableLabel.vue";
 import {storeToRefs} from 'pinia';
 import {useWebhookFilterStore} from '@/stores/webhooks'
 
 const filterStore = useWebhookFilterStore()
+const currentPage = ref(0)
+const pages = ref<{
+  href?: string,
+  label: string,
+  title: string
+}[]>([])
+const numberPerPages = ref(10)
+const totalFiltered = shallowRef(0)
 
 const router = useRouter()
 
@@ -105,6 +136,8 @@ const modalDeleteText = ref('')
 const modalDeleteOpened = ref(false)
 const modalDeleteActions = ref([])
 
+const EXPIRY_DATE = 1000 * 60 * 60 * 24 * 182 // 6 months
+
 declare global {
   const navigator: any;
 }
@@ -115,10 +148,17 @@ const filteredWebhooks = computed(() => {
   for (const webhook of webhookList.value) {
     let push = false
     for (const index in webhook) {
-      let value: any = webhook[index]
-      if (value?.label) value = value.label
-      if (typeof value === 'string') {
-        if (value.toLowerCase().includes(filter.value.toLowerCase())) {
+      let tableCellData: any = webhook[index]
+      let tableCellDataLabel, tableCellDataHiddenLabel
+      if (tableCellData?.label) tableCellDataLabel = tableCellData.label
+      if (typeof tableCellDataLabel === 'string') {
+        if (tableCellDataLabel.toLowerCase().includes(filter.value.toLowerCase())) {
+          push = true
+        }
+      }
+      if (tableCellData?.hiddenLabel) tableCellDataHiddenLabel = tableCellData.hiddenLabel
+      if (typeof tableCellDataHiddenLabel === 'string') {
+        if (tableCellDataHiddenLabel.toLowerCase().includes(filter.value.toLowerCase())) {
           push = true
         }
       }
@@ -126,7 +166,21 @@ const filteredWebhooks = computed(() => {
     if (push) webhooks.push(webhook)
   }
 
-  return webhooks
+  pages.value = []
+  const maxPage = Math.round(webhooks.length / numberPerPages.value + 0.5)
+  for (let i = 0; i < maxPage; i++) {
+    pages.value.push({
+      href: "#" + (i + 1),
+      label: (i + 1) + '',
+      title: (i + 1) + ''
+    })
+  }
+
+  if (currentPage.value > maxPage) currentPage.value = maxPage
+  
+  totalFiltered.value = webhooks.length
+
+  return webhooks.slice(currentPage.value * numberPerPages.value, (currentPage.value + 1) * numberPerPages.value)
 })
 
 
@@ -158,8 +212,6 @@ function onClickGenerate() {
   )
     .then(stream => stream.json())
     .then(value => {
-      // console.log(value)
-      // updateList()
       router.push('/webhook/' + value.webhook_id)
     })
 }
@@ -167,6 +219,23 @@ function onClickGenerate() {
 function hasScript(script: string) {
   if (script === '// Il est possible de manipuler la variable data (le message), qui sera récupérée et envoyée au bot à la fin du traitement.\ndata = data;') return false
   return script !== '';
+}
+
+function getAppendedLabel(row: WebhookRow) {
+
+  const script: boolean = hasScript(row.script)
+  const internet: boolean = row.internet
+  let appended = ''
+
+  if (script || internet) {
+    appended += ' (W. '
+    if (script) appended += "Script"
+    if (script && internet) appended += ' & '
+    if (internet) appended += 'Internet'
+    appended += ')'
+  }
+
+  return appended;
 }
 
 function updateList() {
@@ -177,12 +246,21 @@ function updateList() {
   )
     .then(stream => stream.json())
     .then(value => {
-      if (value.map) webhookList.value = value.map(
+      let mappedList = []
+      if (value.map) mappedList = value.map(
         (row: WebhookRow) => [
           {
-            component: Span,
-            label: row.webhook_label.replace(/:.*?($| )/g, "$1") + (hasScript(row.script) ? " (w. script)" : ""),
-            hasScript: hasScript(row.script)
+            component: WebhookTableLabel,
+            label: row.webhook_label.replace(/:.*?($| )/g, "$1") + getAppendedLabel(row),
+            hiddenLabel: (hasScript(row.script) ? "#script #custom " : "") + (row.internet ? "#internet #net " : "") + (Date.now() - row.lastUseEpoch > EXPIRY_DATE ? "#inutilisé #expiré #vieux #old #unused " : ""),
+            hasScript: hasScript(row.script),
+            expired: Date.now() - row.lastUseEpoch > EXPIRY_DATE,
+            isInternet: row.internet,
+            lastUseEpoch: row.lastUseEpoch,
+            webhook_id: row.webhook_id,
+            loading: true,
+            error: false,
+            errorReason: ""
           },
           {
             component: DsfrButton,
@@ -213,6 +291,31 @@ function updateList() {
               ]
           }
         ]);
+
+      for (const mappedListElement of mappedList) {
+        fetchWithError(apiPath + '/api/webhook/check',
+          {
+            method: "POST", // *GET, POST, PUT, DELETE, etc.
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              "webhook_id": mappedListElement[0].webhook_id,
+            })
+          }
+        )
+          .then(stream => stream.json())
+          .then(value => {
+            mappedListElement[0].loading = false
+            mappedListElement[0].error = value.hasError
+            mappedListElement[0].errorReason = value.reason
+            if (value.hasError) mappedListElement[0].hiddenLabel += "#erreur #error #KO #HS " + value.reason
+            triggerRef(webhookList)
+          })
+
+      }
+
+      webhookList.value = mappedList
     })
 }
 
@@ -236,6 +339,8 @@ interface WebhookRow {
   script: string
   room_id: string
   bot_id: string
+  internet: boolean
+  lastUseEpoch: number
 }
 
 </script>

@@ -24,10 +24,32 @@ export default {
 
         logger.debug("Posting from webhook : ", webhook.dataValues.webhook_id)
 
+        webhook.set({lastUseEpoch: Date.now()})
+        webhook.save().catch(reason => {
+            logger.error("Error updating webhook's lastUseEpoch :", reason)
+        })
+
         return await botService.postMessage(webhook.dataValues.room_id,
             message,
             webhook.dataValues.bot_id,
             {messageFormat: messageFormat})
+    },
+
+    async check(webhookId: string) {
+
+        let hasError = false
+        let isBotMemberOfRoom = null
+
+        const webhook = await this.findOneWithWebhookId(webhookId)
+
+        if (webhook == null) {
+            hasError = true
+        } else {
+            isBotMemberOfRoom = await botService.isBotAMemberOfRoom(webhook.dataValues.room_id, webhook.dataValues.bot_id)
+            if (!isBotMemberOfRoom) hasError = true
+        }
+
+        return {hasError, isBotMemberOfRoom}
     },
 
 
@@ -43,7 +65,9 @@ export default {
             webhook_label: webhook_label,
             bot_id: bot_id ? bot_id : "" + process.env.BOT_USER_ID,
             room_id: room_id,
-            script: script
+            internet: false,
+            script: script,
+            lastUseEpoch: Date.now()
         };
 
         let webhook
@@ -74,6 +98,8 @@ export default {
     async update(webhookId: string, newWebhook: {
         webhook_label: string,
         room_id: string,
+        bot_id: string,
+        internet: boolean,
         script: string,
     }) {
 

@@ -1,6 +1,5 @@
 import authService from "../services/auth.service.js";
 import {Request, Response} from "express";
-import userService from "../services/user.service.js";
 import {StatusCodes} from "http-status-codes";
 
 export function getUserFromToken(req: Request, res: Response) {
@@ -11,10 +10,10 @@ export function getUserFromToken(req: Request, res: Response) {
     });
     token = token?.split('=')[1];
 
-    if (!token) res.status(StatusCodes.UNAUTHORIZED).send({
+    if (!token) return res.status(StatusCodes.UNAUTHORIZED).send({
         message: "Missing JWT token."
     });
     else {
-        res.json({user: authService.getUserFromToken(token)})
+        return res.json({user: authService.getUserFromToken(token)})
     }
 }

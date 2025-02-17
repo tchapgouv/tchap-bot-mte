@@ -3,8 +3,10 @@ import https from 'https';
 import fs from 'fs';
 import db from './models/index.js'
 import userRouter from './routes/user.routes.js';
+import metricsRouter from './routes/metrics.routes.js';
 import botRoomRouter from './routes/bot.room.routes.js';
 import botUserRouter from './routes/bot.user.routes.js';
+import testsRouter from './routes/tests.routes.js';
 import authRouter from './routes/auth.routes.js';
 import cors from 'cors';
 import logger from "./utils/logger.js";
@@ -16,6 +18,7 @@ import {syntaxErrorHandler} from "./requestHandlers/syntaxError.handler.js";
 import swaggerUi from "swagger-ui-express"
 import {specs} from "./swagger.config.js";
 import crypto from "crypto";
+import Crontab from "./Crontab.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -40,6 +43,8 @@ app.use(express.urlencoded({extended: true}));
 
 app.use(express.static(vuePath));
 
+app.use(testsRouter);
+app.use(metricsRouter);
 app.use(webhookRouter);
 app.use(userRouter);
 app.use(authRouter);
@@ -99,3 +104,5 @@ logger.info("Current Time Based Token : ",
     "Based on : ",
     new Date().toLocaleDateString("fr-FR") + "-JWT_KEY")
 
+const cron = new Crontab()
+cron.init()

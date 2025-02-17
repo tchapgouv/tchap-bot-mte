@@ -5,12 +5,18 @@ import {sendMessage} from "./helper.js";
 import {RequestInit} from "node-fetch";
 import fetchWithError from "../../utils/fetchWithError.js";
 import {GMCD_INFRA_ROOM_ID} from "./config.js";
+import {Brain} from "./Brain.js";
+import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
+import configGmcd from "../gmcd/config.js";
+import metricService, {MetricLabel} from "../../services/metric.service.js";
+import {BotMessageData} from "./BotMessageData.js";
 
 export class Bot {
 
     client: MatrixClient;
-    private readonly parseMessage: (arg0: MatrixClient, arg1: MatrixEvent) => void;
-    private readonly parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent) => void;
+    brain: Brain = new Brain()
+    private readonly parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: BotMessageData) => void;
+    private readonly parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: BotMessageData) => void;
 
     ids_token: { token: string, valid_until: Date } | undefined
 
@@ -21,8 +27,14 @@ export class Bot {
                     deviceId: string,
                     idBaseUrl: string
                 },
-                parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent) => void,
-                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent) => void) {
+                parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: {
+                    message: string,
+                    formatted_message: string,
+                    sender: RoomMember;
+                    botId: string;
+                    roomId: string
+                }) => void,
+                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }) => void) {
 
         const getIST = () => {
             return this.getIdentityServerToken()
@@ -100,11 +112,17 @@ export class Bot {
                     return
                 }
 
+                if (event.sender?.userId.toLowerCase().includes("@bot-")) {
+                    logger.info("Message is one of fellow Bot =)")
+                    return
+                }
+
                 const botName = this.client.getUser(botId)?.displayName?.replace(/ \[.*/, "")
                 const userIds = event.getContent()["m.mentions"]?.user_ids;
 
                 let isSelfMentioned = userIds && userIds.indexOf(botId) > -1;
-                if (isSelfMentioned === undefined && botName) isSelfMentioned = event.event.content?.body.toLowerCase().includes("@" + botName.toLowerCase())
+                const body = event.event.content?.formatted_body ? event.event.content?.formatted_body : event.event.content?.body
+                if (!isSelfMentioned && botName) isSelfMentioned = body.toLowerCase().replace(/> .*?\n/g, '').includes("@" + botName.toLowerCase())
 
                 logger.debug("Is self mentioned ? ", isSelfMentioned)
                 logger.debug("sender = ", event.getSender())
@@ -121,13 +139,39 @@ export class Bot {
 
                 if (isNewMessage) {
 
-                    if (isSelfMentioned) {
-                        logger.debug("Parsing Message To Self", this.client.getUserId())
-                        this.parseMessageToSelf(this.client, event)
-                    } else {
+                    const message: string = event.event.content?.body?.toLowerCase() || ""
+                    const formatted_message: string = event.event.content?.formatted_body?.toLowerCase() || ""
+                    const roomId = event.event.room_id
 
-                        logger.debug("Parsing Message", this.client.getUserId())
-                        this.parseMessage(this.client, event)
+                    logger.debug("roomId", roomId, "event.sender", event.sender, "this.client.getUserId()", this.client.getUserId())
+
+                    if (roomId && event.sender && this.client.getUserId()) {
+
+                        const data: BotMessageData = {
+                            message,
+                            formatted_message,
+                            sender: event.sender,
+                            roomId,
+                            botId: this.client.getUserId() || configGmcd.userId
+                        }
+
+                        if (isSelfMentioned) {
+
+                            metricService.createOrIncrease(
+                                {
+                                    name: "bot_mentioned",
+                                    labels: [
+                                        new MetricLabel("bot_id", this.client.getUserId() || configGmcd.userId),
+                                    ]
+                                })
+
+                            logger.debug("Parsing Message To Self", this.client.getUserId())
+                            this.parseMessageToSelf(this.client, event, this.brain, data)
+                        } else {
+
+                            logger.debug("Parsing Message", this.client.getUserId())
+                            this.parseMessage(this.client, event, this.brain, data)
+                        }
                     }
                 }
             }
@@ -195,6 +239,14 @@ export class Bot {
         const startLength = start.length
         const end = ['.', ' !', ', me revoilà.', '. Je viens de redémarrer ¯\\_(ツ)_/¯', ', encore =)'];
         const endLength = end.length
+
+        metricService.createOrIncrease(
+            {
+                name: "bot_restart",
+                labels: [
+                    new MetricLabel("bot_id", client.getUserId() + ""),
+                ]
+            })
 
         sendMessage(client, GMCD_INFRA_ROOM_ID, "(Prepared) " + start[Math.floor(Math.random() * startLength)] + end[Math.floor(Math.random() * endLength)])
     }

@@ -1,25 +1,36 @@
 <template>
-  <div>
-    <DsfrAlert :title="alerteTitle"
-               :description="alerteDescription"
-               :type="alerteType"
-               :small="true"
-               :closeable="true"
-               :closed="alerteClosed"
-               @close="close"/>
-    <br/>
-      <dsfr-input v-model="username"
-                  :label="'Identifiant :'"
-                  :type="'text'"
-                  :label-visible="true"></dsfr-input>
-      <br/>
-      <dsfr-input v-model="password"
-                  :label="'Mot de passe :'"
-                  :type="'password'"
-                  :label-visible="true"></dsfr-input>
-      <br/>
-      <dsfr-button :label="'Se connecter'"
-                   @click="login"></dsfr-button>
+  <div class="fr-container">
+    <div class="fr-grid-row fr-mb-3w fr-grid-row--center">
+      <DsfrAlert :title="alerteTitle"
+                 :description="alerteDescription"
+                 :type="alerteType"
+                 :small="true"
+                 :closeable="true"
+                 :closed="alerteClosed"
+                 @close="close"/>
+    </div>
+    <div class="fr-grid-row fr-mb-3w">
+      <div class="fr-col-offset-3"/>
+      <div class="fr-col-6">
+        <DsfrInput v-model="username"
+                   :label="'Identifiant :'"
+                   :type="'text'"
+                   :label-visible="true"></DsfrInput>
+      </div>
+    </div>
+    <div class="fr-grid-row fr-mb-8w">
+      <div class="fr-col-offset-3"/>
+      <div class="fr-col-6">
+        <DsfrInput v-model="password"
+                   :label="'Mot de passe :'"
+                   :type="'password'"
+                   :label-visible="true"></DsfrInput>
+      </div>
+    </div>
+    <div class="fr-grid-row fr-mb-3w fr-grid-row--center">
+      <DsfrButton :label="'Se connecter'"
+                  @click="login"></DsfrButton>
+    </div>
   </div>
 </template>
 
@@ -31,6 +42,7 @@
 import fetchWithError from "../scripts/fetchWithError";
 import useAuth from "../composable/useAuth";
 import {useRouter} from 'vue-router'
+import {DsfrInput} from "@gouvminint/vue-dsfr";
 
 const username = ref('');
 const password = ref('');
@@ -44,11 +56,11 @@ const alerteClosed = ref(true)
 
 if (user.value) router.push('/webhooks')
 
-function close () {
+function close() {
   if (!alerteClosed.value) alerteClosed.value = true
 }
 
-function login () {
+function login() {
 
   fetchWithError(apiPath + '/api/auth',
     {

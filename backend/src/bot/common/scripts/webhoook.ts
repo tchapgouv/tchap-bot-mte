@@ -14,7 +14,7 @@ function getWebhookMessage(exists: boolean, webhook_id: any) {
         "La charge utile (body) doit être de la forme suivante :\n" +
         "{\n" +
         "   \"message\": \"Coucou ! Message envoyé avec un webhook =)\",\n" +
-        "   \"message_format\": \"\"\n" +
+        "   \"message_format\": \"\",\n" +
         "   \"message_raw\": \"\"\n" +
         "}\n" +
         "`message_format` est optionnel. Il peut prendre les valeurs suivantes : `html|md|markdown`" +
@@ -31,7 +31,7 @@ function getWebhookHtmlMessage(exists: boolean, webhook_id: any) {
         codeBlock(
             "{\n" +
             "   \"message\": \"Coucou ! Message envoyé avec un webhook =)\",\n" +
-            "   \"message_format\": \"\"\n" +
+            "   \"message_format\": \"\",\n" +
             "   \"message_raw\": \"\"\n" +
             "}\n", "json") +
         "<code>message_format</code> est optionnel. Il peut prendre les valeurs suivantes : <code>html|md|markdown</code><br>" +
@@ -65,8 +65,9 @@ function createOrReturnWebhook(client: MatrixClient, roomId: string, user: User,
 /**
  * @help
  * command : create webhook|créer webhook
- * return : je créé un webhook (RIE) pour le canal afin d'y envoyer des messages (Administrateur uniquement !)
+ * return : je créé un webhook (RIE) pour le canal afin d'y envoyer des messages <sup>*</sup>
  * isAnswer : true
+ * isAdmin : true
  */
 export function createWebhookIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 

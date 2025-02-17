@@ -1,7 +1,7 @@
 import jwt, {JwtPayload} from 'jsonwebtoken';
 import ldap from "ldapjs"
 import logger from "../utils/logger.js";
-import ldapService from "./ldap.service.js";
+import ldapService, {Agent} from "./ldap.service.js";
 import userService from "./user.service.js";
 
 function decodeToken(token: string) {
@@ -20,21 +20,23 @@ function decodeToken(token: string) {
     return payload;
 }
 
+
 export default {
 
     async verifyJwt(token: string) {
 
         logger.debug(">>>> verifyJwt")
 
-        // decode cookie and get user id
-        const decoded = decodeToken(token)
+        // decode user_token
+        const decoded_agent = decodeToken(token) as Agent
+        if (!decoded_agent.uid) return null
 
-        logger.debug("Decoded token : ", decoded)
+        logger.debug("Decoded token : ", decoded_agent)
 
         let user
         // find the user
         await userService.findAllUsernames().then((users) => {
-            user = users?.find(u => u.username === decoded.uid[0]);
+            user = users?.find(u => u.username === decoded_agent.uid);
         })
 
         logger.notice("User found : ", user)
@@ -59,9 +61,9 @@ export default {
         return user
     },
 
-    ldapAuth(username: string, password: string):Promise<{}> {
+    ldapAuth(username: string, password: string): Promise<Agent> {
 
-        return new Promise((resolve, reject) => {
+        return new Promise<Agent>((resolve, reject) => {
             (async () => {
 
                 logger.debug(process.env.LDAP_URI)
@@ -73,30 +75,36 @@ export default {
                     // baseDN: process.env.BASE_DN || ''
                 });
 
-                let user: any = {}
-                await ldapService.getUserForUID(client, username).then(value => user = value)
+                client.on('error', (err) => {
+                    if (err.code === 'ENOTFOUND') logger.critical("Cannot connect to LDAP instance !")
+                    else logger.error('LDAP : ' + err.message);
+                });
 
-                if (!user.dn) reject({message: "User not found !"})
-
-                client.bind(user.dn, password, (error, _response) => {
-
-                    // logger.debug(response)
-
-                    if (error) {
-
-                        client.unbind(() => {
-                            logger.debug('Disconnecting.');
-                        });
-                        logger.alert("LDAP binding failed.")
-                        reject({message: error.message})
-
-                    } else {
-
-                        logger.notice(username + " : Logged in")
-                        resolve(user)
-                    }
+                let user = await ldapService.getUserForUID(client, username).catch(reason => {
+                    logger.error("Could not get mail for uid " + username + " : ", reason)
                 })
 
+                if (!user) {
+                    reject({message: "User not found !"})
+                } else {
+                    client.bind(user.dn, password, (error, _response) => {
+
+                        // logger.debug(response)
+                        if (error) {
+
+                            client.unbind(() => {
+                                logger.debug('Disconnecting.');
+                            });
+                            logger.alert("LDAP binding failed.")
+                            reject({message: error.message})
+
+                        } else {
+
+                            logger.notice(username + " : Logged in")
+                            if (user) resolve(user)
+                        }
+                    })
+                }
             })()
         })
     }

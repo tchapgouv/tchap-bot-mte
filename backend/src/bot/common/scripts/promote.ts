@@ -1,17 +1,18 @@
 import {MatrixClient, MatrixEvent} from "matrix-js-sdk";
 import logger from "../../../utils/logger.js";
-import {getUserPowerLevel, isSomeoneAdmin, isSupport, sendMessage} from "../helper.js";
+import {getPowerLevel, getUserPowerLevel, isSomeoneAdmin, isSupport, sendMessage} from "../helper.js";
 
 
 /**
  * @help
- * command : promote me|promeut moi
- * return : je promeus administrateur un utilisateur (si je suis moi-même administrateur)
+ * command : promote me|promeus moi
+ * return : je promeus administrateur un utilisateur (si je suis moi-même administrateur) <sup>*</sup>
  * isAnswer : true
+ * isAdmin : true
  */
 export function promoteUserIfAsked(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /.*(promote me|promeut moi).*/i
+    const regex: RegExp = /.*(promote me|promeus moi).*/i
 
 
     if (regex.test(body)) {
@@ -37,9 +38,17 @@ export function promoteUserIfAsked(client: MatrixClient, event: MatrixEvent, bod
 
                             } else {
 
-                                logger.debug("Promoting " + user.username + ".")
-                                client.setPowerLevel(roomId, userId, 100);
-                                sendMessage(client, roomId, "Je viens de promouvoir " + user.username + ". Félicitation ! 🎆")
+                                getPowerLevel(client, roomId).then(powerLevel => {
+
+                                    if (powerLevel === 100) {
+                                        logger.debug("Promoting " + user.username + ".")
+                                        client.setPowerLevel(roomId, userId, 100);
+                                        sendMessage(client, roomId, "Je viens de promouvoir " + user.username + ". Félicitation ! 🎆")
+                                    }
+                                    else {
+                                        sendMessage(client, roomId, "Je n'ai pas les droits suffisants pour promouvoir une personne 🤷")
+                                    }
+                                })
 
                             }
                         })

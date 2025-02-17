@@ -6,5 +6,5 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
 
     @Unique
     @Column(DataType.TEXT)
-    username!: string
+    declare username: string
 }

@@ -1,18 +1,24 @@
-import gmcdBot from "../bot/gmcd/bot.js";
+import botGmcd from "../bot/gmcd/bot.js";
 import gmcdBotConfig from "../bot/gmcd/config.js";
-import psinBot from "../bot/psin/bot.js";
+import botPsin from "../bot/psin/bot.js";
+import bot777 from "../bot/777/bot.js";
 import vm from "vm"
-import {MatrixClient, Visibility} from "matrix-js-sdk";
+import {MatrixClient, Preset, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
-import ldapService from "./ldap.service.js";
-import {getPowerLevel, sendHtmlMessage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
+import ldapService, {Agent} from "./ldap.service.js";
+import {getPowerLevel, sendFile, sendHtmlMessage, sendImage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
 import {Bot} from "../bot/common/Bot.js";
 import {splitEvery} from "../utils/utils.js";
 import {RoomMember} from "matrix-js-sdk/lib/models/room-member.js";
+import ldap from "ldapjs";
+import ldapGroupService from "./ldapListGroup.service.js";
+import mailGroupService from "./mailListGroup.service.js";
+import metricService, {MetricLabel} from "./metric.service.js";
 
 const bots: Bot[] = [
-    gmcdBot,
-    psinBot
+    botGmcd,
+    botPsin,
+    bot777
 ]
 
 const rateLimit = 10
@@ -31,6 +37,8 @@ export default {
 
     async inviteUserInRoom(userMail: string, roomId: string, opts = {retries: 0, logAlreadyInvited: true}) {
 
+        userMail = userMail.toLowerCase()
+
         logger.debug("inviteUserInRoom", userMail, roomId, opts)
 
         let message = ""
@@ -42,8 +50,8 @@ export default {
         logger.notice("Inviting " + userMail + " into " + roomName + " (" + roomId + "). retries " + opts.retries)
         let invited = false
 
-        const uid = userMail.toLowerCase().replace(/@.*/, "")
-        const alreadyInvited = gmcdBot.client.getRoom(roomId)?.getMembers().some(roomMember => {
+        const uid = userMail.replace(/@.*/, "")
+        const alreadyInvited = botGmcd.client.getRoom(roomId)?.getMembers().some(roomMember => {
             logger.debug(roomMember.userId.toLowerCase(), "vs", uid)
             return roomMember.userId.toLowerCase().includes(uid)
         })
@@ -58,25 +66,41 @@ export default {
 
         let tries = 0
         while (!invited && tries <= opts.retries) {
-            await gmcdBot.client.inviteByEmail(roomId, userMail)
+
+            const userInternalIdLeftPart = "@" + userMail.toLowerCase().replace("@", "-")
+            const userInternalId = userInternalIdLeftPart + ":agent.dev-durable.tchap.gouv.fr"
+            const user = botGmcd.client.getUser(userInternalId)
+
+            let inviteRequest, userToLog: string, userToMarkdown: string
+            if (user !== null) {
+                inviteRequest = botGmcd.client.invite(roomId, userInternalId)
+                userToLog = userInternalIdLeftPart
+                userToMarkdown = `[${userToLog}](https://matrix.to/#/${userInternalId})`
+            } else {
+                inviteRequest = botGmcd.client.inviteByEmail(roomId, userMail.toLowerCase())
+                userToLog = userMail.toLowerCase()
+                userToMarkdown = userMail.toLowerCase()
+            }
+
+            await inviteRequest
                 .then(() => {
-                    logger.notice(userMail + " successfully invited.")
+                    logger.notice(userToLog + " successfully invited.")
+                    message = " ✅ " + userToMarkdown + " invité.\n"
                     invited = true
-                    message = " ✅ " + userMail + " invité.\n"
                 })
                 .catch(reason => {
                     if (reason.data?.error?.includes("already in the room")) {
-                        opts.logAlreadyInvited ? message = " 🤷 " + userMail + " était déjà présent.\n" : ""
+                        opts.logAlreadyInvited ? message = " 🤷 " + userToMarkdown + " était déjà présent.\n" : ""
                         invited = true
                     } else {
                         logger.debug("typeof reason :", typeof reason, reason?.HTTPError, reason?.httpStatus)
-                        logger.error("Error inviting " + userMail + " will retry in 10 seconds", reason)
+                        logger.error("Error inviting " + userToLog + " will retry in 10 seconds", reason)
                         if (tries == opts.retries) {
 
                             if (reason?.httpStatus === '502') {
-                                message = " ❗️ " + userMail + ", Tchap returned 502...\n"
+                                message = " ❗️ " + userToLog + ", Tchap returned 502...\n"
                             } else {
-                                message = " ❗️ " + userMail + ", " + (reason?.data?.error) + "\n"
+                                message = " ❗️ " + userToLog + ", " + (reason?.data?.error) + "\n"
                                 hasError = true
                             }
                         }
@@ -94,22 +118,20 @@ export default {
         logger.debug("createRoom", roomName, isPrivate)
 
         let message: string = ""
-        let roomId: any
+        let roomId: string | undefined
 
-        await gmcdBot.client.getRoomIdForAlias("#" + roomName + ":" + process.env.TCHAP_SERVER_NAME).then((data) => {
+        await botGmcd.client.getRoomIdForAlias("#" + roomName + ":" + process.env.TCHAP_SERVER_NAME).then((data) => {
             roomId = data.room_id
             message += roomName + " existait déjà et n'a pas été créé.\n"
         }).catch(reason => logger.notice("Room not found", reason))
 
         if (!roomId) {
-            await gmcdBot.client.createRoom({
+            await botGmcd.client.createRoom({
                 name: roomName,
                 room_alias_name: roomName,
+                preset: isPrivate ? Preset.PrivateChat : Preset.PublicChat,
                 visibility: isPrivate ? Visibility.Private : Visibility.Public,
-                // preset: isPrivate ? Preset.PrivateChat : Preset.PublicChat,
-                // power_level_content_override: {
-                // users_default: 50
-                // },
+                power_level_content_override: {}
             })
                 .then((data) => {
                     logger.notice("Room created : ", data)
@@ -118,6 +140,9 @@ export default {
                     message += "Vous pouvez vous promouvoir administrateur simplement en me le demandant : `@bot-gmcd promote me`. 🍄\n"
                     message += "Enfin, vous pouvez me renvoyer : `@bot-gmcd oust !`. 🪦\n"
                     roomId = data.room_id
+
+                    this.setRoomNotificationPowerLevel(roomId, 0)
+
                 })
                 .catch(reason => {
                     logger.error("Error creating room " + roomName + ". ", reason)
@@ -130,17 +155,78 @@ export default {
         message += "Bonne journée !\n"
 
         if (roomId != null) {
-            sendMessage(gmcdBot.client, roomId, message)
+            sendMessage(botGmcd.client, roomId, message)
         }
 
         return {roomId, message}
     },
 
-    async deleteRoom(roomId: string, opts: { kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷", client?: MatrixClient, }) {
+    async upload(roomId: string, file: Buffer, opts: {
+        fileName: string,
+        mimeType: string,
+        includeFilename?: boolean,
+        width?: number,
+        height?: number
+    }) {
+
+        let message = ""
+        let uri = ""
+
+        await botGmcd.client.uploadContent(file, {name: opts.fileName, type: opts.mimeType, includeFilename: opts.includeFilename}).then(value => {
+
+            if (opts.mimeType.includes("image")) {
+                sendImage(
+                    botGmcd.client,
+                    roomId,
+                    opts.fileName,
+                    {
+                        mimeType: opts.mimeType,
+                        width: opts.width ? opts.width : 800,
+                        height: opts.height ? opts.height : 600,
+                        size: file.byteLength
+                    },
+                    value.content_uri)
+            } else {
+                sendFile(botGmcd.client,
+                    roomId,
+                    {
+                        fileName: opts.fileName,
+                        mimeType: opts.mimeType,
+                        size: file.byteLength,
+                        url: value.content_uri
+                    })
+            }
+
+            message = "File " + opts.fileName + " uploaded"
+            uri = value.content_uri
+
+        }).catch(reason => {
+            logger.error("Error uploading file :", reason)
+            message = "Error uploading file !"
+        })
+
+        return {message: message, uri: uri}
+    },
+
+    /**
+     * @deprecated will be removed
+     */
+    setRoomNotificationPowerLevel(roomId: string, powerLevel: number) {
+
+        logger.notice("Setting room notification power level requirement to " + powerLevel)
+
+        botGmcd.client.getStateEvent(roomId, "m.room.power_levels", "").then(value => {
+            logger.notice(value)
+        }).catch(reason => {
+            logger.error("Error getting room notification power level requirement :", reason)
+        })
+    },
+
+    async deleteRoom(roomId: string, opts: { kickReason?: "Quelqu'un m'a demandé de vous expulser, désolé 🤷", client?: MatrixClient, }) {
 
         logger.debug("deleteRoom", roomId)
 
-        if (!opts.client) opts.client = gmcdBot.client
+        if (!opts.client) opts.client = botGmcd.client
         const client = opts.client
         const botId = client.getUserId()
 
@@ -154,47 +240,99 @@ export default {
 
         let adminList: { name: string, userId: string }[] = []
 
-        let members: RoomMember[] | undefined = gmcdBot.client.getRoom(roomId)?.getMembers();
+        let members: RoomMember[] | undefined = client.getRoom(roomId)?.getMembers();
 
         if (members) {
             for (const roomMember of members) {
+                if (roomMember.userId === botId) continue
                 await this.kickUser(roomId, roomMember.userId, opts.kickReason)
                 if (roomMember.powerLevel === 100) adminList.push({name: roomMember.name, userId: roomMember.userId})
             }
         }
 
         if (adminList.length > 0) sendMessage(client, roomId, "Quelques Administrateurs demeurent dans ce salon et je ne peux les exclure.\nCe salon ne sera pas purgé tant qu'ils ne l'auront pas quitté.\nN'oubliez pas d'éteindre la lumière en partant ! 💡\n 👋")
-        else sendMessage(client, roomId, "🚪")
+        else sendMessage(client, roomId, "👋🚪")
 
-        client.leave(roomId)
+        client.leave(roomId).then(() => {
+            logger.notice("Room " + roomId + " successfully left.")
+        }).catch((error) => {
+            logger.error("Error leaving room " + roomId + " : " + error)
+            metricService.createOrIncrease({
+                name: "error",
+                labels: [new MetricLabel("reason", "Error leaving room")]
+            })
+        })
 
         return adminList
     },
 
-    async kickUser(roomId: string, userId: string, kickReason?: "Quelqu'un m'a demandé de vous expulser, désole 🤷") {
+    async searchUserFromMail(userMail: string) {
+
+        userMail = "@" + userMail.replace("@", "-")
+        return this.searchUser(userMail).catch(reason => {
+            throw reason
+        })
+    },
+
+    async searchUser(searchTerm: string) {
+
+        let user: { user_id: string, display_name?: string, avatar_url?: string } | undefined
+
+        await botGmcd.client.searchUserDirectory({term: searchTerm, limit: 5}).then(value => {
+            if (value.results.length > 1) throw 'Invalid number of matches (Limit 5). Found ' + value.results.length + ', expected 1.'
+            if (value.results.at(0)) user = value.results.at(0)
+        })
+
+        if (!user) {
+            const matchingKnownUsers = botGmcd.client.getUsers().filter(value => {
+                return value.userId.toLowerCase().includes(searchTerm) || value.displayName?.toLowerCase().includes(searchTerm)
+            })
+            if (matchingKnownUsers.length > 1) throw 'Invalid number of matches (Limit 5). Found ' + matchingKnownUsers.length + ', expected 1.'
+            const matchingKnownUser = matchingKnownUsers.at(0)
+            if (matchingKnownUser) user = {user_id: matchingKnownUser.userId, display_name: matchingKnownUser.displayName, avatar_url: matchingKnownUser.avatarUrl}
+        }
+
+        if (!user) throw 'User not found.'
+
+        return user
+    },
+
+    async kickUser(roomId: string, userTerm: string, kickReason: string = "Quelqu'un m'a demandé de vous expulser, désolé 🤷") {
+
+        logger.debug("kickUser : ", roomId, userTerm, kickReason)
 
         let message = ""
         let isAdmin = false
         let hasError = false
-        let members: RoomMember[] | undefined = gmcdBot.client.getRoom(roomId)?.getMembers();
+        let members: RoomMember[] | undefined = botGmcd.client.getRoom(roomId)?.getMembers();
 
-        if (!members) return {message: "No room members found !", isAdmin: false, hasError: true}
+        if (!members || !members.length) return {message: "No room members found !", isAdmin: false, hasError: true}
+
+        let powerLevel
+        await getPowerLevel(botGmcd.client, roomId).then(value => {
+            powerLevel = value
+        })
+        if (powerLevel !== 100) return {message: "Rights insufficient to kick !", isAdmin: false, hasError: true}
 
         for (const roomMember of members) {
 
-            if (!roomMember.userId.toLowerCase().includes(userId.toLowerCase())) continue
-            if (roomMember.userId === gmcdBot.client.getUserId()) {
+            logger.debug("roomMember", roomMember)
+            logger.debug(roomMember.userId + " power level  = " + roomMember.powerLevel)
+            const isMatch = roomMember.userId.toLowerCase().includes(userTerm.toLowerCase())
+            logger.debug(roomMember.userId.toLowerCase() + " vs " + userTerm.toLowerCase() + ". isMatch ? " + isMatch)
+
+            if (!isMatch) continue
+
+            if (roomMember.userId === botGmcd.client.getUserId()) {
                 message += "Did you really thought i would kick myself ?!\n"
                 continue
             }
 
-            logger.debug("roomMember", roomMember)
-            logger.debug(roomMember.userId + " power level  = " + roomMember.powerLevel)
-
             if (!roomMember.powerLevel || roomMember.powerLevel < 100) {
 
                 logger.debug("Kicking " + roomMember.userId)
-                await gmcdBot.client.kick(roomId, roomMember.userId, kickReason)
+
+                await botGmcd.client.kick(roomId, roomMember.userId, kickReason)
                     .then(() => {
                         message += roomMember.name + " kicked.\n"
                     })
@@ -219,29 +357,32 @@ export default {
 
         logger.debug("getRoomName", roomId)
 
-        const roomName = gmcdBot.client.getRoom(roomId)?.name
+        const roomName = botGmcd.client.getRoom(roomId)?.name
 
         if (!roomName) throw "Cannot find room name for Id : " + roomId + ". Do I know this room ?"
 
         return roomName
     },
 
-    async inviteUsersInRoom(userList: string[], roomId: string, retry = 0, logAlreadyInvited = true): Promise<void> {
+    async inviteUsersInRoom(botId: string, userUidList: string[], roomId: string, retry = 0, logAlreadyInvited = true): Promise<void> {
 
-        logger.debug("inviteUsersInRoom", userList.length, roomId, retry, logAlreadyInvited)
+        const bot = this.getBotById(botId)
+        const client: MatrixClient = bot.client
+
+        logger.debug("inviteUsersInRoom", userUidList.length, roomId, retry, logAlreadyInvited)
 
         const isMemberOfRoom = await this.isMemberOfRoom(roomId)
 
         if (!isMemberOfRoom) throw "I am not able to invite has i am not a member of the room !"
 
-        if (!gmcdBot.client.getRoom(roomId)?.canInvite(gmcdBotConfig.userId)) throw "I am do not have permissions to invite in this room !"
+        if (!client.getRoom(roomId)?.canInvite(gmcdBotConfig.userId)) throw "I am do not have permissions to invite in this room !"
 
         let message: string = "Rapport d'invitations : \n"
 
         let userMailList: string[] = []
         let hasExternal = false
 
-        await ldapService.getMailsForUIDs(userList)
+        await ldapService.getMailsForUIDs(userUidList)
             .then(data => {
                 userMailList = data.userMailList
                 for (const username of data.userNotFoundList) {
@@ -264,7 +405,7 @@ export default {
 
         if (hasExternal) {
             logger.notice("Setting guest access to room " + roomId)
-            await gmcdBot.client.sendStateEvent(roomId, "im.vector.room.access_rules", {rule: "unrestricted"})
+            await client.sendStateEvent(roomId, "im.vector.room.access_rules", {rule: "unrestricted"})
                 .then(() => {
                     logger.notice("Guest access set for room " + roomId)
                 }).catch(_ => {
@@ -273,7 +414,7 @@ export default {
         }
 
         // Maj du token préventivement afin d’éviter de multiples appels en parallèle
-        await gmcdBot.getIdentityServerToken()
+        await bot.getIdentityServerToken()
 
         // On invite par groupes de 10 et on met un délai entre les invitations pour ne pas tomber sur la limite des haproxy (rate limit de l’endpoint en lui-même = 1k/s).
         let tasks: Promise<{ message: string, hasError: boolean, mail: string }>[] = [];
@@ -299,7 +440,7 @@ export default {
             count++
         }
 
-        sendMessage(gmcdBot.client, roomId, message)
+        sendMessage(client, roomId, message)
 
         logger.debug("Awaiting " + tasks.length + " inviting tasks.")
 
@@ -307,7 +448,7 @@ export default {
             let inviteResultMessage = ""
             await Promise.all(chunk).then(results => {
                 for (const result of results) {
-                    inviteResultMessage += result.message
+                    inviteResultMessage += "-" + result.message
                     if (result.hasError) mailInErrorList.push(result.mail)
                     logger.debug("inviteResult : ", result)
                 }
@@ -315,20 +456,29 @@ export default {
                 logger.error("Promise.all(inviteByEmail) : ", reason)
                 throw (reason)
             })
-            sendMessage(gmcdBot.client, roomId, inviteResultMessage)
+            sendMarkdownMessage(client, roomId, inviteResultMessage)
         })
 
         logger.debug("Inviting tasks completed")
 
         if (mailInErrorList.length > 0 && retry <= 2) {
-            sendMessage(gmcdBot.client, roomId, " ❗️ Certaines invitations semblent en erreur et seront retentées dans 30 minutes.\n")
+            sendMessage(client, roomId, " ❗️ Certaines invitations semblent en erreur et seront retentées dans 30 minutes.\n")
             setTimeout(() => {
                 retry++
-                this.inviteUsersInRoom(mailInErrorList, roomId, retry, false).catch(reason => {
+                this.inviteUsersInRoom(botId, mailInErrorList, roomId, retry, false).catch(reason => {
                     throw reason
                 })
             }, 30 * 60 * 1000)
         }
+    },
+
+    getBotById(botId: string) {
+
+        for (const bot of bots) {
+            if (bot.client.getUserId() === botId) return bot
+        }
+
+        return botGmcd;
     },
 
     async postMessage(roomId: string,
@@ -336,13 +486,7 @@ export default {
                       botId: string,
                       opts: { messageFormat: string } = {messageFormat: "text"}): Promise<{ message: string } | void> {
 
-        let client
-
-        for (const bot of bots) {
-            if (bot.client.getUserId() === botId) client = bot.client
-        }
-
-        if (!client) client = gmcdBot.client
+        let client = this.getBotById(botId).client;
 
         logger.info("Posting message")
 
@@ -372,7 +516,7 @@ export default {
 
         let isMember = false
 
-        await gmcdBot.client.getJoinedRoomMembers(roomId)
+        await botGmcd.client.getJoinedRoomMembers(roomId)
             .then(value => {
                 isMember = !!value.joined[userId ? userId : "" + process.env.BOT_USER_ID]
             })
@@ -382,5 +526,108 @@ export default {
             })
 
         return isMember
+    },
+
+    async isBotAMemberOfRoom(roomId: string | null, botId: string) {
+
+        logger.debug("isBotAMemberOfRoom", roomId, botId)
+
+        if (!roomId) throw "isBotAMemberOfRoom ? roomId cannot be empty"
+
+        let isMember = false
+
+        const bot = this.getBotById(botId);
+
+        await bot.client.getJoinedRoomMembers(roomId)
+            .then(value => {
+                isMember = !!value.joined[botId]
+            })
+            .catch(reason => {
+                logger.error("isMemberOfRoom", reason)
+                isMember = false
+            })
+
+        return isMember
+    },
+
+    async updateRoomMemberList(client: MatrixClient, roomId: string, dryRun: boolean = true) {
+
+        let dryRunMessage: string = "Les changements suivants seront opérés <sup>*</sup> : \n\n"
+
+        if (!roomId) throw "updateRoomMemberList : roomId cannot be empty"
+
+        const ldapListGroup = await ldapGroupService.findRoomGroup(roomId)
+        const mailListGroup = await mailGroupService.findRoomGroup(roomId)
+
+        logger.debug("ldapListGroup :", ldapListGroup)
+        logger.debug("mailListGroup :", mailListGroup)
+
+        if (!ldapListGroup && !mailListGroup) {
+            throw ({message: "No defined ldap group or mail group configuration found for given room."})
+        }
+
+        let agentList: Agent[] = []
+
+        const ldapClient = ldap.createClient({url: process.env.LDAP_URI || ''});
+
+        if (ldapListGroup) {
+            agentList = await ldapService.getUsersWithLdapRequest(ldapClient, ldapListGroup.getDataValue("base_dn"), ldapListGroup.getDataValue("recursively"), ldapListGroup.getDataValue("filter"))
+        }
+        if (mailListGroup) {
+            agentList = await ldapService.getUsersWithLdapMailingList(ldapClient, mailListGroup.getDataValue("mail"))
+        }
+
+        const roomMembers: RoomMember[] = client.getRoom(roomId)?.getMembers() || [];
+
+        let foundSomeoneToKick = false
+        for (const roomMember of roomMembers) {
+            if (!agentList.some(agent => roomMember.userId.includes(agent.mailPR.toLowerCase().replace("@", "-")))) {
+                if (roomMember.userId.toLowerCase().includes("bot-")) continue
+                if (dryRun) {
+                    if (!foundSomeoneToKick) {
+                        foundSomeoneToKick = true
+                        dryRunMessage += "Seront renvoyés :\n\n"
+                    }
+                    dryRunMessage += " - " + roomMember.name + "\n"
+                } else {
+                    this.kickUser(roomId, roomMember.userId, "Vous n'appartenez plus au groupe configuré, définissant les membres de ce salon.").then(value => {
+                        sendMessage(client, roomId, value.message)
+                    })
+                }
+            }
+        }
+
+        let userUidList: string[] = []
+        let foundSomeoneToInvite = false
+        for (const agent of agentList) {
+
+            const mailPR = agent.mailPR.toLowerCase()
+
+            if (!roomMembers.some(roomMember => roomMember.userId.includes(agent.mailPR.toLowerCase().replace("@", "-")))) {
+                if (dryRun) {
+                    if (!foundSomeoneToInvite) {
+                        foundSomeoneToInvite = true
+                        dryRunMessage += "\nSeront invités :\n\n"
+                    }
+                    dryRunMessage += " - " + mailPR + "\n"
+                } else {
+                    userUidList.push((agent.uid || "").toLowerCase())
+                }
+            }
+        }
+
+        if (dryRun) {
+            if (!foundSomeoneToInvite && !foundSomeoneToKick) {
+                dryRunMessage += "Aucun.\n"
+            }
+            dryRunMessage += "\n_<sup>*</sup> Sous réserve de droits suffisants._"
+            sendMarkdownMessage(client, roomId, dryRunMessage)
+        } else {
+            if (userUidList.length > 0) {
+                this.inviteUsersInRoom(client.getUserId() + "", userUidList, roomId, 0, false).catch(reason => {
+                    logger.error("Error inviting users based on ldap", reason)
+                })
+            }
+        }
     }
 }

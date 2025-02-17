@@ -1,19 +1,22 @@
 import express from 'express';
-import {destroy, findAll, findOneWithWebhook, postMessage, update} from "../controllers/webhook.controller.js";
-import {create} from "../controllers/webhook.controller.js";
-import {verifyToken} from "../controllers/auth.controller.js";
+import {check, create, destroy, findAll, findOneWithWebhook, postMessage, update, uploadFile} from "../controllers/webhook.controller.js";
+import {verifyAuth, verifyOrigin} from "../controllers/auth.controller.js";
+import fileUpload from "express-fileupload";
+import logger from "../utils/logger.js";
 
 const webhookRouter = express.Router();
 
-webhookRouter.post("/api/webhook/create", verifyToken, create);
+webhookRouter.post("/api/webhook/create", verifyOrigin, verifyAuth, create);
 
-webhookRouter.delete("/api/webhook/delete", verifyToken, destroy);
+webhookRouter.delete("/api/webhook/delete", verifyOrigin, verifyAuth, destroy);
 
-webhookRouter.get("/api/webhook/list", verifyToken, findAll);
+webhookRouter.get("/api/webhook/list", verifyOrigin, verifyAuth, findAll);
 
-webhookRouter.post("/api/webhook/get", verifyToken, findOneWithWebhook);
+webhookRouter.post("/api/webhook/check", verifyOrigin, verifyAuth, check);
 
-webhookRouter.put("/api/webhook/update", verifyToken, update);
+webhookRouter.post("/api/webhook/get", verifyOrigin, verifyAuth, findOneWithWebhook);
+
+webhookRouter.put("/api/webhook/update", verifyOrigin, verifyAuth, update);
 
 /**
  * @openapi
@@ -52,5 +55,18 @@ webhookRouter.put("/api/webhook/update", verifyToken, update);
  *         description:
  */
 webhookRouter.post("/api/webhook/post/:webhook?", postMessage)
+
+webhookRouter.post("/api/webhook/upload/:webhook?", fileUpload({
+    abortOnLimit: true,
+    limits: {
+        fileSize: 10 * 1024 * 1024
+    },
+    debug: true,
+    logger: {
+        log: (msg) => {
+            logger.debug(msg)
+        }
+    }
+}), uploadFile)
 
 export default webhookRouter

@@ -5,14 +5,20 @@ import {InferAttributes, InferCreationAttributes} from "sequelize";
 export class Webhook extends Model<InferAttributes<Webhook>, InferCreationAttributes<Webhook>> {
 
     @Column(DataType.TEXT)
-    webhook_label!: string;
+    declare webhook_label: string;
     @Unique
     @Column(DataType.TEXT)
-    webhook_id!: string;
+    declare webhook_id: string;
     @Column(DataType.TEXT)
-    bot_id!: string;
+    declare bot_id: string;
     @Column(DataType.TEXT)
-    room_id!: string;
+    declare room_id: string;
     @Column(DataType.TEXT)
-    script!: string;
+    declare script: string;
+    @Column(DataType.BOOLEAN)
+    declare internet: boolean;
+    @Column(DataType.NUMBER)
+    declare lastUseEpoch: number;
 }
+
+// ALTER TABLE webhooks ADD COLUMN lastUseEpoch INTEGER DEFAULT 0;
