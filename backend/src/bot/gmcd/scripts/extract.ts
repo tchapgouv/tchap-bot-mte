@@ -1,4 +1,6 @@
 import {MatrixClient} from "matrix-js-sdk";
+import botService from "../../../services/bot.service.js";
+import {sendMessage} from "../../common/helper.js";
 
 
 /**
@@ -8,12 +10,13 @@ import {MatrixClient} from "matrix-js-sdk";
  */
 export function extractIfAsked(client: MatrixClient, roomId: string, body: string) {
 
-    const regex: RegExp = /.*(norris( |$)).*/i
+    const regex: RegExp = /.*(get history( |$)).*/i
 
     if (regex.test(body)) {
 
-        client.getRoom(roomId)?.getTimelineSets()
-
-        // sendMessage(client, roomId, data.joke)
+        botService.getHistorySinceMilliseconds(roomId, {since: 1000 * 60 * 60 * 24 * 7}).then(value => {
+            const numberOfMessages = value.length
+            sendMessage(client, roomId, "Trouvé " + numberOfMessages + " messages")
+        })
     }
 }

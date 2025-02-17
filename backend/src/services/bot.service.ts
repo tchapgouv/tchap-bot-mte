@@ -3,7 +3,7 @@ import gmcdBotConfig from "../bot/gmcd/config.js";
 import botPsin from "../bot/psin/bot.js";
 import bot777 from "../bot/777/bot.js";
 import vm from "vm"
-import {MatrixClient, Preset, Visibility} from "matrix-js-sdk";
+import {IContent, MatrixClient, Method, Preset, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import ldapService, {Agent} from "./ldap.service.js";
 import {getPowerLevel, sendFile, sendHtmlMessage, sendImage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
@@ -33,6 +33,52 @@ export default {
         await vm.runInContext(script, context);
 
         return context.data
+    },
+
+    async getHistorySinceMilliseconds(roomId: string, opts: { botId?: string, since: number }) {
+        const limit = 100
+
+        let gotAll = false
+        let events: ChunkElement[] = []
+        let from
+        while (!gotAll) {
+            await this.getlastNthMessages(roomId, {nth: limit, botId: opts.botId, from}).then(data => {
+                for (const chunkElement of data.chunk) {
+                    if (chunkElement.age < opts.since) {
+                        events.push(chunkElement)
+                    } else {
+                        gotAll = true
+                    }
+                }
+                from = data.end
+            })
+        }
+        return events
+    },
+
+    async getlastNthMessages(roomId: string, opts: { nth: number, botId?: string, from?: string }) {
+
+        const bot = this.getBotById(opts.botId || process.env.BOT_USER_ID + "")
+
+        const filter = {'lazy_load_members': 'true', 'types': ['m.room.message']}
+        const order = "b" // 'f'orward || 'b'ackward
+
+        return await bot.client.http.authedRequest<{
+            "chunk": ChunkElement[],
+            end: string
+        }>(Method.Get, "/rooms/" + roomId + "/messages?" +
+            "dir=" + order +
+            "&limit=" + opts.nth +
+            (opts.from ? "&from=" + opts.from : '') +
+            "&filter=" + encodeURI(JSON.stringify(filter)))
+            .then(data => {
+                for (const chunkElement of data.chunk) {
+                    if (chunkElement.content.body) {
+                        console.log(chunkElement.content.body)
+                    }
+                }
+                return {chunk: data.chunk, end: data.end}
+            })
     },
 
     async inviteUserInRoom(userMail: string, roomId: string, opts = {retries: 0, logAlreadyInvited: true}) {
@@ -630,4 +676,17 @@ export default {
             }
         }
     }
+}
+
+export interface ChunkElement {
+
+    content: IContent
+    origin_server_ts: number
+    room_id: string
+    sender: string
+    type: string
+    // unsigned:
+    event_id: string
+    user_id: string
+    age: number
 }
