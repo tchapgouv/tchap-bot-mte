@@ -36,7 +36,7 @@ export default {
     },
 
     async getHistorySinceMilliseconds(roomId: string, opts: { botId?: string, since: number }) {
-        const limit = 100
+        const limit = Number.parseInt(process.env.HISTORY_FETCH_MESSAGES_LIMIT + '') || 20
 
         let gotAll = false
         let events: ChunkElement[] = []
