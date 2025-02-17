@@ -122,7 +122,7 @@ export class Bot {
 
                 let isSelfMentioned = userIds && userIds.indexOf(botId) > -1;
                 const body = event.event.content?.formatted_body ? event.event.content?.formatted_body : event.event.content?.body
-                if (!isSelfMentioned && botName) isSelfMentioned = body.toLowerCase().replace(/> .*?\n/g, '').includes("@" + botName.toLowerCase())
+                if (!isSelfMentioned && botName && body) isSelfMentioned = body.toLowerCase().replace(/> .*?\n/g, '').includes("@" + botName.toLowerCase())
 
                 logger.debug("Is self mentioned ? ", isSelfMentioned)
                 logger.debug("sender = ", event.getSender())
