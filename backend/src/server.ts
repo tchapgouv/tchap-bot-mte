@@ -19,7 +19,6 @@ import swaggerUi from "swagger-ui-express"
 import {specs} from "./swagger.config.js";
 import crypto from "crypto";
 import Crontab from "./Crontab.js";
-import botService from "./services/bot.service.js";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -96,12 +95,10 @@ try {
 
     app.listen(PORT, () => {
         logger.notice(`Server is running http on port ${PORT}.`);
-        botService.getHistorySinceMilliseconds("!MClnjDYVSLjFZpoqVk:agent.dev-durable.tchap.gouv.fr")
     });
 }
 const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString("fr-FR") + "-" + process.env.JWT_KEY).digest('hex')
 logger.info("Current Time Based Token : ",
-    currentToken,
     currentToken.substring(0, 15) + "***************" + currentToken.substring(currentToken.length - 15, currentToken.length),
     "Based on : ",
     new Date().toLocaleDateString("fr-FR") + "-JWT_KEY")
