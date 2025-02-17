@@ -38,6 +38,8 @@ export default {
     async getHistorySinceMilliseconds(roomId: string, opts: { botId?: string, since: number }) {
         const limit = Number.parseInt(process.env.HISTORY_FETCH_MESSAGES_LIMIT + '') || 20
 
+        logger.debug("getHistorySinceMilliseconds : search with limit = " + limit + ", since = " + opts.since)
+
         let gotAll = false
         let events: ChunkElement[] = []
         let from
@@ -53,6 +55,7 @@ export default {
                 from = data.end
             })
         }
+        logger.debug("getHistorySinceMilliseconds : found " + events.length)
         return events
     },
 
@@ -62,6 +65,8 @@ export default {
 
         const filter = {'lazy_load_members': 'true', 'types': ['m.room.message']}
         const order = "b" // 'f'orward || 'b'ackward
+
+        logger.debug("getlastNthMessages : requesting last " + opts.nth + " messages from " + roomId + " starting at " + opts.from)
 
         return await bot.client.http.authedRequest<{
             "chunk": ChunkElement[],
