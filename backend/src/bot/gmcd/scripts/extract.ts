@@ -14,6 +14,8 @@ export function extractHistoryIfAsked(client: MatrixClient, roomId: string, body
 
     if (regex.test(body)) {
 
+        sendMessage(client, roomId, "Recherche des messages des 7 derniers jours.\n🕰️ Merci de patienter.")
+
         botService.getHistorySinceMilliseconds(roomId, {since: 1000 * 60 * 60 * 24 * 7}).then(value => {
             const discussion = value.map(chunkElement => {
                 return {
