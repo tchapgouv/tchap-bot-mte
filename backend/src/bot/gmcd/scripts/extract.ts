@@ -15,8 +15,18 @@ export function extractHistoryIfAsked(client: MatrixClient, roomId: string, body
     if (regex.test(body)) {
 
         botService.getHistorySinceMilliseconds(roomId, {since: 1000 * 60 * 60 * 24 * 7}).then(value => {
+            const discussion = value.map(chunkElement => {
+                return {
+                    body: chunkElement.content.body,
+                    sender: chunkElement.sender,
+                    timestamp: chunkElement.origin_server_ts
+                }
+            })
+            const bufferedDiscussion = Buffer.from(JSON.stringify(discussion));
+
             const numberOfMessages = value.length
-            sendMessage(client, roomId, "Trouvé " + numberOfMessages + " messages")
+            sendMessage(client, roomId, numberOfMessages + " messages trouvés.")
+            client.uploadContent(bufferedDiscussion, {name: new Date().toLocaleDateString("fr-FR") + "_j-7.json", type: 'application/json', includeFilename: true})
         })
         return true
     }
