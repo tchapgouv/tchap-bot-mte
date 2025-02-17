@@ -105,7 +105,7 @@ export class Bot {
 
             const botId = this.client.getUserId()
 
-            if (event.getType() === EventType.RoomMessage && botId) {
+            if (event.getType() === EventType.RoomMessage && botId && event.sender?.userId) {
 
                 if (event.sender?.userId === botId) {
                     logger.info("Message is mine")
