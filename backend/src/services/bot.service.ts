@@ -80,11 +80,11 @@ export default {
             end: string
         }>(Method.Get, url)
             .then(data => {
-                for (const chunkElement of data.chunk) {
-                    if (chunkElement.content.body) {
-                        console.log(chunkElement.content.body)
-                    }
-                }
+                // for (const chunkElement of data.chunk) {
+                //     if (chunkElement.content.body) {
+                //         console.log(chunkElement.content.body)
+                //     }
+                // }
                 return {chunk: data.chunk, end: data.end}
             })
     },
