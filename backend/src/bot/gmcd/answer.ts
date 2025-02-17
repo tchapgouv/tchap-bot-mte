@@ -23,6 +23,7 @@ import {listServicesIfAsked} from "../common/scripts/listService.js";
 import {getServicesIfAsked} from "../common/scripts/getService.js";
 import {pingService} from "../common/scripts/pingService.js";
 import {BotMessageData} from "../common/BotMessageData.js";
+import {extractHistoryIfAsked} from "./scripts/extract.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, _data: BotMessageData): void {
 
@@ -67,6 +68,8 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, bra
     if (!actionTaken) actionTaken = deleteMailUsersListIfAsked(client, event, data.message)
 
     if (!actionTaken) actionTaken = updateRoomUsersListIfAsked(client, event, data.message)
+
+    if (!actionTaken) actionTaken = extractHistoryIfAsked(client, data.roomId, data.message)
 
     // Actions propres au Bot
 

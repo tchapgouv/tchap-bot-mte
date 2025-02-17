@@ -8,7 +8,7 @@ import {sendMessage} from "../../common/helper.js";
  * command : extract
  * return : Je génère une extraction des messages sur une semaine
  */
-export function extractIfAsked(client: MatrixClient, roomId: string, body: string) {
+export function extractHistoryIfAsked(client: MatrixClient, roomId: string, body: string) {
 
     const regex: RegExp = /.*(get history( |$)).*/i
 
@@ -18,5 +18,7 @@ export function extractIfAsked(client: MatrixClient, roomId: string, body: strin
             const numberOfMessages = value.length
             sendMessage(client, roomId, "Trouvé " + numberOfMessages + " messages")
         })
+        return true
     }
+    return false
 }
