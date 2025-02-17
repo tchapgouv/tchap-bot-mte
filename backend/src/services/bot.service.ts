@@ -14,7 +14,6 @@ import ldap from "ldapjs";
 import ldapGroupService from "./ldapListGroup.service.js";
 import mailGroupService from "./mailListGroup.service.js";
 import metricService, {MetricLabel} from "./metric.service.js";
-import {FileType} from "matrix-js-sdk/src/http-api/index.js";
 
 const bots: Bot[] = [
     botGmcd,
@@ -218,7 +217,7 @@ export default {
         return {roomId, message}
     },
 
-    async upload(roomId: string, file: FileType, opts: {
+    async upload(roomId: string, file: Buffer | string, opts: {
         client?: MatrixClient,
         fileName: string,
         mimeType: string,
@@ -243,7 +242,7 @@ export default {
                         mimeType: opts.mimeType,
                         width: opts.width ? opts.width : 800,
                         height: opts.height ? opts.height : 600,
-                        size: file.byteLength
+                        size: (typeof file === 'string') ? Buffer.byteLength(file, 'utf8') : file.byteLength,
                     },
                     value.content_uri)
             } else {
@@ -252,7 +251,7 @@ export default {
                     {
                         fileName: opts.fileName,
                         mimeType: opts.mimeType,
-                        size: file.byteLength,
+                        size: (typeof file === 'string') ? Buffer.byteLength(file, 'utf8') : file.byteLength,
                         url: value.content_uri
                     })
             }
