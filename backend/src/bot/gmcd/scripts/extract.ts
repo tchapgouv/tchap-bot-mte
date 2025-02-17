@@ -14,7 +14,7 @@ export function extractHistoryIfAsked(client: MatrixClient, roomId: string, body
 
     if (regex.test(body)) {
 
-        sendMessage(client, roomId, "Recherche des messages des 7 derniers jours.\n🕰️ Merci de patienter.")
+        sendMessage(client, roomId, "Recherche des messages des 7 derniers jours.\nMerci de patienter 🕰️.")
 
         botService.getHistorySinceMilliseconds(roomId, {since: 1000 * 60 * 60 * 24 * 7}).then(value => {
             const discussion = value.map(chunkElement => {
@@ -24,10 +24,10 @@ export function extractHistoryIfAsked(client: MatrixClient, roomId: string, body
                     timestamp: chunkElement.origin_server_ts
                 }
             })
-            const stringifyDiscussion = JSON.stringify(discussion);
+            const stringifyDiscussion = JSON.stringify(discussion, null, 2);
 
             const numberOfMessages = value.length
-            sendMessage(client, roomId, numberOfMessages + " messages trouvés.\n📦 Envoi du fichier en cours.")
+            sendMessage(client, roomId, numberOfMessages + " messages trouvés.\nEnvoi du fichier en cours 📦.")
             botService.upload(roomId, stringifyDiscussion, {client, fileName: new Date().toLocaleDateString("fr-FR") + "_j-7.json", mimeType: 'application/json', includeFilename: true})
         })
         return true
