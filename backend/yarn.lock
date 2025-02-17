@@ -357,13 +357,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express-fileupload@npm:^1":
-  version: 1.5.0
-  resolution: "@types/express-fileupload@npm:1.5.0"
+"@types/express-fileupload@npm:^1.5.1":
+  version: 1.5.1
+  resolution: "@types/express-fileupload@npm:1.5.1"
   dependencies:
     "@types/busboy": "npm:*"
     "@types/express": "npm:*"
-  checksum: 10c0/0f6075d04ea111ad4a49b43d0fd43b44aac67793175547347a7bfff53d9a53830d519d39585b5a530a6feee06086f1b51898c0a3bfd96ce703f7ebb923d025c5
+  checksum: 10c0/eff97a97a3629d33db155274fbac7611e8adb14eddc3b845a851c6af783d6b064e9b98267c337e70134401f20847f56758894494269694c00424fae58d076815
   languageName: node
   linkType: hard
 
@@ -1448,6 +1448,26 @@ __metadata:
   dependencies:
     busboy: "npm:^1.6.0"
   checksum: 10c0/987deead0e04c483afa9d3d624d82c9d8abba1681cbf2f24b6d33a50d07dfbc8dfe0ec0be251fc754e085c09129db9ccbcbcc0d1d2de57e3604661c278e3d047
+  languageName: node
+  linkType: hard
+
+"express-rate-limit@npm:7":
+  version: 7.5.0
+  resolution: "express-rate-limit@npm:7.5.0"
+  peerDependencies:
+    express: ^4.11 || 5 || ^5.0.0-beta.1
+  checksum: 10c0/3e96afa05b4f577395688ede37e0cb19901f20c350b32575fb076f3d25176209fb88d3648151755c232aaf304147c58531f070757978f376e2f08326449299fd
+  languageName: node
+  linkType: hard
+
+"express-slow-down@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "express-slow-down@npm:2.0.3"
+  dependencies:
+    express-rate-limit: "npm:7"
+  peerDependencies:
+    express: 4 || 5 || ^5.0.0-beta.1
+  checksum: 10c0/6897c6c86fc6f90fabebcab4c254d95d4fab4713f6b9c6b4114548dae087bef17ed4d6317cb467dceb5456c376ad97aa190b59f00b481e471cd5004df08bb567
   languageName: node
   linkType: hard
 
@@ -3686,7 +3706,7 @@ __metadata:
   dependencies:
     "@types/cors": "npm:^2.8.17"
     "@types/express": "npm:^4.17.21"
-    "@types/express-fileupload": "npm:^1"
+    "@types/express-fileupload": "npm:^1.5.1"
     "@types/jsonwebtoken": "npm:^9.0.5"
     "@types/ldapjs": "npm:^3.0.6"
     "@types/mime": "npm:^4.0.0"
@@ -3699,6 +3719,7 @@ __metadata:
     cors: "npm:^2.8.5"
     express: "npm:^4.18.2"
     express-fileupload: "npm:^1.5.0"
+    express-slow-down: "npm:^2.0.3"
     fs: "npm:^0.0.1-security"
     http-status-codes: "npm:^2.3.0"
     https: "npm:^1.0.0"
