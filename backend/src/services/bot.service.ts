@@ -38,12 +38,13 @@ export default {
     async getHistorySinceMilliseconds(roomId: string, opts: { botId?: string, since: number }) {
         const limit = Number.parseInt(process.env.HISTORY_FETCH_MESSAGES_LIMIT + '') || 20
 
-        logger.debug("getHistorySinceMilliseconds : search with limit = " + limit + ", since = " + opts.since)
+        logger.debug("getHistory SinceMilliseconds : search with limit = " + limit + ", since = " + opts.since)
 
         let gotAll = false
         let events: ChunkElement[] = []
         let from
         while (!gotAll) {
+            logger.debug("getHistory SinceMilliseconds : from = " + from)
             await this.getlastNthMessages(roomId, {nth: limit, botId: opts.botId, from}).then(data => {
                 for (const chunkElement of data.chunk) {
                     if (chunkElement.age < opts.since) {
@@ -55,7 +56,7 @@ export default {
                 from = data.end
             })
         }
-        logger.debug("getHistorySinceMilliseconds : found " + events.length)
+        logger.debug("getHistory SinceMilliseconds : found " + events.length)
         return events
     },
 
@@ -71,8 +72,8 @@ export default {
             (opts.from ? "&from=" + opts.from : '') +
             "&filter=" + encodeURI(JSON.stringify(filter))
 
-        logger.debug("getlastNthMessages : requesting last " + opts.nth + " messages from " + roomId + " starting at " + opts.from)
-        logger.debug("getlastNthMessages : url = " + url)
+        logger.debug("getHistory lastNthMessages : requesting last " + opts.nth + " messages from " + roomId + " starting at " + opts.from)
+        logger.debug("getHistory lastNthMessages : url = " + url)
 
 
         return await bot.client.http.authedRequest<{
@@ -85,6 +86,7 @@ export default {
                 //         console.log(chunkElement.content.body)
                 //     }
                 // }
+                logger.debug("getHistory lastNthMessages : got = " + data.chunk.length)
                 return {chunk: data.chunk, end: data.end}
             })
     },
