@@ -1,101 +1,62 @@
-# vue-dsfr-project
+# Frontend - Webhooks Tchap
 
-Ce gabarit possède tous les outils configurés pour développer un projets Vue 3 et VueDsfr avec Vite.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Configuration recommandée
+Frontend pour la gestion des webhooks du bot Tchap GMCD.
 
-- Visual Studio Code avec ces extensions :
-  - [VSCode](https://code.visualstudio.com/)
-  - [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur)
-  - [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin)
-  - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-  - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-  - [Vue Ecosystem Snippets](https://marketplace.visualstudio.com/items?itemName=matijao.vue-nuxt-snippets)
+## Prérequis
 
-## Support de TypeScript pour les fichiers `.vue`
+- Node.js
+- Yarn
 
-TypeScript ne sait pas gérer les informations de type pour les imports dans les fichiers `.vue` par défault, donc la CLI `tsc` est remplacée par `vue-tsc` pour la vérification des types. Dans les éditeurs, il est besoin de l’extension [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) pour rendre le service du langage TypeScript capable de gérer les types des fichiers `.vue`.
+## Installation
 
-Si le plugin TypeScript ne vous semble pas assez performant, Volar a aussi implémenté un [mode Take Over](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) qui est plus performant. Vous pouvez l’activer en suivant les étapes suivantes :
+Clonez le dépôt et installez les dépendances :
 
-1. Désactiver l’extension TypeScript incluse
-    1) Lancer `Extensions: Show Built-in Extensions` depuis la palette de commandes VSCode
-    2) Trouver `TypeScript and JavaScript Language Features`, cliquer avec le bouton droit et sélectionner `Disable (Workspace)`
-2. Recharger la fenêtre VSCode en lançant `Developer: Reload Window` depuis la palette de commandes.
-
-## Installer les dépendances
-
-```sh
-npm install
+```bash
+cd frontend
+yarn install
 ```
 
-### Compilation et Hot-Reload pour le développement
+## Configuration
 
-```sh
-npm run dev
+Créez un fichier `.env` à la racine du projet et ajoutez les variables d'environnement nécessaires :
+
+```env
+VITE_API_ENDPOINT=<votre-api-endpoint>
 ```
 
-### Vérification des types, Compilation et Minification pour la Production
+Pour le développement, vous pouvez utiliser le fichier `.env.development` :
 
-```sh
-npm run build
+```env
+VITE_API_ENDPOINT=http://localhost:8085
 ```
 
-## Voir l'application avec le code de production
+## Démarrage
 
-```sh
-npm run preview
+Pour démarrer le serveur de développement, utilisez la commande suivante :
+
+```bash
+yarn start-dev
 ```
 
-## Déployer le code de production
+## Scripts
 
-Déployer le contenu du dossier `dist` après avoir généré le code de production.
+- `yarn build` : Compile le projet pour la production.
+- `yarn start-dev` : Démarre le serveur de développement.
 
-### Vérifier la syntaxe et le formattage avec [ESLint](https://eslint.org/)
+## Dépendances
 
-```sh
-npm run lint
-```
+- Vue 3
+- Vue Router
+- Pinia
+- @gouvfr/dsfr
+- @gouvminint/vue-dsfr
 
-### Lancer les Tests Unitaires avec [Vitest](https://vitest.dev/)
+## Contribuer
 
-```sh
-npm run test:unit
-```
+Les contributions sont les bienvenues ! Veuillez soumettre une pull request ou ouvrir une issue pour discuter des changements que vous souhaitez apporter.
 
-### Lancer les tests de composants avec [Cypress](https://www.cypress.io/)
+## Licence
 
-#### Avec une interface graphique
-
-```sh
-npm run test:ct
-```
-
-#### Sans interface graphique (pour la CI)
-
-```sh
-npm run test:ct:ci
-```
-
-### Lancer les Tests End-to-End Tests avec [Cypress](https://www.cypress.io/)
-
-```sh
-npm run test:e2e:dev
-```
-
-Cela lance les tests end-to-end avec le code de développement et le server de développement Vite.
-C’est bien plus rapide que le build de production.
-
-Cependant, il est recommandé de lancer les tests end-to-end avec le code de production : il faut lancer le build puis lancer
-cypress avec le server Vite qui sert le code de production :
-
-```sh
-npm run build
-npm run test:e2e
-```
-
-### Analyse statique du code avec [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](../LICENSE.md) pour plus de détails.
