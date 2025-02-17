@@ -218,6 +218,7 @@ export default {
     },
 
     async upload(roomId: string, file: Buffer, opts: {
+        client?: MatrixClient,
         fileName: string,
         mimeType: string,
         includeFilename?: boolean,
@@ -228,11 +229,13 @@ export default {
         let message = ""
         let uri = ""
 
-        await botGmcd.client.uploadContent(file, {name: opts.fileName, type: opts.mimeType, includeFilename: opts.includeFilename}).then(value => {
+        const client = opts.client || botGmcd.client
+
+        await client.uploadContent(file, {name: opts.fileName, type: opts.mimeType, includeFilename: opts.includeFilename}).then(value => {
 
             if (opts.mimeType.includes("image")) {
                 sendImage(
-                    botGmcd.client,
+                    client,
                     roomId,
                     opts.fileName,
                     {
@@ -243,7 +246,7 @@ export default {
                     },
                     value.content_uri)
             } else {
-                sendFile(botGmcd.client,
+                sendFile(client,
                     roomId,
                     {
                         fileName: opts.fileName,

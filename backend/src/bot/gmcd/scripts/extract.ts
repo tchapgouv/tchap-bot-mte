@@ -27,8 +27,8 @@ export function extractHistoryIfAsked(client: MatrixClient, roomId: string, body
             const bufferedDiscussion = Buffer.from(JSON.stringify(discussion));
 
             const numberOfMessages = value.length
-            sendMessage(client, roomId, numberOfMessages + " messages trouvés.")
-            client.uploadContent(bufferedDiscussion, {name: new Date().toLocaleDateString("fr-FR") + "_j-7.json", type: 'application/json', includeFilename: true})
+            sendMessage(client, roomId, numberOfMessages + " messages trouvés.\n📦 Envoi du fichier en cours.")
+            botService.upload(roomId, bufferedDiscussion, {client, fileName: new Date().toLocaleDateString("fr-FR") + "_j-7.json", mimeType: 'application/json', includeFilename: true})
         })
         return true
     }
