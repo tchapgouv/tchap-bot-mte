@@ -65,17 +65,20 @@ export default {
 
         const filter = {'lazy_load_members': 'true', 'types': ['m.room.message']}
         const order = "b" // 'f'orward || 'b'ackward
+        const url = "/rooms/" + roomId + "/messages?" +
+            "dir=" + order +
+            "&limit=" + opts.nth +
+            (opts.from ? "&from=" + opts.from : '') +
+            "&filter=" + encodeURI(JSON.stringify(filter))
 
         logger.debug("getlastNthMessages : requesting last " + opts.nth + " messages from " + roomId + " starting at " + opts.from)
+        logger.debug("getlastNthMessages : url = " + url)
+
 
         return await bot.client.http.authedRequest<{
             "chunk": ChunkElement[],
             end: string
-        }>(Method.Get, "/rooms/" + roomId + "/messages?" +
-            "dir=" + order +
-            "&limit=" + opts.nth +
-            (opts.from ? "&from=" + opts.from : '') +
-            "&filter=" + encodeURI(JSON.stringify(filter)))
+        }>(Method.Get, url)
             .then(data => {
                 for (const chunkElement of data.chunk) {
                     if (chunkElement.content.body) {
