@@ -14,6 +14,7 @@ import ldap from "ldapjs";
 import ldapGroupService from "./ldapListGroup.service.js";
 import mailGroupService from "./mailListGroup.service.js";
 import metricService, {MetricLabel} from "./metric.service.js";
+import {FileType} from "matrix-js-sdk/src/http-api/index.js";
 
 const bots: Bot[] = [
     botGmcd,
@@ -217,7 +218,7 @@ export default {
         return {roomId, message}
     },
 
-    async upload(roomId: string, file: Buffer, opts: {
+    async upload(roomId: string, file: FileType, opts: {
         client?: MatrixClient,
         fileName: string,
         mimeType: string,
