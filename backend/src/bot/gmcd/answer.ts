@@ -24,6 +24,7 @@ import {getServicesIfAsked} from "../common/scripts/getService.js";
 import {pingService} from "../common/scripts/pingService.js";
 import {BotMessageData} from "../common/BotMessageData.js";
 import {extractHistoryIfAsked} from "./scripts/extract.js";
+import {inviteInRoomIfAsked} from "../common/scripts/invite.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, _data: BotMessageData): void {
 
@@ -70,6 +71,10 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, bra
     if (!actionTaken) actionTaken = updateRoomUsersListIfAsked(client, event, data.message)
 
     if (!actionTaken) actionTaken = extractHistoryIfAsked(client, data.roomId, data.message)
+
+    // Admin only
+
+    if (!actionTaken) actionTaken = inviteInRoomIfAsked(client, data.roomId, data.sender.userId, data.message)
 
     // Actions propres au Bot
 
