@@ -28,13 +28,21 @@ export class Bot {
                     idBaseUrl: string
                 },
                 parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: {
+                    raw_message: string,
                     message: string,
                     formatted_message: string,
                     sender: RoomMember;
                     botId: string;
                     roomId: string
                 }) => void,
-                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }) => void) {
+                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: {
+                    raw_message: string,
+                    message: string,
+                    formatted_message: string,
+                    sender: RoomMember;
+                    botId: string;
+                    roomId: string
+                }) => void) {
 
         const getIST = () => {
             return this.getIdentityServerToken()
