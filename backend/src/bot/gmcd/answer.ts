@@ -74,7 +74,7 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, bra
 
     // Admin only
 
-    if (!actionTaken) actionTaken = inviteInRoomIfAsked(client, data.roomId, data.sender.userId, data.message)
+    if (!actionTaken) actionTaken = inviteInRoomIfAsked(client, data.roomId, data.sender.userId, data.message, data.raw_message)
 
     // Actions propres au Bot
 

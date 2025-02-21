@@ -148,6 +148,7 @@ export class Bot {
                     if (roomId && event.sender && this.client.getUserId()) {
 
                         const data: BotMessageData = {
+                            raw_message: event.event.content?.body,
                             message,
                             formatted_message,
                             sender: event.sender,
