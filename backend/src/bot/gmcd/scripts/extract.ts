@@ -1,6 +1,7 @@
 import {MatrixClient} from "matrix-js-sdk";
 import botService from "../../../services/bot.service.js";
 import {sendMessage} from "../../common/helper.js";
+import logger from "../../../utils/logger.js";
 
 
 /**
@@ -16,8 +17,16 @@ export function extractHistoryIfAsked(client: MatrixClient, roomId: string, body
 
         sendMessage(client, roomId, "Recherche des messages des 7 derniers jours.\nMerci de patienter 🕰️.")
 
-        botService.getHistorySinceMilliseconds(roomId, {since: 1000 * 60 * 60 * 24 * 7}).then(value => {
-            const discussion = value.map(chunkElement => {
+        botService.getHistorySinceMilliseconds(roomId, {since: 1000 * 60 * 60 * 24 * 7}).then(chunkElementList => {
+
+
+            chunkElementList.slice(0, 5).forEach(chunkElement => {
+
+                logger.debug("chunkElement", chunkElement)
+
+            })
+
+            const discussion = chunkElementList.map(chunkElement => {
                 return {
                     body: chunkElement.content.body,
                     sender: chunkElement.sender,
@@ -26,7 +35,11 @@ export function extractHistoryIfAsked(client: MatrixClient, roomId: string, body
             })
             const stringifyDiscussion = JSON.stringify(discussion, null, 2);
 
-            const numberOfMessages = value.length
+            discussion.map(discussionElement => {
+                logger.debug("discussionElement", discussionElement)
+            })
+
+            const numberOfMessages = chunkElementList.length
             sendMessage(client, roomId, numberOfMessages + " messages trouvés.\nEnvoi du fichier en cours 📦.")
             botService.upload(roomId, stringifyDiscussion, {
                 client,
