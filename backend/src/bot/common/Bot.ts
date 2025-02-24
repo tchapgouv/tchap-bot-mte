@@ -147,7 +147,7 @@ export class Bot {
 
                 if (isNewMessage) {
 
-                    const message: string = event.event.content?.body?.toLowerCase() || ""
+                    const message: string = (event.event.content?.body?.toLowerCase() || "").replace(/^> .*?\n/gm, "")
                     const formatted_message: string = event.event.content?.formatted_body?.toLowerCase() || ""
                     const roomId = event.event.room_id
 
