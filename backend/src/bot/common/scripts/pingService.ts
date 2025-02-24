@@ -12,7 +12,7 @@ import logger from "../../../utils/logger.js";
  */
 export function pingService(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /(?:^|\n| ).*ping +service +@.*?(?: |\n|$).*/si
+    const regex: RegExp = /(?:^|\n| ).*ping +service +@.*?(?:\n|$).*/si
 
     // logger.debug("pingService", regex)
     // logger.debug("pingService", body)
@@ -20,7 +20,7 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
 
     if (regex.test(body)) {
 
-        let service = body.replace(/(?:^|\n| ).*ping +service +@(.*?)(?: |\n|$).*/si, "$1");
+        let service = body.replace(/(?:^|\n| ).*ping +service +@(.*?)(?:\n|$).*/si, "$1");
 
         let botId = client.getUserId() + "";
 
