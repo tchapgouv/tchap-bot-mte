@@ -19,7 +19,7 @@ export function pingService(client: MatrixClient, event: MatrixEvent, body: stri
 
     if (regex.test(body)) {
 
-        logger.debug("pingService", body)
+        // logger.debug("pingService", body)
 
         let service = body.replace(/(?:^|\n| ).*ping +service +@(.*?)(?:\n|$).*/si, "$1");
 
