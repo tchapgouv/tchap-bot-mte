@@ -28,17 +28,14 @@ import {inviteInRoomIfAsked} from "../common/scripts/invite.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: BotMessageData): void {
 
-    const message: string | undefined = event.event.content?.body.toLowerCase()
-    const roomId = event.event.room_id
-
-    if (!roomId || !message || !event.sender) return
+    if (!data.roomId || !data.message || !event.sender) return
 
     bePoliteIfHeard(client, event, data.message)
     pingService(client, event, data.message)
 
     // Actions propres au Bot
 
-    norrisIfHeard(client, roomId, data.message)
+    norrisIfHeard(client, data.roomId, data.message)
 }
 
 export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain: Brain, data: BotMessageData): void {

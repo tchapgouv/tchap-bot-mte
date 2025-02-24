@@ -20,10 +20,7 @@ import {BotMessageData} from "../common/BotMessageData.js";
 
 export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: BotMessageData): void {
 
-    const message: string | undefined = event.event.content?.body.toLowerCase()
-    const roomId = event.event.room_id
-
-    if (!roomId || !message || !event.sender) return
+    if (!data.roomId || !data.message || !event.sender) return
 
     bePoliteIfHeard(client, event, data.message)
     pingService(client, event, data.message)
