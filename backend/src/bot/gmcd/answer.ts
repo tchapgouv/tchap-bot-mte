@@ -23,20 +23,19 @@ import {listServicesIfAsked} from "../common/scripts/listService.js";
 import {getServicesIfAsked} from "../common/scripts/getService.js";
 import {pingService} from "../common/scripts/pingService.js";
 import {BotMessageData} from "../common/BotMessageData.js";
+import {extractHistoryIfAsked} from "./scripts/extract.js";
+import {inviteInRoomIfAsked} from "../common/scripts/invite.js";
 
-export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, _data: BotMessageData): void {
+export function parseMessage(client: MatrixClient, event: MatrixEvent, _brain: Brain, data: BotMessageData): void {
 
-    const message: string | undefined = event.event.content?.body.toLowerCase()
-    const roomId = event.event.room_id
+    if (!data.roomId || !data.message || !event.sender) return
 
-    if (!roomId || !message || !event.sender) return
-
-    bePoliteIfHeard(client, event, message)
-    pingService(client, event, message)
+    bePoliteIfHeard(client, event, data.message)
+    pingService(client, event, data.message)
 
     // Actions propres au Bot
 
-    norrisIfHeard(client, roomId, message)
+    norrisIfHeard(client, data.roomId, data.message)
 }
 
 export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, brain: Brain, data: BotMessageData): void {
@@ -67,6 +66,12 @@ export function parseMessageToSelf(client: MatrixClient, event: MatrixEvent, bra
     if (!actionTaken) actionTaken = deleteMailUsersListIfAsked(client, event, data.message)
 
     if (!actionTaken) actionTaken = updateRoomUsersListIfAsked(client, event, data.message)
+
+    if (!actionTaken) actionTaken = extractHistoryIfAsked(client, data.roomId, data.message)
+
+    // Admin only
+
+    if (!actionTaken) actionTaken = inviteInRoomIfAsked(client, data.roomId, data.sender.userId, data.message, data.raw_message)
 
     // Actions propres au Bot
 

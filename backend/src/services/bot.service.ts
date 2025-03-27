@@ -3,7 +3,7 @@ import gmcdBotConfig from "../bot/gmcd/config.js";
 import botPsin from "../bot/psin/bot.js";
 import bot777 from "../bot/777/bot.js";
 import vm from "vm"
-import {MatrixClient, Preset, Visibility} from "matrix-js-sdk";
+import {IContent, MatrixClient, Method, Preset, Visibility} from "matrix-js-sdk";
 import logger from "../utils/logger.js";
 import ldapService, {Agent} from "./ldap.service.js";
 import {getPowerLevel, sendFile, sendHtmlMessage, sendImage, sendMarkdownMessage, sendMessage} from "../bot/common/helper.js";
@@ -33,6 +33,62 @@ export default {
         await vm.runInContext(script, context);
 
         return context.data
+    },
+
+    async getHistorySinceMilliseconds(roomId: string, opts: { botId?: string, since: number }) {
+        const limit = Number.parseInt(process.env.HISTORY_FETCH_MESSAGES_LIMIT + '') || 20
+
+        logger.debug("getHistory SinceMilliseconds : search with limit = " + limit + ", since = " + opts.since)
+
+        let gotAll = false
+        let events: ChunkElement[] = []
+        let from
+        while (!gotAll) {
+            logger.debug("getHistory SinceMilliseconds : from = " + from)
+            await this.getlastNthMessages(roomId, {nth: limit, botId: opts.botId, from}).then(data => {
+                for (const chunkElement of data.chunk) {
+                    if (chunkElement.age < opts.since) {
+                        events.push(chunkElement)
+                    } else {
+                        gotAll = true
+                    }
+                }
+                from = data.end
+            })
+        }
+        logger.debug("getHistory SinceMilliseconds : found " + events.length)
+        return events
+    },
+
+    async getlastNthMessages(roomId: string, opts: { nth: number, botId?: string, from?: string }) {
+
+        const bot = this.getBotById(opts.botId || process.env.BOT_USER_ID + "")
+
+        const filter = {'lazy_load_members': 'true', 'types': ['m.room.message']}
+        const order = "b" // 'f'orward || 'b'ackward
+        const url = "/rooms/" + roomId + "/messages?" +
+            "dir=" + order +
+            "&limit=" + opts.nth +
+            (opts.from ? "&from=" + opts.from : '') +
+            "&filter=" + encodeURI(JSON.stringify(filter))
+
+        logger.debug("getHistory lastNthMessages : requesting last " + opts.nth + " messages from " + roomId + " starting at " + opts.from)
+        logger.debug("getHistory lastNthMessages : url = " + url)
+
+
+        return await bot.client.http.authedRequest<{
+            "chunk": ChunkElement[],
+            end: string
+        }>(Method.Get, url)
+            .then(data => {
+                // for (const chunkElement of data.chunk) {
+                //     if (chunkElement.content.body) {
+                //         console.log(chunkElement.content.body)
+                //     }
+                // }
+                logger.debug("getHistory lastNthMessages : got = " + data.chunk.length)
+                return {chunk: data.chunk, end: data.end}
+            })
     },
 
     async inviteUserInRoom(userMail: string, roomId: string, opts = {retries: 0, logAlreadyInvited: true}) {
@@ -161,7 +217,8 @@ export default {
         return {roomId, message}
     },
 
-    async upload(roomId: string, file: Buffer, opts: {
+    async upload(roomId: string, file: Buffer | string, opts: {
+        client?: MatrixClient,
         fileName: string,
         mimeType: string,
         includeFilename?: boolean,
@@ -172,27 +229,29 @@ export default {
         let message = ""
         let uri = ""
 
-        await botGmcd.client.uploadContent(file, {name: opts.fileName, type: opts.mimeType, includeFilename: opts.includeFilename}).then(value => {
+        const client = opts.client || botGmcd.client
+
+        await client.uploadContent(file, {name: opts.fileName, type: opts.mimeType, includeFilename: opts.includeFilename}).then(value => {
 
             if (opts.mimeType.includes("image")) {
                 sendImage(
-                    botGmcd.client,
+                    client,
                     roomId,
                     opts.fileName,
                     {
                         mimeType: opts.mimeType,
                         width: opts.width ? opts.width : 800,
                         height: opts.height ? opts.height : 600,
-                        size: file.byteLength
+                        size: (typeof file === 'string') ? Buffer.byteLength(file, 'utf8') : file.byteLength,
                     },
                     value.content_uri)
             } else {
-                sendFile(botGmcd.client,
+                sendFile(client,
                     roomId,
                     {
                         fileName: opts.fileName,
                         mimeType: opts.mimeType,
-                        size: file.byteLength,
+                        size: (typeof file === 'string') ? Buffer.byteLength(file, 'utf8') : file.byteLength,
                         url: value.content_uri
                     })
             }
@@ -630,4 +689,17 @@ export default {
             }
         }
     }
+}
+
+export interface ChunkElement {
+
+    content: IContent
+    origin_server_ts: number
+    room_id: string
+    sender: string
+    type: string
+    // unsigned:
+    event_id: string
+    user_id: string
+    age: number
 }

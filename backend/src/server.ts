@@ -99,7 +99,6 @@ try {
 }
 const currentToken = crypto.createHash('sha512').update(new Date().toLocaleDateString("fr-FR") + "-" + process.env.JWT_KEY).digest('hex')
 logger.info("Current Time Based Token : ",
-    currentToken,
     currentToken.substring(0, 15) + "***************" + currentToken.substring(currentToken.length - 15, currentToken.length),
     "Based on : ",
     new Date().toLocaleDateString("fr-FR") + "-JWT_KEY")

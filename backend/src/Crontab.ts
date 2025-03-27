@@ -5,8 +5,10 @@ import botService from "./services/bot.service.js";
 import mailGroupService from "./services/mailListGroup.service.js";
 import fetchWithError from "./utils/fetchWithError.js";
 import {CONTEXT} from "./bot/gmcd/scripts/ollama.js";
+import {sendMessage} from "./bot/common/helper.js";
 
 const MIDNIGHT = '0 0 * * *'
+const ONCE_A_WEEK_ON_SUNDAY = '0 23 * * 0'
 
 function updateLdapListGroups() {
     ldapGroupService.findAll().then(ldapListGroups => {
@@ -65,6 +67,32 @@ function wakeOllamaUp() {
         })
 }
 
+function dumpBNumInfoHistory() {
+
+    const gmcdBot = botService.getBotById(process.env.BOT_USER_ID + '')
+    const BNUM_INFO_ROOM_ID = '!PHwHATDnuimhMowBKN:agent.dev-durable.tchap.gouv.fr'
+
+    botService.getHistorySinceMilliseconds(BNUM_INFO_ROOM_ID, {since: 1000 * 60 * 60 * 24 * 7}).then(value => {
+        const discussion = value.map(chunkElement => {
+            return {
+                body: chunkElement.content.body,
+                sender: chunkElement.sender,
+                timestamp: chunkElement.origin_server_ts
+            }
+        })
+        const stringifyDiscussion = JSON.stringify(discussion, null, 2);
+
+        sendMessage(gmcdBot.client, BNUM_INFO_ROOM_ID, "📦 Historique des conversations des 7 derniers jours :")
+        botService.upload(BNUM_INFO_ROOM_ID, stringifyDiscussion, {
+            client: gmcdBot.client,
+            fileName: BNUM_INFO_ROOM_ID.replace(/:.*?($| )/g, "$1") + "_" + new Date().toLocaleDateString("fr-FR") + "_j-7.json",
+            mimeType: 'application/json',
+            includeFilename: true
+        })
+    })
+}
+
+
 export default class Crontab {
 
     init() {
@@ -76,6 +104,12 @@ export default class Crontab {
             updateMailListGroups()
             wakeOllamaUp()
         });
+
+        crontab.schedule(ONCE_A_WEEK_ON_SUNDAY, () => {
+
+            logger.notice('Running sunday tasks')
+            dumpBNumInfoHistory()
+        })
 
     }
 }

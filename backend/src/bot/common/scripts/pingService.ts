@@ -12,15 +12,16 @@ import logger from "../../../utils/logger.js";
  */
 export function pingService(client: MatrixClient, event: MatrixEvent, body: string) {
 
-    const regex: RegExp = /.*ping +service +@.*/i
+    const regex: RegExp = /(?:^|\n| ).*ping +service +@.*?(?:\n|$).*/si
 
-    logger.debug("pingService", regex)
-    logger.debug("pingService", body)
-    logger.debug("pingService", regex.test(body))
+    // logger.debug("pingService", regex)
+    // logger.debug("pingService", regex.test(body))
 
     if (regex.test(body)) {
 
-        let service = body.replace(/.*ping +service +@(.*)/, "$1");
+        // logger.debug("pingService", body)
+
+        let service = body.replace(/(?:^|\n| ).*ping +service +@(.*?)(?:\n|$).*/si, "$1");
 
         let botId = client.getUserId() + "";
 

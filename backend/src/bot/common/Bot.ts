@@ -28,13 +28,21 @@ export class Bot {
                     idBaseUrl: string
                 },
                 parseMessageToSelf: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: {
+                    raw_message: string,
                     message: string,
                     formatted_message: string,
                     sender: RoomMember;
                     botId: string;
                     roomId: string
                 }) => void,
-                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: { message: string, formatted_message: string, sender: RoomMember; botId: string; roomId: string }) => void) {
+                parseMessage: (arg0: MatrixClient, arg1: MatrixEvent, arg2: Brain, arg3: {
+                    raw_message: string,
+                    message: string,
+                    formatted_message: string,
+                    sender: RoomMember;
+                    botId: string;
+                    roomId: string
+                }) => void) {
 
         const getIST = () => {
             return this.getIdentityServerToken()
@@ -105,7 +113,7 @@ export class Bot {
 
             const botId = this.client.getUserId()
 
-            if (event.getType() === EventType.RoomMessage && botId) {
+            if (event.getType() === EventType.RoomMessage && botId && event.sender?.userId) {
 
                 if (event.sender?.userId === botId) {
                     logger.info("Message is mine")
@@ -122,7 +130,7 @@ export class Bot {
 
                 let isSelfMentioned = userIds && userIds.indexOf(botId) > -1;
                 const body = event.event.content?.formatted_body ? event.event.content?.formatted_body : event.event.content?.body
-                if (!isSelfMentioned && botName) isSelfMentioned = body.toLowerCase().replace(/> .*?\n/g, '').includes("@" + botName.toLowerCase())
+                if (!isSelfMentioned && botName && body) isSelfMentioned = body.toLowerCase().replace(/> .*?\n/g, '').includes("@" + botName.toLowerCase())
 
                 logger.debug("Is self mentioned ? ", isSelfMentioned)
                 logger.debug("sender = ", event.getSender())
@@ -139,7 +147,7 @@ export class Bot {
 
                 if (isNewMessage) {
 
-                    const message: string = event.event.content?.body?.toLowerCase() || ""
+                    const message: string = (event.event.content?.body?.toLowerCase() || "").replace(/^> .*?\n/gm, "")
                     const formatted_message: string = event.event.content?.formatted_body?.toLowerCase() || ""
                     const roomId = event.event.room_id
 
@@ -148,6 +156,7 @@ export class Bot {
                     if (roomId && event.sender && this.client.getUserId()) {
 
                         const data: BotMessageData = {
+                            raw_message: event.event.content?.body,
                             message,
                             formatted_message,
                             sender: event.sender,

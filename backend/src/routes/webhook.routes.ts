@@ -56,7 +56,7 @@ webhookRouter.put("/api/webhook/update", verifyOrigin, verifyAuth, update);
  */
 webhookRouter.post("/api/webhook/post/:webhook?", postMessage)
 
-webhookRouter.post("/api/webhook/upload/:webhook?", fileUpload({
+const getCheckAndLimitFile = fileUpload({
     abortOnLimit: true,
     limits: {
         fileSize: 10 * 1024 * 1024
@@ -67,6 +67,8 @@ webhookRouter.post("/api/webhook/upload/:webhook?", fileUpload({
             logger.debug(msg)
         }
     }
-}), uploadFile)
+})
+
+webhookRouter.post("/api/webhook/upload/:webhook?", getCheckAndLimitFile, uploadFile)
 
 export default webhookRouter
